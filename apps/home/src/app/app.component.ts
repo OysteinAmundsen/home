@@ -1,16 +1,20 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { WidgetComponent } from './shared/widget/widget.component';
+import { WidgetService } from './shared/widget/widget.service';
 
 @Component({
-  standalone: true,
-  imports: [RouterModule, WidgetComponent],
+  imports: [RouterModule, CommonModule, WidgetComponent],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  http = inject(HttpClient);
-  widgets = signal([]);
+  widgetService = inject(WidgetService);
+  widgets = this.widgetService.widgets;
+
+  filter(id: number | undefined) {
+    this.widgetService.filter.set(id);
+  }
 }

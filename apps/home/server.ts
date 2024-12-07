@@ -1,60 +1,59 @@
-import { APP_BASE_HREF } from '@angular/common';
-import { CommonEngine } from '@angular/ssr';
+import {
+  AngularNodeAppEngine,
+  createNodeRequestHandler,
+  isMainModule,
+  writeResponseToNodeResponse,
+} from '@angular/ssr/node';
 import express from 'express';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import bootstrap from './src/main.server';
+import { widgetRoutes } from './src/api/widget/widget.route.js';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
   const server = express();
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
   const browserDistFolder = resolve(serverDistFolder, '../browser');
-  const indexHtml = join(serverDistFolder, 'index.server.html');
 
-  const commonEngine = new CommonEngine();
+  // Here, we now use the `AngularNodeAppEngine` instead of the `CommonEngine`
+  const angularNodeAppEngine = new AngularNodeAppEngine();
 
-  server.set('view engine', 'html');
-  server.set('views', browserDistFolder);
+  // Setup api routes
+  widgetRoutes(server);
 
-  // Example Express Rest API endpoints
-  server.get('/api/test', (req, res) => res.send('Hello World!'));
-  // Serve static files from /browser
+  // Serve static files from the browser distribution folder
   server.get(
     '**',
     express.static(browserDistFolder, {
       maxAge: '1y',
       index: 'index.html',
-    })
+    }),
   );
 
-  // All regular routes use the Angular engine
   server.get('**', (req, res, next) => {
-    const { protocol, originalUrl, baseUrl, headers } = req;
+    // Yes, this is executed in devMode via the Vite DevServer
+    console.log('request', req.url, res.statusCode);
 
-    commonEngine
-      .render({
-        bootstrap,
-        documentFilePath: indexHtml,
-        url: `${protocol}://${headers.host}${originalUrl}`,
-        publicPath: browserDistFolder,
-        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
-      })
-      .then((html) => res.send(html))
-      .catch((err) => next(err));
+    angularNodeAppEngine
+      .handle(req, { server: 'express' })
+      .then((response) =>
+        response ? writeResponseToNodeResponse(response, res) : next(),
+      )
+      .catch(next);
   });
 
   return server;
 }
 
-function run(): void {
+const server = app();
+if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
-
-  // Start up the Node server
-  const server = app();
   server.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    console.log(`Node Express server listening on http://localhost:\${port}`);
   });
 }
 
-run();
+console.warn('Node Express server started');
+
+// This exposes the RequestHandler
+export const reqHandler = createNodeRequestHandler(server);

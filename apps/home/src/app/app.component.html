@@ -1,5 +1,23 @@
 <h1>My dashboard</h1>
 
-@for (widget of widgets(); track widget) {
-<app-widget></app-widget>
-}
+<nav>
+  <button (click)="filter(1)">Widget 1</button>
+  <button (click)="filter(2)">Widget 2</button>
+  <button (click)="filter(undefined)">All</button>
+</nav>
+
+<section>
+  @for (widget of widgets.value(); track widget.id) {
+    <app-widget [data]="widget"> </app-widget>
+  } @empty {
+    <div>
+      @if (widgets.isLoading()) {
+        <span class="loading">Loading...</span>
+      } @else if (widgets.error()) {
+        <span class="error">{{ widgets.error() }}</span>
+      } @else {
+        <span class="empty">No widgets found</span>
+      }
+    </div>
+  }
+</section>
