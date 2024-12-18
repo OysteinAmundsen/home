@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { WidgetComponent } from './shared/widget/widget.component';
 import { WidgetService } from './shared/widget/widget.service';
@@ -13,6 +14,9 @@ import { WidgetService } from './shared/widget/widget.service';
 export class AppComponent {
   widgetService = inject(WidgetService);
   widgets = this.widgetService.widgets;
+  error = computed(
+    () => (this.widgets.error() as HttpErrorResponse).error.error,
+  );
 
   filter(id: number | undefined) {
     this.widgetService.filter.set(id);

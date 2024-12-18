@@ -3,6 +3,7 @@
 <nav>
   <button (click)="filter(1)">Widget 1</button>
   <button (click)="filter(2)">Widget 2</button>
+  <button (click)="filter(3)">Widget 3</button>
   <button (click)="filter(undefined)">All</button>
 </nav>
 
@@ -14,7 +15,7 @@
       @if (widgets.isLoading()) {
         <span class="loading">Loading...</span>
       } @else if (widgets.error()) {
-        <span class="error">{{ widgets.error() }}</span>
+        <span class="error">{{ error() }}</span>
       } @else {
         <span class="empty">No widgets found</span>
       }

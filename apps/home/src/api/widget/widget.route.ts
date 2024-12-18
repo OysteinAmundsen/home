@@ -7,8 +7,9 @@ import express from 'express';
  */
 export function widgetRoutes(server: express.Express) {
   const widgetData = [
-    { id: 1, name: 'Widget 1', componentName: 'widget1' },
-    { id: 2, name: 'Widget 2', componentName: 'widget2' },
+    { id: 1, name: 'Weather', componentName: 'widget1' },
+    { id: 2, name: 'Taxes', componentName: 'widget2' },
+    { id: 3, name: 'Something else', componentName: 'widget3' },
   ];
 
   /**
@@ -30,8 +31,6 @@ export function widgetRoutes(server: express.Express) {
       } else {
         res.json([widget]);
       }
-    } else {
-      res.status(400).json({ error: 'Invalid widget ID' });
     }
     console.log('request', req.url, res.statusCode);
   });
