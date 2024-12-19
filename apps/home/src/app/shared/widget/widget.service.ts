@@ -12,9 +12,14 @@ export type Widget = {
 export class WidgetService {
   private http = inject(HttpClient);
 
+  /** Filter widgets by id */
   filter = signal<number | undefined>(undefined);
+
+  /** Fetches the widgets from the server */
   widgets = resource({
+    // Triggers
     request: () => ({ id: this.filter() }),
+    // Actions
     loader: async ({ request }) => {
       // Cannot use fetch directly because Angular's SSR does not support it.
       // I get a `TypeError: Failed to parse URL` from SSR when using fetch.
@@ -36,9 +41,9 @@ export class WidgetService {
   async loadWidget(componentName: string | undefined) {
     let component: any;
     switch (componentName) {
-      case 'widget1':
-        component = (await import('../../views/widget1.component'))
-          .Widget1Component;
+      case 'weather':
+        component = (await import('../../views/weather.component'))
+          .WeatherComponent;
         break;
       case 'widget2':
         component = (await import('../../views/widget2.component'))

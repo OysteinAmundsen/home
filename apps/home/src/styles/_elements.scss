@@ -1,0 +1,38 @@
+html {
+  height: 100dvh;
+}
+body {
+  height: 100%;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  font-family: 'Roboto', sans-serif;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  padding: 0;
+  margin: 0;
+}
+
+button {
+  color: var(--header-emphasis-color);
+  background-color: var(--header-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1rem;
+}
+
+.material-symbols-outlined {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+  overflow: hidden;
+}
+
+h1 {
+  color: var(--text-emphasis-color);
+  margin: 0;
+}

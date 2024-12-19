@@ -1,4 +1,12 @@
 :host {
+  background-image: var(--background-image);
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 1rem;
   section {
     display: flex;
     gap: 1rem;

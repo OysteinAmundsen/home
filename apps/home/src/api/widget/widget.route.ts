@@ -7,7 +7,7 @@ import express from 'express';
  */
 export function widgetRoutes(server: express.Express) {
   const widgetData = [
-    { id: 1, name: 'Weather', componentName: 'widget1' },
+    { id: 1, name: 'Weather', componentName: 'weather' },
     { id: 2, name: 'Taxes', componentName: 'widget2' },
     { id: 3, name: 'Something else', componentName: 'widget3' },
   ];
@@ -17,7 +17,7 @@ export function widgetRoutes(server: express.Express) {
    */
   server.get('/api/widgets', (req, res) => {
     res.json(widgetData);
-    console.log('request', req.url, res.statusCode);
+    console.log('[APP]', req.method, req.url, res.statusCode);
   });
 
   /**
@@ -32,6 +32,6 @@ export function widgetRoutes(server: express.Express) {
         res.json([widget]);
       }
     }
-    console.log('request', req.url, res.statusCode);
+    console.log('[APP]', req.method, req.url, res.statusCode);
   });
 }

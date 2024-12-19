@@ -1,0 +1,12 @@
+:root {
+  color-scheme: light dark;
+  --text-color: light-dark(hsl(0, 0%, 45%), hsl(0, 0%, 85%));
+  --text-emphasis-color: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
+  --background-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 15%));
+  --header-emphasis-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 97%));
+  --header-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 63%));
+  --header-background: light-dark(hsl(0, 0%, 30%), hsl(0, 0%, 24%));
+  --shadow-color: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 4%));
+  --border-color: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 30%));
+  --border-radius: 0.5rem;
+}

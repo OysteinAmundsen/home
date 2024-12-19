@@ -9,6 +9,11 @@ import {
 } from '@angular/core';
 import { Widget, WidgetService } from './widget.service';
 
+/**
+ * Container for widget components.
+ *
+ * This renders a standard ui wrapper for all widgets when displayed in the dashboard.
+ */
 @Component({
   selector: 'app-widget',
   templateUrl: './widget.component.html',

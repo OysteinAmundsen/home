@@ -5,9 +5,11 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { widgetRoutes } from './src/api/widget/widget.route.js';
+import { proxyRoutes } from './src/api/proxy.routes';
+import { widgetRoutes } from './src/api/widget/widget.route';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -21,6 +23,11 @@ export function app(): express.Express {
   // Setup api routes
   widgetRoutes(server);
 
+  // Setup reverse proxy routes
+  Object.entries(proxyRoutes).forEach(([path, config]) =>
+    server.get(path, createProxyMiddleware(config)),
+  );
+
   // Serve static files from the browser distribution folder
   server.get(
     '**',
@@ -32,7 +39,7 @@ export function app(): express.Express {
 
   server.get('**', (req, res, next) => {
     // Yes, this is executed in devMode via the Vite DevServer
-    console.log('request', req.url, res.statusCode);
+    console.log('[APP]', req.method, req.url, res.statusCode);
 
     angularNodeAppEngine
       .handle(req, { server: 'express' })

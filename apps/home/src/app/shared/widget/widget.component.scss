@@ -1,18 +1,23 @@
 :host {
-  display: block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0.25rem 0.5rem 0.5rem -0.35rem var(--shadow-color);
 
   header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background: #f0f0f0;
+    padding: 0.5rem 1rem;
+    background: var(--header-background);
+    color: var(--header-color);
+    font-size: 0.9rem;
   }
 
   section {
     padding: 1rem;
+    background-color: var(--background-color);
   }
 }
