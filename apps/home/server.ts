@@ -60,9 +60,9 @@ export async function bootstrap() {
 
 const server = await bootstrap();
 if (isMainModule(import.meta.url)) {
-  const port = process.env['PORT'] || 4000;
+  const port = process.env['PORT'] || 4200;
   server.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:\${port}`);
+    console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }
 
