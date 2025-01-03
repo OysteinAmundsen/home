@@ -10,9 +10,10 @@ import {
 import { RouterModule } from '@angular/router';
 import { WidgetComponent } from './shared/widget/widget.component';
 import { WidgetService } from './shared/widget/widget.service';
+import { TimeComponent } from './shared/time.component';
 
 @Component({
-  imports: [RouterModule, CommonModule, WidgetComponent],
+  imports: [RouterModule, CommonModule, WidgetComponent, TimeComponent],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

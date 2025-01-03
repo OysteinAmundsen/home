@@ -27,6 +27,16 @@ export class IconPipe implements PipeTransform {
         return 'rainy_heavy';
       case 'partlycloudy_night':
         return 'partly_cloudy_night';
+      case 'snow':
+      case 'lightsnow':
+        return 'weather_snowy';
+      case 'lightsnowshowers_day':
+      case 'lightsnowshowers_night':
+        return 'weather_snowy';
+      case 'snowshowers_day':
+        return 'sunny_snowing';
+      case 'snowshowers_night':
+        return 'cloudy_snowing';
     }
     return value;
   }

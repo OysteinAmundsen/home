@@ -4,24 +4,20 @@ import {
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ApiModule } from './src/api/api.module';
 import { proxyRoutes } from './src/api/proxy.routes';
-import { widgetRoutes } from './src/api/widget/widget.route';
 
-// The Express app is exported so that it can be used by serverless Functions.
-export function app(): express.Express {
-  const server = express();
-  const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-  const browserDistFolder = resolve(serverDistFolder, '../browser');
-
-  // Here, we now use the `AngularNodeAppEngine` instead of the `CommonEngine`
-  const angularNodeAppEngine = new AngularNodeAppEngine();
-
-  // Setup api routes
-  widgetRoutes(server);
+export async function bootstrap() {
+  // Create the NestJS application
+  const app = await NestFactory.create<NestExpressApplication>(ApiModule);
+  // Get the Express instance
+  const server = app.getHttpAdapter().getInstance();
 
   // Setup reverse proxy routes
   Object.entries(proxyRoutes).forEach(([path, config]) =>
@@ -29,6 +25,8 @@ export function app(): express.Express {
   );
 
   // Serve static files from the browser distribution folder
+  const serverDistFolder = dirname(fileURLToPath(import.meta.url));
+  const browserDistFolder = resolve(serverDistFolder, '../browser');
   server.get(
     '**',
     express.static(browserDistFolder, {
@@ -37,30 +35,36 @@ export function app(): express.Express {
     }),
   );
 
+  // SSR middleware: Render out the angular application server-side
+  const angularNodeAppEngine = new AngularNodeAppEngine();
   server.get('**', (req, res, next) => {
-    // Yes, this is executed in devMode via the Vite DevServer
-    console.log('[APP]', req.method, req.url, res.statusCode);
-
     angularNodeAppEngine
       .handle(req, { server: 'express' })
-      .then((response) =>
-        response ? writeResponseToNodeResponse(response, res) : next(),
-      )
+      .then((response) => {
+        // If the Angular app returned a response, write it to the Express response
+        if (response) {
+          const n = writeResponseToNodeResponse(response, res);
+          console.log('[SSR]', req.method, req.url, response.status);
+          return n;
+        }
+        // If not, this is not an Angular route, so continue to the next middleware
+        return next();
+      })
       .catch(next);
   });
 
+  // Initialize the NestJS application and return the server
+  app.init();
   return server;
 }
 
-const server = app();
+const server = await bootstrap();
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
   server.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:\${port}`);
   });
 }
-
-console.warn('Node Express server started');
 
 // This exposes the RequestHandler
 export const reqHandler = createNodeRequestHandler(server);

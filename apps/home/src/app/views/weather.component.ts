@@ -31,7 +31,7 @@ import { Widget } from '../shared/widget/widget.service';
             ></span>
             <span class="temp"
               >{{
-                time.data.instant.details.air_temperature | number: '2.1'
+                time.data.instant.details.air_temperature | number: '1.1'
               }}°C</span
             >
           </div>
@@ -54,6 +54,7 @@ import { Widget } from '../shared/widget/widget.service';
         }
         .temp {
           width: 3rem;
+          text-align: right;
         }
       }
     }

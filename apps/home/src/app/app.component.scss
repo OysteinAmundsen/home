@@ -7,6 +7,18 @@
   gap: 0.5rem;
   height: 100%;
   padding: 1rem;
+  header {
+    display: flex;
+    place-items: center;
+    h1 {
+      flex: 1;
+      text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+    }
+  }
+  nav {
+    display: flex;
+    gap: 0.25rem;
+  }
   section {
     display: flex;
     gap: 1rem;
