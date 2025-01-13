@@ -1,25 +1,30 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-import { NxWelcomeComponent } from './nx-welcome.component';
+import { signal } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
+import { AppComponent } from './app.component';
+import { WidgetService } from './shared/widget/widget.service';
 
 describe('AppComponent', () => {
+  let fixture: ComponentFixture<AppComponent>;
+  let component: AppComponent;
+
+  const widgetStub = {
+    filter: signal<number | undefined>(undefined),
+    widgets: { error: jest.fn() },
+    loadWidget: jest.fn(),
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent, NxWelcomeComponent, RouterModule.forRoot([])],
+      imports: [RouterModule.forRoot([]), AppComponent],
+      providers: [{ provide: WidgetService, useValue: widgetStub }],
     }).compileComponents();
+
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
   });
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Welcome home');
-  });
-
-  it(`should have as title 'home'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('home');
+  it('should create the app', () => {
+    expect(component).toBeTruthy();
   });
 });

@@ -10,7 +10,7 @@ import {
   ResourceRef,
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { IconPipe } from '../shared/icon.pipe';
+import { IconPipe } from '../shared/pipes/icon.pipe';
 import { Widget } from '../shared/widget/widget.service';
 
 @Component({

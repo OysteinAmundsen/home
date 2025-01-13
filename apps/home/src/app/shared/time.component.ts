@@ -1,6 +1,7 @@
-import { Component, computed } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map, switchMap, timer } from 'rxjs';
+import { Component, computed, inject } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { distinctUntilChanged, map, switchMap, timer } from 'rxjs';
+import { VisibilityService } from './visibility.service';
 
 @Component({
   selector: 'app-time',
@@ -12,12 +13,27 @@ import { map, switchMap, timer } from 'rxjs';
   `,
 })
 export class TimeComponent {
-  now$ = timer(1000 - new Date().getMilliseconds(), 1000).pipe(
-    switchMap(() => timer(0, 1000)),
-    map(() => new Date()),
+  private readonly visibility = inject(VisibilityService);
+  private isVisible$ = toObservable(this.visibility.isBrowserActive);
+  // Timer that emits the current time every second on the second
+  // But only if the page is currently active. This saves CPU cycles
+  // when user is not actively using the page.
+  private now$ = this.isVisible$.pipe(
+    distinctUntilChanged(),
+    switchMap((isRunning) =>
+      isRunning
+        ? timer(1000 - new Date().getMilliseconds(), 1000).pipe(
+            switchMap(() => timer(0, 1000)),
+            map(() => new Date()),
+          )
+        : [],
+    ),
   );
-  now = toSignal(this.now$);
-  formatter = new Intl.DateTimeFormat('no-NB', {
+  // The current time as a signal
+  private now = toSignal(this.now$);
+
+  // INTL formatter for date and time
+  private formatter = new Intl.DateTimeFormat('no-NB', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -26,5 +42,11 @@ export class TimeComponent {
     second: 'numeric',
     hour12: false,
   });
-  time = computed(() => this.formatter.format(this.now()));
+
+  /** The current time formatted as a string */
+  time = computed(() =>
+    this.visibility.isBrowserActive()
+      ? this.formatter.format(this.now())
+      : this.formatter.format(this.now()).substring(0, 15) + 'Inactive!',
+  );
 }

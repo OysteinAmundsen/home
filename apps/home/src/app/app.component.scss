@@ -1,12 +1,57 @@
 :host {
-  background-image: var(--background-image);
-  background-repeat: no-repeat;
-  background-size: cover;
+  // Page layout
   display: grid;
   grid-template-rows: auto auto auto 1fr;
   gap: 0.5rem;
   height: 100%;
   padding: 1rem;
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+
+  &.offline {
+    --vignette-color: rgb(78, 32, 32);
+  }
+
+  // Apply background image
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -5%;
+    background-image: url('/api/background');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    z-index: -1;
+    transition: background-position 0.1s ease;
+  }
+  // Move background with cursor if user allows motion
+  &:not(.inactive)::before {
+    @media (prefers-reduced-motion: no-preference) {
+      background-position: var(--background-position-x, center)
+        var(--background-position-y, center);
+    }
+  }
+
+  // Apply vignette when browser tab is inactive
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle at center center,
+      transparent 0%,
+      var(--vignette-color, black) 100%
+    );
+    z-index: -1;
+    opacity: 0.2;
+    transition: opacity 0.5s ease-in-out;
+  }
+  &.inactive::after {
+    opacity: 1;
+  }
+
+  // Other styles
   header {
     display: flex;
     place-items: center;
