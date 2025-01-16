@@ -1,12 +1,12 @@
 {
   "executors": {
     "application": {
-      "implementation": "./src/executors/application/executor",
+      "implementation": "./src/executors/application",
       "schema": "./src/executors/application/schema.json",
       "description": "Application executor"
     },
     "dev-server": {
-      "implementation": "./src/executors/dev-server/executor",
+      "implementation": "./src/executors/dev-server",
       "schema": "./src/executors/dev-server/schema.json",
       "description": "dev-server executor"
     }

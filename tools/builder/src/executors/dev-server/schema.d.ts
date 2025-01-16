@@ -1,1 +1,1 @@
-export interface ExecutorExecutorSchema {} // eslint-disable-line
+export interface CustomDevServerSchema {} // eslint-disable-line

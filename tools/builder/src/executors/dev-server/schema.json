@@ -1,8 +1,9 @@
 {
   "$schema": "https://json-schema.org/schema",
   "version": 2,
-  "title": "Dev-server executor",
-  "description": "",
+  "$id": "CustomDevServerSchema",
+  "title": "Custom dev server schema for Angular build facade",
+  "description": "Dev server target options",
   "type": "object",
   "properties": {},
   "required": []

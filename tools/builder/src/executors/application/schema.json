@@ -1,8 +1,9 @@
 {
   "$schema": "https://json-schema.org/schema",
   "version": 2,
-  "title": "Application executor",
-  "description": "",
+  "$id": "BuildCustomApplicationSchema",
+  "title": "Custom application schema for Build Facade",
+  "description": "Application target options",
   "type": "object",
   "properties": {},
   "required": []
