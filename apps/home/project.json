@@ -6,8 +6,11 @@
   "sourceRoot": "apps/home/src",
   "tags": [],
   "targets": {
+    "custom": {
+      "executor": "@home/builder:application"
+    },
     "build": {
-      "executor": "@home/builder:application",
+      "executor": "@angular-devkit/build-angular:application",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/home",
@@ -55,7 +58,7 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "executor": "@home/builder:dev-server",
+      "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
           "buildTarget": "home:build:production"
