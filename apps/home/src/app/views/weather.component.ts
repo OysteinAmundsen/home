@@ -79,6 +79,11 @@ export class WeatherComponent {
       // Actions (will trigger only once when initialized)
       loader: async () => {
         return new Promise((resolve, reject) => {
+          if (typeof window === 'undefined') {
+            // Do not ask for geolocation in SSR
+            reject('Geolocation is not supported in this environment');
+            return;
+          }
           if (!navigator.geolocation) {
             // Browser does not support geolocation
             reject('Geolocation is not supported by your browser');

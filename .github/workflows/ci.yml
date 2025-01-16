@@ -26,10 +26,14 @@ jobs:
       #   run: bun x nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e-ci"
 
       # Cache node_modules
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: bun x nx-cloud record -- echo Hello World
       # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
-      - run: bun run nx affected --base=origin/master -t lint test build
+      - name: Run affected tasks
+        run: bun run nx affected --base=origin/master -t lint test build
