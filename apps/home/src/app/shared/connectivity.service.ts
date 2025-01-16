@@ -10,7 +10,9 @@ export class ConnectivityService implements OnDestroy {
   // In SSR environment, the window object does not exist. We need to get a mockup window object from the globalThis object.
   // from angulars DOCUMENT object.
   private window = globalThis.window || this.document.defaultView;
-  private isOffline = signal(!navigator.onLine);
+  private isOffline = signal(
+    typeof window === 'undefined' || !navigator.onLine,
+  );
   /** Readonly flag set to true if browser looses connectivity */
   public isBrowserOffline = computed(() => this.isOffline());
 
@@ -43,6 +45,8 @@ export class ConnectivityService implements OnDestroy {
 
   /* Event handler for connectivity state changes */
   private updateConnectivityState() {
+    // Do not ask for geolocation in SSR
+    if (typeof window === 'undefined') return;
     this.isOffline.set(!navigator.onLine);
   }
 }
