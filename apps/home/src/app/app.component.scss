@@ -41,7 +41,7 @@
     background-image: radial-gradient(
       circle at center center,
       transparent 0%,
-      var(--vignette-color, black) 100%
+      var(--vignette-color, var(--background-color)) 100%
     );
     z-index: -1;
     opacity: 0.2;

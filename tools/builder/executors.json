@@ -1,0 +1,16 @@
+{
+  "executors": {
+    "application": {
+      "implementation": "./src/application/index",
+      "schema": "./src/application/schema.json",
+      "description": "Application"
+    }
+  },
+  "builders": {
+    "dev-server": {
+      "implementation": "./src/dev-server/index",
+      "schema": "./src/dev-server/schema.json",
+      "description": "dev-server"
+    }
+  }
+}
