@@ -4,14 +4,16 @@
   "license": "MIT",
   "scripts": {
     "nx": "nx",
-    "watch": "node --watch dist/apps/home/server/server.mjs",
     "start": "nx serve home",
-    "prod": "bun run build && bun dist/apps/home/server/server.mjs",
-    "build": "nx build home",
+    "build": "nx build home && bun run build:wb",
     "test": "nx test home",
     "lint": "nx lint home",
     "e2e": "nx e2e home",
-    "update": "nx migrate latest"
+    "build:wb": "bun x webpack --config ./apps/home/builders/webpack.config.js",
+    "watch": "node --watch dist/apps/home/server/server.mjs",
+    "prod": "bun run build && bun dist/apps/home/server/server.mjs",
+    "update": "nx migrate latest",
+    "analyze": "bunx source-map-explorer"
   },
   "private": true,
   "dependencies": {
@@ -45,9 +47,15 @@
     "mqtt": "^5.10.3",
     "nats": "^2.29.1",
     "rxjs": "~7.8.1",
+    "workbox-core": "^7.3.0",
+    "workbox-expiration": "^7.3.0",
+    "workbox-precaching": "^7.3.0",
+    "workbox-routing": "^7.3.0",
+    "workbox-strategies": "^7.3.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@angular-builders/custom-esbuild": "^19.0.0",
     "@angular-devkit/build-angular": "~19.0.7",
     "@angular-devkit/core": "~19.0.7",
     "@angular-devkit/schematics": "~19.0.7",
@@ -88,6 +96,9 @@
     "ts-node": "10.9.2",
     "tslib": "^2.8.1",
     "typescript": "~5.6.3",
-    "typescript-eslint": "^8.20.0"
+    "typescript-eslint": "^8.20.0",
+    "webpack-cli": "^6.0.1",
+    "workbox-cli": "^7.3.0",
+    "workbox-build": "^7.3.0"
   }
 }

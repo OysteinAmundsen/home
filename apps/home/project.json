@@ -7,7 +7,7 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@home/builder:application",
+      "executor": "@angular-builders/custom-esbuild:application",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/home",
@@ -28,7 +28,8 @@
         "prerender": false,
         "ssr": {
           "entry": "apps/home/server.ts"
-        }
+        },
+        "plugins": ["apps/home/builders/custom-esbuild.ts"]
       },
       "configurations": {
         "production": {
@@ -55,7 +56,7 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "executor": "@home/builder:dev-server",
+      "executor": "@angular-builders/custom-esbuild:dev-server",
       "configurations": {
         "production": {
           "buildTarget": "home:build:production"

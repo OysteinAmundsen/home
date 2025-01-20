@@ -12,7 +12,7 @@ bootstrapApplication(AppComponent, appConfig)
  * This will also listen for updates and act accordingly
  */
 function loadServiceWorker() {
-  if ('serviceWorker' in navigator) {
+  if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     try {
       const wb = new Workbox('/sw.js', { scope: '/', updateViaCache: 'none' });
 
