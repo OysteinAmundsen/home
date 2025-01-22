@@ -6,6 +6,14 @@
   "sourceRoot": "apps/home/src",
   "tags": [],
   "targets": {
+    "pwa": {
+      "executor": "@home/builder:application",
+      "options": {
+        "buildTarget": "home:build",
+        "serviceWorker": "apps/home/src/sw.ts",
+        "tsConfig": "apps/home/tsconfig.wb.json"
+      }
+    },
     "build": {
       "executor": "@angular-builders/custom-esbuild:application",
       "outputs": ["{options.outputPath}"],

@@ -1,11 +1,17 @@
-import * as esbuild from 'esbuild';
+import { Plugin, PluginBuild, build } from 'esbuild';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 
+export type Manifest = ManifestEntry[];
+
+export interface ManifestEntry {
+  url: string;
+  revision: string;
+}
+
 const MATCH_FILES = /^.+\.(js|css|svg|img|html|txt|webmanifest)$/i;
-const manifest: { url: string; revision: string }[] = [];
+const manifest: Manifest = [];
 const srcRoot = 'apps/home/src';
-const distRoot = process.cwd() + '/dist/apps/home';
 const CACHE_BUST = /-[A-Z0-9]{8}\./;
 
 /**
@@ -18,6 +24,11 @@ const CACHE_BUST = /-[A-Z0-9]{8}\./;
  * I've tried different techniques to get the complete manifest:
  * - **Using a custom esbuild plugin**
  *   to hook into the end of the build process - this is the one you see here
+ *   NOTE: This actually works a whole lot better when running `ng serve` than
+ *   when running `ng build`. The result.outputFiles array is populated with
+ *   a lot more of the files to be included in the manifest. I actually get
+ *   css files here as well. But I do have to add index.html manually though.
+ *
  * - **Creating my own custom Angular builder**
  *   in order to hook into the absolute end of the process. This worked the same
  *   as the esbuild plugin. Could not get it to compile the complete manifest.
@@ -25,12 +36,12 @@ const CACHE_BUST = /-[A-Z0-9]{8}\./;
  * The only way I could get this to work, was to use the "recommended" approach,
  * which is to use the workbox-webpack-plugin. This is such a dissapointment.
  */
-const wbInject: esbuild.Plugin = {
+const wbInject: Plugin = {
   name: 'wbInject',
-  setup(build: esbuild.PluginBuild) {
+  setup(builder: PluginBuild) {
     // Append sw to entry points
     // This is done so that it is discoverable in the onEnd hook
-    const options = build.initialOptions;
+    const options = builder.initialOptions;
     Object.assign(options.entryPoints || {}, {
       sw: path.resolve(srcRoot, 'sw.ts'),
     });
@@ -38,8 +49,8 @@ const wbInject: esbuild.Plugin = {
 
     // Pre-build the worker, so that we get a single module for this
     // as angular would chunk it otherwise
-    build.onStart(async () => {
-      const result = await esbuild.build({
+    builder.onStart(async () => {
+      const result = await build({
         entryPoints: [srcRoot + '/sw.ts'],
         bundle: true,
         write: false,
@@ -51,7 +62,7 @@ const wbInject: esbuild.Plugin = {
     });
 
     // Inject manifest into worker
-    build.onEnd(async (result) => {
+    builder.onEnd(async (result) => {
       if (result.errors.length !== 0) return;
 
       // Add build output to manifest
@@ -60,6 +71,10 @@ const wbInject: esbuild.Plugin = {
           (f) => f.path.match(MATCH_FILES) && !f.path.match(/sw/),
         ) || [];
       for (const file of files) await addToManifest(file.path, file.contents);
+      // Add index.html to manifest if it doesn't exist
+      if (manifest.findIndex((i) => i.url === 'index.html') === -1) {
+        manifest.push({ url: 'index.html', revision: '' } as ManifestEntry);
+      }
 
       const workerFile = result.outputFiles?.find((file) =>
         file.path.match(/sw.*\.js$/),
@@ -80,6 +95,7 @@ const wbInject: esbuild.Plugin = {
         'self.__WB_MANIFEST',
         JSON.stringify(manifest),
       );
+      console.log('Injected manifest: ', manifest);
 
       // Update the worker file in the output
       workerFile.contents = new TextEncoder().encode(updatedWorkerCode);
@@ -101,7 +117,7 @@ async function addToManifest(filePath: string, contents?: Uint8Array) {
 
   const content = contents || (await readFileSync(filePath));
   const hash = await createHash(content);
-  manifest.push({ url: relPath, revision: hash });
+  manifest.push({ url: relPath, revision: hash } as ManifestEntry);
 }
 
 async function createHash(content: BufferSource) {

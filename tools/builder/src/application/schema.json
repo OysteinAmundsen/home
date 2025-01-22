@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "version": 2,
+  "title": "Application executor",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "buildTarget": {
+      "type": "string",
+      "description": "The target to run before compiling the service worker."
+    },
+    "serviceWorker": {
+      "type": "string",
+      "description": "The path to the service worker file."
+    },
+    "tsConfig": {
+      "type": "string",
+      "description": "The ts config to use for the service worker compilation."
+    }
+  },
+  "required": ["buildTarget", "serviceWorker", "tsConfig"]
+}

@@ -1,0 +1,10 @@
+{
+  "executors": {},
+  "builders": {
+    "application": {
+      "implementation": "./src/application/index",
+      "schema": "./src/application/schema.json",
+      "description": "application builder"
+    }
+  }
+}

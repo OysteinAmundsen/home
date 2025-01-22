@@ -44,9 +44,5 @@ export class TimeComponent {
   });
 
   /** The current time formatted as a string */
-  time = computed(() =>
-    this.visibility.isBrowserActive()
-      ? this.formatter.format(this.now())
-      : this.formatter.format(this.now()).substring(0, 15) + 'Inactive!',
-  );
+  time = computed(() => this.formatter.format(this.now()));
 }
