@@ -6,7 +6,7 @@ import {
   Param,
   ParseIntPipe,
 } from '@nestjs/common';
-import { widgetStore } from './widget.store';
+import { WidgetService } from './widget.service';
 
 /**
  * The controller for the /api/widgets route.
@@ -15,14 +15,14 @@ import { widgetStore } from './widget.store';
  */
 @Controller('api/widgets')
 export class WidgetController {
-  private widgetData = widgetStore;
+  constructor(private widgetService: WidgetService) {}
 
   /**
    * Fetch all widgets.
    */
   @Get()
   getAll() {
-    return this.widgetData;
+    return this.widgetService.getWidgets();
   }
 
   /**
@@ -36,7 +36,7 @@ export class WidgetController {
     )
     id: number,
   ) {
-    const widget = this.widgetData.find((w) => w.id === id);
+    const widget = this.widgetService.getWidgets(id);
     if (!widget) {
       throw new HttpException('Widget not found', HttpStatus.NOT_FOUND);
     }

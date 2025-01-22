@@ -10,8 +10,9 @@ export class ConnectivityService implements OnDestroy {
   // In SSR environment, the window object does not exist. We need to get a mockup window object from the globalThis object.
   // from angulars DOCUMENT object.
   private window = globalThis.window || this.document.defaultView;
+  //Appear online if ssr rendered. This is to avoid the flickering of the offline gradient.
   private isOffline = signal(
-    typeof window === 'undefined' || !navigator.onLine,
+    typeof window === 'undefined' ? true : !navigator.onLine,
   );
   /** Readonly flag set to true if browser looses connectivity */
   public isBrowserOffline = computed(() => this.isOffline());
