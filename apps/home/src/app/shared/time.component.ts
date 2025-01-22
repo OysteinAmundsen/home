@@ -6,11 +6,6 @@ import { VisibilityService } from './visibility.service';
 @Component({
   selector: 'app-time',
   template: `<time>{{ time() }}</time>`,
-  styles: `
-    :host time {
-      text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
-    }
-  `,
 })
 export class TimeComponent {
   private readonly visibility = inject(VisibilityService);

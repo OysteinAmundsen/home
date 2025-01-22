@@ -9,4 +9,15 @@
   --shadow-color: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 4%));
   --border-color: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 30%));
   --border-radius: 0.5rem;
+
+  --text-shadow: 0 0 3px light-dark(rgba(255, 255, 255, 1), rgba(0, 0, 0, 0.5));
+}
+
+html {
+  &[data-schema='dark'] {
+    color-scheme: dark;
+  }
+  &[data-schema='light'] {
+    color-scheme: light;
+  }
 }

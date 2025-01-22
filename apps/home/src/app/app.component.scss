@@ -10,7 +10,7 @@
   overflow: hidden;
 
   &.offline {
-    --vignette-color: rgb(78, 32, 32);
+    --vignette-color: light-dark(rgb(214, 145, 145), rgb(78, 32, 32));
   }
 
   // Apply background image
@@ -55,9 +55,15 @@
   header {
     display: flex;
     place-items: center;
+    margin: -1rem -1rem 0 -1rem; // Compensate for parent element padding
+    padding: 1rem 1rem 0 1rem;
+    background: linear-gradient(
+      to bottom,
+      var(--header-background),
+      transparent
+    );
     h1 {
       flex: 1;
-      text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
     }
   }
   nav {

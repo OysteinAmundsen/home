@@ -10,13 +10,20 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ConnectivityService } from './shared/connectivity.service';
+import { ThemeComponent } from './shared/theme.component';
 import { TimeComponent } from './shared/time.component';
 import { VisibilityService } from './shared/visibility.service';
 import { WidgetComponent } from './shared/widget/widget.component';
 import { WidgetService } from './shared/widget/widget.service';
 
 @Component({
-  imports: [RouterModule, CommonModule, WidgetComponent, TimeComponent],
+  imports: [
+    RouterModule,
+    CommonModule,
+    WidgetComponent,
+    TimeComponent,
+    ThemeComponent,
+  ],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
