@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
+  AfterViewInit,
   Component,
   computed,
   ElementRef,
@@ -28,7 +29,7 @@ import { WidgetService } from './shared/widget/widget.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   private readonly widgetService = inject(WidgetService);
   private readonly visibility = inject(VisibilityService);
   private readonly connectivity = inject(ConnectivityService);
@@ -74,5 +75,9 @@ export class AppComponent {
       '--background-position-y',
       `${offsetY}%`,
     );
+  }
+
+  ngAfterViewInit() {
+    this.filter(undefined);
   }
 }

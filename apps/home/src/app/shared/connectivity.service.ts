@@ -12,7 +12,7 @@ export class ConnectivityService implements OnDestroy {
   private window = globalThis.window || this.document.defaultView;
   //Appear online if ssr rendered. This is to avoid the flickering of the offline gradient.
   private isOffline = signal(
-    typeof window === 'undefined' ? true : !navigator.onLine,
+    typeof window === 'undefined' ? false : !navigator.onLine,
   );
   /** Readonly flag set to true if browser looses connectivity */
   public isBrowserOffline = computed(() => this.isOffline());

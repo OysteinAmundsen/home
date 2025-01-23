@@ -73,6 +73,7 @@ export class WeatherComponent {
   http = inject(HttpClient);
   data = input<Widget>();
 
+  // TODO:https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition
   /** Fetch users current position using Geolocation API */
   private location: ResourceRef<{ latitude: number; longitude: number }> =
     resource({
