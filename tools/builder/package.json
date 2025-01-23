@@ -2,7 +2,9 @@
   "name": "@home/builder",
   "version": "0.0.1",
   "dependencies": {
-    "@nx/devkit": "20.2.1",
+    "@angular-devkit/architect": "0.1900.7",
+    "esbuild": "^0.24.0",
+    "rxjs": "~7.8.1",
     "tslib": "^2.3.0"
   },
   "type": "commonjs",
