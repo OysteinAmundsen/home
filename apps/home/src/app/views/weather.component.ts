@@ -6,12 +6,12 @@ import {
   effect,
   inject,
   input,
-  OnDestroy,
   resource,
   ResourceRef,
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
+import { GeoLocationService } from '../shared/geoLocation.service';
 import { IconPipe } from '../shared/pipes/icon.pipe';
 import { Widget } from '../shared/widget/widget.service';
 
@@ -71,51 +71,14 @@ import { Widget } from '../shared/widget/widget.service';
     }
   `,
 })
-export class WeatherComponent implements OnDestroy {
+export class WeatherComponent {
   http = inject(HttpClient);
   data = input<Widget>();
-  watchID: number | undefined;
+  loc = inject(GeoLocationService);
 
   /** Fetch users current position using Geolocation API */
   private location: ResourceRef<{ latitude: number; longitude: number }> =
-    rxResource({
-      // Actions (will trigger only once when initialized)
-      loader: () => {
-        return new Observable<{ latitude: number; longitude: number }>(
-          (observer) => {
-            if (typeof window === 'undefined') {
-              // Do not ask for geolocation in SSR
-              observer.error(
-                'Geolocation is not supported in this environment',
-              );
-              return;
-            }
-            if (!navigator.geolocation) {
-              // Browser does not support geolocation
-              observer.error('Geolocation is not supported by your browser');
-              return;
-            }
-            this.watchID = navigator.geolocation.watchPosition(
-              (position: GeolocationPosition) => {
-                // Will trigger every time device location changes
-                observer.next({
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                });
-              },
-              (error: GeolocationPositionError) => {
-                observer.error(error);
-              },
-              {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0,
-              },
-            );
-          },
-        );
-      },
-    });
+    rxResource({ loader: () => this.loc.watchLocation$ });
 
   /** Fetch weather data for current position using yr.no api */
   weather = resource({
@@ -163,10 +126,4 @@ export class WeatherComponent implements OnDestroy {
       (this.weather.value()?.properties.timeseries || []) as Array<any>
     ).slice(0, 12);
   });
-
-  ngOnDestroy() {
-    if (this.watchID) {
-      navigator.geolocation.clearWatch(this.watchID);
-    }
-  }
 }
