@@ -9,8 +9,10 @@ import {
   resource,
   ResourceRef,
 } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
-import { IconPipe } from '../shared/pipes/icon.pipe';
+import { GeoLocationService } from '../shared/geoLocation/geoLocation.service';
+import { IconPipe } from '../shared/icons/icon.pipe';
 import { Widget } from '../shared/widget/widget.service';
 
 @Component({
@@ -72,38 +74,11 @@ import { Widget } from '../shared/widget/widget.service';
 export class WeatherComponent {
   http = inject(HttpClient);
   data = input<Widget>();
+  loc = inject(GeoLocationService);
 
-  // TODO:https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition
   /** Fetch users current position using Geolocation API */
   private location: ResourceRef<{ latitude: number; longitude: number }> =
-    resource({
-      // Actions (will trigger only once when initialized)
-      loader: async () => {
-        return new Promise((resolve, reject) => {
-          if (typeof window === 'undefined') {
-            // Do not ask for geolocation in SSR
-            reject('Geolocation is not supported in this environment');
-            return;
-          }
-          if (!navigator.geolocation) {
-            // Browser does not support geolocation
-            reject('Geolocation is not supported by your browser');
-            return;
-          }
-          navigator.geolocation.getCurrentPosition(
-            (position: GeolocationPosition) => {
-              resolve({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              });
-            },
-            (error: GeolocationPositionError) => {
-              reject(error);
-            },
-          );
-        });
-      },
-    });
+    rxResource({ loader: () => this.loc.watchLocation$ });
 
   /** Fetch weather data for current position using yr.no api */
   weather = resource({

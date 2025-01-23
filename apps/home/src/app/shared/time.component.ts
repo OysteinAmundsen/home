@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged, map, switchMap, timer } from 'rxjs';
-import { VisibilityService } from './visibility.service';
+import { VisibilityService } from './visibility/visibility.service';
 
 @Component({
   selector: 'app-time',
