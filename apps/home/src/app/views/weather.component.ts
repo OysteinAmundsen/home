@@ -6,10 +6,12 @@ import {
   effect,
   inject,
   input,
+  OnDestroy,
   resource,
   ResourceRef,
 } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { firstValueFrom, Observable } from 'rxjs';
 import { IconPipe } from '../shared/pipes/icon.pipe';
 import { Widget } from '../shared/widget/widget.service';
 
@@ -69,39 +71,49 @@ import { Widget } from '../shared/widget/widget.service';
     }
   `,
 })
-export class WeatherComponent {
+export class WeatherComponent implements OnDestroy {
   http = inject(HttpClient);
   data = input<Widget>();
+  watchID: number | undefined;
 
-  // TODO:https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition
   /** Fetch users current position using Geolocation API */
   private location: ResourceRef<{ latitude: number; longitude: number }> =
-    resource({
+    rxResource({
       // Actions (will trigger only once when initialized)
-      loader: async () => {
-        return new Promise((resolve, reject) => {
-          if (typeof window === 'undefined') {
-            // Do not ask for geolocation in SSR
-            reject('Geolocation is not supported in this environment');
-            return;
-          }
-          if (!navigator.geolocation) {
-            // Browser does not support geolocation
-            reject('Geolocation is not supported by your browser');
-            return;
-          }
-          navigator.geolocation.getCurrentPosition(
-            (position: GeolocationPosition) => {
-              resolve({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              });
-            },
-            (error: GeolocationPositionError) => {
-              reject(error);
-            },
-          );
-        });
+      loader: () => {
+        return new Observable<{ latitude: number; longitude: number }>(
+          (observer) => {
+            if (typeof window === 'undefined') {
+              // Do not ask for geolocation in SSR
+              observer.error(
+                'Geolocation is not supported in this environment',
+              );
+              return;
+            }
+            if (!navigator.geolocation) {
+              // Browser does not support geolocation
+              observer.error('Geolocation is not supported by your browser');
+              return;
+            }
+            this.watchID = navigator.geolocation.watchPosition(
+              (position: GeolocationPosition) => {
+                // Will trigger every time device location changes
+                observer.next({
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                });
+              },
+              (error: GeolocationPositionError) => {
+                observer.error(error);
+              },
+              {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0,
+              },
+            );
+          },
+        );
       },
     });
 
@@ -151,4 +163,10 @@ export class WeatherComponent {
       (this.weather.value()?.properties.timeseries || []) as Array<any>
     ).slice(0, 12);
   });
+
+  ngOnDestroy() {
+    if (this.watchID) {
+      navigator.geolocation.clearWatch(this.watchID);
+    }
+  }
 }
