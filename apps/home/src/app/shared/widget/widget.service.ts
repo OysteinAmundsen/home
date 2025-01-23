@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { doSafeTransition } from '../utils/transitions';
 
 export type Widget = {
   id: number;
@@ -29,13 +30,9 @@ export class WidgetService {
         ),
       );
       // Resolve using view transitions
-      return new Promise<Widget[]>((resolve) => {
-        if (typeof window === 'undefined') {
-          resolve(widgets);
-          return;
-        }
-        document.startViewTransition(() => resolve(widgets));
-      });
+      return new Promise<Widget[]>((resolve) =>
+        doSafeTransition(() => resolve(widgets)),
+      );
     },
   });
 
@@ -48,6 +45,7 @@ export class WidgetService {
    */
   async loadWidget(componentName: string | undefined) {
     let component: any;
+    // TODO: Find a better way of handling this. Maybe use a Route[]?
     switch (componentName) {
       case 'weather':
         component = (await import('../../views/weather.component'))

@@ -1,6 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, Subscriber } from 'rxjs';
 
+/**
+ * A service which wraps the geolocation API in an observable.
+ *
+ * This service will watch the location of the device and emit the new location
+ * every time it changes.
+ */
 @Injectable({ providedIn: 'root' })
 export class GeoLocationService implements OnDestroy {
   /* Watch ID for geolocation */
@@ -42,7 +49,12 @@ export class GeoLocationService implements OnDestroy {
     },
   );
 
-  cleanup() {
+  /**
+   * A signal containing a snapshot of the current location of the device.
+   */
+  getCurrentLocation = toSignal(this.watchLocation$);
+
+  private cleanup() {
     if (this.watchID) {
       navigator.geolocation.clearWatch(this.watchID);
     }

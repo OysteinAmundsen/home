@@ -1,6 +1,12 @@
 import { DOCUMENT } from '@angular/common';
 import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 
+/**
+ * Service that provides information about the "visibility" of the document.
+ *
+ * That means that it will report `isBrowserActive() = true` if the document is in focus
+ * and the browser tab is active.
+ */
 @Injectable({ providedIn: 'root' })
 export class VisibilityService implements OnDestroy {
   private readonly document = inject(DOCUMENT);

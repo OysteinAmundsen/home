@@ -1,6 +1,14 @@
 import { DOCUMENT } from '@angular/common';
 import { effect, inject, Injectable, linkedSignal } from '@angular/core';
+import { doSafeTransition } from '../utils/transitions';
 
+/**
+ * This site supports a light and dark color scheme.
+ *
+ * The css will autoselect the color scheme based on the user's preference,
+ * but the user can also manually select the color scheme. This service
+ * keeps track of the currently selected color scheme.
+ */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   doc = inject(DOCUMENT);
@@ -14,15 +22,8 @@ export class ThemeService {
 
   private onChange = effect(() => {
     const theme = this.selectedTheme();
-    if (typeof window === 'undefined') return; // Do not run on server
-
-    const callback = () => {
-      this.doc.documentElement.setAttribute('data-schema', theme);
-    };
-    if ('startViewTransition' in this.doc) {
-      this.doc.startViewTransition(callback);
-    } else {
-      callback();
-    }
+    doSafeTransition(() =>
+      this.doc.documentElement.setAttribute('data-schema', theme),
+    );
   });
 }
