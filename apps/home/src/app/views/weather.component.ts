@@ -11,8 +11,8 @@ import {
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
-import { GeoLocationService } from '../shared/geoLocation.service';
-import { IconPipe } from '../shared/pipes/icon.pipe';
+import { GeoLocationService } from '../shared/geoLocation/geoLocation.service';
+import { IconPipe } from '../shared/icons/icon.pipe';
 import { Widget } from '../shared/widget/widget.service';
 
 @Component({
