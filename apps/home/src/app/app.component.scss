@@ -73,5 +73,6 @@
   section {
     display: flex;
     gap: 1rem;
+    view-transition-name: widget-container;
   }
 }

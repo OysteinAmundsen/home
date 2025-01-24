@@ -3,19 +3,21 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   AfterViewInit,
   Component,
-  computed,
+  effect,
   ElementRef,
   HostBinding,
   HostListener,
   inject,
+  signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ConnectivityService } from './shared/connectivity/connectivity.service';
 import { ThemeComponent } from './shared/theme/theme.component';
 import { TimeComponent } from './shared/time.component';
+import { doSafeTransition } from './shared/utils/transitions';
 import { VisibilityService } from './shared/visibility/visibility.service';
 import { WidgetComponent } from './shared/widget/widget.component';
-import { WidgetService } from './shared/widget/widget.service';
+import { Widget, WidgetService } from './shared/widget/widget.service';
 
 @Component({
   imports: [
@@ -47,11 +49,33 @@ export class AppComponent implements AfterViewInit {
     return this.connectivity.isBrowserOffline();
   }
 
-  /** The resource loader for widgets */
-  widgets = this.widgetService.widgets;
-  error = computed(
-    () => (this.widgets.error() as HttpErrorResponse).error.error,
-  );
+  /** The resource loader for widgets is outsourced to an effect in order to animate this */
+  widgets = signal([] as Widget[]);
+  error = signal(undefined);
+
+  /* This will apply loaded widgets inside a view transition */
+  widgetLoader = effect(() => {
+    const widgets = this.widgetService.widgets;
+    if (widgets.isLoading()) return;
+    if (widgets.error()) {
+      this.error.set((widgets.error() as HttpErrorResponse).error.error);
+      return;
+    }
+    doSafeTransition(() =>
+      this.widgets.update((oldWidgets) => {
+        const newWidgets = widgets.value() || [];
+        // Keep widgets that exist in both arrays,
+        // remove widgets that are not in the new array
+        // and add widgets that are not in the old array
+        return newWidgets.map((newWidget) => {
+          const oldWidget = oldWidgets.find(
+            (oldWidget) => oldWidget.id === newWidget.id,
+          );
+          return oldWidget || newWidget;
+        });
+      }),
+    );
+  });
 
   /** The resource reactive signal for reloading */
   filter(id: number | undefined) {

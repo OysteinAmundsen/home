@@ -1,5 +1,0 @@
-export const widgetStore = [
-  { id: 1, name: 'Weather', componentName: 'weather' },
-  { id: 2, name: 'Taxes', componentName: 'widget2' },
-  { id: 3, name: 'Something else', componentName: 'widget3' },
-];

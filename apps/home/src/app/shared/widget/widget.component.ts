@@ -1,6 +1,7 @@
 import {
   Component,
   effect,
+  HostBinding,
   inject,
   input,
   resource,
@@ -18,12 +19,18 @@ import { Widget, WidgetService } from './widget.service';
   selector: 'app-widget',
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.scss'],
+  host: { class: 'widget' },
 })
 export class WidgetComponent {
   private readonly widgetService = inject(WidgetService);
   private container = viewChild('container', { read: ViewContainerRef });
 
   data = input<Widget>();
+
+  @HostBinding('style.--widget-id')
+  get widgetId() {
+    return `widget_${this.data()?.id}`;
+  }
 
   /**
    * Dynamically load a component based on the `componentName` input.

@@ -20,7 +20,7 @@ export class GeoLocationService implements OnDestroy {
     (observer: Subscriber<{ latitude: number; longitude: number }>) => {
       if (typeof window === 'undefined') {
         // Do not ask for geolocation in SSR
-        observer.error('Geolocation is not supported in this environment');
+        observer.error('Loading...');
         return;
       }
       if (!navigator.geolocation) {
@@ -38,7 +38,19 @@ export class GeoLocationService implements OnDestroy {
           });
         },
         (error: GeolocationPositionError) => {
-          observer.error(error);
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              observer.error('You denied the request for Geolocation.');
+              break;
+            case error.POSITION_UNAVAILABLE:
+              observer.error('Location information is unavailable.');
+              break;
+            case error.TIMEOUT:
+              observer.error('The request to get location timed out.');
+              break;
+            default:
+              observer.error(error.message);
+          }
         },
         {
           enableHighAccuracy: true,

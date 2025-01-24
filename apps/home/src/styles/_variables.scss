@@ -1,6 +1,6 @@
 :root {
   color-scheme: light dark;
-  --text-color: light-dark(hsl(0, 0%, 45%), hsl(0, 0%, 85%));
+  --text-color: light-dark(hsl(0, 0%, 32%), hsl(0, 0%, 85%));
   --text-emphasis-color: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
   --background-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 15%));
   --header-emphasis-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 97%));
@@ -16,8 +16,10 @@
 html {
   &[data-schema='dark'] {
     color-scheme: dark;
+    --text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
   }
   &[data-schema='light'] {
     color-scheme: light;
+    --text-shadow: 0 0 3px rgba(255, 255, 255, 1), 0 0 1px rgba(0, 0, 0, 1);
   }
 }

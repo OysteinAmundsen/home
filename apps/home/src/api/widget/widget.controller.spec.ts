@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WidgetController } from './widget.controller';
 import { WidgetService } from './widget.service';
-import { widgetStore } from './widget.store';
+import widgetStore from './widget.store.json';
 
 describe('WidgetController', () => {
   let controller: WidgetController;

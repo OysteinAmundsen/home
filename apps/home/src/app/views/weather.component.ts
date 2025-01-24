@@ -22,7 +22,7 @@ import { Widget } from '../shared/widget/widget.service';
     @if (weather.isLoading()) {
       <header>Loading...</header>
     } @else if (weather.error()) {
-      <header>Error: {{ weather.error() | json }}</header>
+      <header>{{ weather.error() }}</header>
     } @else if (weather.value()) {
       <section>
         @for (time of todaysWeather(); track time.time) {
@@ -30,7 +30,8 @@ import { Widget } from '../shared/widget/widget.service';
             <time>{{ time.time | date: 'HH:mm' }}</time>
             <span
               [outerHTML]="time.data.next_1_hours.summary.symbol_code | icon"
-            ></span>
+            >
+            </span>
             <span class="temp"
               >{{
                 time.data.instant.details.air_temperature | number: '1.1'
@@ -83,9 +84,14 @@ export class WeatherComponent {
   /** Fetch weather data for current position using yr.no api */
   weather = resource({
     // Triggers
-    request: () => ({ location: this.location.value() }),
+    request: () => ({
+      location: this.location.value(),
+      error: this.location.error(),
+    }),
     // Actions
     loader: async ({ request }) => {
+      // Present error if location gave an error
+      if (request.error) throw request.error;
       // Die if location is not available
       if (request.location == null) return undefined;
       // Fetch weather data for location
