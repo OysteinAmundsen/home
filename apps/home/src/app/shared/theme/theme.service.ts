@@ -1,6 +1,9 @@
 import { DOCUMENT } from '@angular/common';
 import { effect, inject, Injectable, linkedSignal } from '@angular/core';
+import { CookieService } from '../utils/cookie';
 import { doSafeTransition } from '../utils/transitions';
+
+export type Theme = 'light' | 'dark';
 
 /**
  * This site supports a light and dark color scheme.
@@ -12,7 +15,12 @@ import { doSafeTransition } from '../utils/transitions';
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   doc = inject(DOCUMENT);
-  selectedTheme = linkedSignal<'light' | 'dark'>(() => {
+  cookieService = inject(CookieService);
+
+  selectedTheme = linkedSignal<Theme>(() => {
+    const cookie = this.cookieService.getCookie('theme');
+    if (cookie && ['light', 'dark'].includes(cookie)) return cookie as Theme;
+
     if (typeof window === 'undefined' || !('matchMedia' in window))
       return 'light'; // Do not run on server
     return window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -22,6 +30,10 @@ export class ThemeService {
 
   private onChange = effect(() => {
     const theme = this.selectedTheme();
+
+    // Store the selection in a cookie
+    this.cookieService.setCookie('theme', theme, { expireIn: 365 });
+
     doSafeTransition(() =>
       this.doc.documentElement.setAttribute('data-schema', theme),
     );

@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
 import {
   AfterViewInit,
   Component,
+  computed,
   effect,
   ElementRef,
   HostBinding,
@@ -50,32 +50,8 @@ export class AppComponent implements AfterViewInit {
   }
 
   /** The resource loader for widgets is outsourced to an effect in order to animate this */
-  widgets = signal([] as Widget[]);
-  error = signal(undefined);
-
-  /* This will apply loaded widgets inside a view transition */
-  widgetLoader = effect(() => {
-    const widgets = this.widgetService.widgets;
-    if (widgets.isLoading()) return;
-    if (widgets.error()) {
-      this.error.set((widgets.error() as HttpErrorResponse).error.error);
-      return;
-    }
-    doSafeTransition(() =>
-      this.widgets.update((oldWidgets) => {
-        const newWidgets = widgets.value() || [];
-        // Keep widgets that exist in both arrays,
-        // remove widgets that are not in the new array
-        // and add widgets that are not in the old array
-        return newWidgets.map((newWidget) => {
-          const oldWidget = oldWidgets.find(
-            (oldWidget) => oldWidget.id === newWidget.id,
-          );
-          return oldWidget || newWidget;
-        });
-      }),
-    );
-  });
+  widgets = computed(() => this.widgetService.widgets());
+  error = this.widgetService.error;
 
   /** The resource reactive signal for reloading */
   filter(id: number | undefined) {

@@ -74,8 +74,8 @@ import { Widget } from '../shared/widget/widget.service';
 })
 export class WeatherComponent {
   http = inject(HttpClient);
-  data = input<Widget>();
   loc = inject(GeoLocationService);
+  data = input<Widget>();
 
   /** Fetch users current position using Geolocation API */
   private location: ResourceRef<{ latitude: number; longitude: number }> =

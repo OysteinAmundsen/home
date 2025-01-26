@@ -7,6 +7,27 @@
   box-shadow: 0.25rem 0.5rem 0.5rem -0.35rem var(--shadow-color);
   view-transition-name: var(--widget-id);
 
+  @layer widget {
+    transition-behavior: allow-discrete;
+    transition:
+      opacity 0.25s ease-in,
+      transform 0.25s ease-in,
+      display 0.25s ease-in;
+
+    // Enter animation
+    @starting-style {
+      transform: translateX(-40px) scale(0.7);
+      opacity: 0;
+    }
+
+    // Exit animation
+    &.exit {
+      transform: translateX(40px) scale(0.7);
+      opacity: 0;
+      display: none;
+    }
+  }
+
   header {
     display: flex;
     justify-content: space-between;

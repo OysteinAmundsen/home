@@ -1,5 +1,5 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, resource, signal } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 export type Widget = {
@@ -16,20 +16,48 @@ export class WidgetService {
   filter = signal<number | undefined>(undefined);
 
   /** Fetches the widgets from the server */
-  widgets = resource({
+  private widgetsCache = [] as Widget[];
+  private widgetsLoader = resource({
     // Triggers
     request: () => ({ id: this.filter() }),
     // Actions
     loader: async ({ request }) => {
       // Cannot use fetch directly because Angular's SSR does not support it.
       // I get a `TypeError: Failed to parse URL` from SSR when using fetch.
-      return await firstValueFrom(
+      const widgets = await firstValueFrom(
         this.http.get<Widget[]>(
           `/api/widgets${request.id ? '/' + request.id : ''}`,
         ),
       );
+
+      // Remove old widgets from the cache
+      this.widgetsCache = this.widgetsCache.filter((widget) =>
+        widgets.find((w) => w.id === widget.id),
+      );
+
+      // Add new widgets to the cache
+      widgets.forEach((widget) => {
+        if (!this.widgetsCache.find((w) => w.id === widget.id)) {
+          this.widgetsCache.push(widget);
+        }
+      });
+
+      return this.widgetsCache.sort((a, b) => a.id - b.id);
     },
   });
+
+  widgets = computed<Widget[]>(() =>
+    // Make sure that widgets always returns an array, even when loading new widgets
+    this.widgetsLoader.isLoading()
+      ? this.widgetsCache
+      : (this.widgetsLoader.value() as Widget[]),
+  );
+  error = computed<string | undefined>(
+    () =>
+      (this.widgetsLoader.error() as HttpErrorResponse)?.error.error ??
+      undefined,
+  );
+  isLoading = computed(() => this.widgetsLoader.isLoading());
 
   /**
    * This acts as a repository for the widgets.
