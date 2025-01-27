@@ -11,7 +11,7 @@
   <button (click)="filter(undefined)">All</button>
 </nav>
 
-<section>
+<section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()">
   @for (widget of widgets(); track widget.id) {
     <app-widget [data]="widget"> </app-widget>
   }

@@ -1,6 +1,6 @@
-<header>
+<header [attr.style]="'view-transition-name: ' + this.widgetId + '-header'">
   <span>{{ data()?.name }}</span>
 </header>
-<section>
+<section [attr.style]="'view-transition-name: ' + this.widgetId + '-content'">
   <ng-container #container></ng-container>
 </section>
