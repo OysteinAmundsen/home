@@ -13,6 +13,9 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppSettingsService } from './app.settings';
+import { AuthenticationService } from './shared/auth/authentication.service';
+import { LoginComponent } from './shared/auth/login.component';
+import { RegisterComponent } from './shared/auth/register.component';
 import { ConnectivityService } from './shared/connectivity/connectivity.service';
 import { ThemeComponent } from './shared/theme/theme.component';
 import { TimeComponent } from './shared/time.component';
@@ -29,6 +32,8 @@ import { widgetAnimation } from './shared/widget/widgets.animation';
     WidgetComponent,
     TimeComponent,
     ThemeComponent,
+    RegisterComponent,
+    LoginComponent,
   ],
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -41,6 +46,7 @@ export class AppComponent implements AfterViewInit {
   private readonly connectivity = inject(ConnectivityService);
   private readonly el = inject(ElementRef);
   private readonly settings = inject(AppSettingsService);
+  private readonly auth = inject(AuthenticationService);
 
   protected animationDisabled = signal(true);
 
@@ -62,9 +68,12 @@ export class AppComponent implements AfterViewInit {
     return this.connectivity.isBrowserOffline();
   }
 
+  isRegistered = this.auth.isRegistered;
+
   /** The resource loader for widgets is outsourced to an effect in order to animate this */
   widgets = signal<Widget[]>([]);
   error = this.widgetService.error;
+  isLoading = this.widgetService.isLoading;
   widgetsLoader = effect(() => {
     const widgets = this.widgetService.widgets();
     doSafeTransition(() => this.widgets.set(widgets));

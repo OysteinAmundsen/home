@@ -27,7 +27,7 @@ I have heard that some people might have had difficulties in installing dependen
 ```bash
 rm -rf bun.lockb
 npm install --force
-sed -i.bak -e 's/bun x/npx/g' -e 's/bun /npm/g' package.json
+sed -i.bak -e 's/bun x/npx/g' -e 's/bun /npm /g' package.json
 ```
 
 This will remove the bun lockfile, install dependencies using npm and lastly replace all usage of `bun` in `package.json` with the `npm` equivalent.

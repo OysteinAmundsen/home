@@ -1,6 +1,15 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Observable, Subscriber } from 'rxjs';
+import {
+  concatMap,
+  delay,
+  Observable,
+  of,
+  retryWhen,
+  Subscriber,
+  take,
+  throwError,
+} from 'rxjs';
 
 /**
  * A service which wraps the geolocation API in an observable.
@@ -12,6 +21,8 @@ import { Observable, Subscriber } from 'rxjs';
 export class GeoLocationService implements OnDestroy {
   /* Watch ID for geolocation */
   private watchID: number | undefined;
+  maxRetries = 5;
+  retryTimeout = 1000;
 
   /**
    * An observable that watches the location of the device
@@ -59,6 +70,21 @@ export class GeoLocationService implements OnDestroy {
         },
       );
     },
+  ).pipe(
+    retryWhen((errors) =>
+      errors.pipe(
+        concatMap((error, count) => {
+          if (
+            count < this.maxRetries &&
+            error === 'The request to get location timed out.'
+          ) {
+            return of(error).pipe(delay(this.retryTimeout));
+          }
+          return throwError(error);
+        }),
+        take(this.maxRetries),
+      ),
+    ),
   );
 
   /**
