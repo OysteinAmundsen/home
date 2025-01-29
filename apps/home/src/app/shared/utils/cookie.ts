@@ -1,11 +1,16 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { inject, Injectable, PLATFORM_ID, REQUEST } from '@angular/core';
+import {
+  inject,
+  Injectable,
+  PLATFORM_ID,
+  REQUEST_CONTEXT,
+} from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class CookieService {
   document = inject(DOCUMENT);
   platform = inject(PLATFORM_ID);
-  request = inject(REQUEST);
+  reqCtx = inject(REQUEST_CONTEXT);
 
   /**
    * Get a cookie by name
@@ -17,7 +22,7 @@ export class CookieService {
     if (isPlatformBrowser(this.platform)) {
       cookieString = this.document.cookie;
     } else {
-      cookieString = this.request?.headers.get('cookie') || '';
+      cookieString = (this.reqCtx as any)?.cookies || '';
     }
     const match = cookieString.match(new RegExp('(^| )' + name + '=([^;]+)'));
     const value = match ? match[2] : '';

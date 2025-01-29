@@ -37,14 +37,25 @@ export async function bootstrap() {
 
   // SSR middleware: Render out the angular application server-side
   const angularNodeAppEngine = new AngularNodeAppEngine();
-  server.get('**', (req, res, next) => {
+  server.use('**', (req, res, next) => {
     angularNodeAppEngine
-      .handle(req, { server: 'express' })
+      .handle(req, {
+        server: 'express',
+        request: req,
+        response: res,
+        cookies: req.headers.cookie,
+      })
       .then((response) => {
         // If the Angular app returned a response, write it to the Express response
         if (response) {
           const n = writeResponseToNodeResponse(response, res);
-          console.log('[SSR]', req.method, req.url, response.status);
+          console.log(
+            '[SSR]',
+            req.method,
+            req.url,
+            req.headers.cookie,
+            response.status,
+          );
           return n;
         }
         // If not, this is not an Angular route, so continue to the next middleware

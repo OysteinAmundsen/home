@@ -24,6 +24,15 @@
         "tsConfig": "apps/home/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "outputMode": "server",
+        "externalDependencies": ["class-transformer/storage"],
+        "stylePreprocessorOptions": {
+          "silenceDeprecations": [
+            "mixed-decls",
+            "color-functions",
+            "global-builtin",
+            "import"
+          ]
+        },
         "assets": [
           {
             "glob": "**/*",
