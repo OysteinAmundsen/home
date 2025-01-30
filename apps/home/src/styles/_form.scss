@@ -1,0 +1,40 @@
+form {
+  .form-field {
+    display: grid;
+    input {
+      flex: 1;
+    }
+    .hint {
+      height: 1rem;
+    }
+
+    // If the next sibling is also a form field, add some spacing
+    &:has(+ .form-field) {
+      .hint {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}
+
+input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: calc(var(--border-radius) / 2);
+  transition: border 0.1s ease-in-out;
+  &:focus,
+  &:focus-visible {
+    outline-style: solid;
+    outline-color: var(--border-focused-color);
+  }
+  &.ng-invalid {
+    --border-color: var(--warn);
+    --border-focused-color: var(--warn);
+    &::placeholder {
+      color: var(--warn);
+    }
+    + .hint {
+      color: var(--warn);
+    }
+  }
+}

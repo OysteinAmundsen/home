@@ -15,7 +15,6 @@ import { RouterModule } from '@angular/router';
 import { AppSettingsService } from './app.settings';
 import { AuthenticationService } from './shared/auth/authentication.service';
 import { LoginComponent } from './shared/auth/login.component';
-import { RegisterComponent } from './shared/auth/register.component';
 import { ConnectivityService } from './shared/connectivity/connectivity.service';
 import { ThemeComponent } from './shared/theme/theme.component';
 import { TimeComponent } from './shared/time.component';
@@ -32,7 +31,6 @@ import { widgetAnimation } from './shared/widget/widgets.animation';
     WidgetComponent,
     TimeComponent,
     ThemeComponent,
-    RegisterComponent,
     LoginComponent,
   ],
   selector: 'app-root',

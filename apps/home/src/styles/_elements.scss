@@ -16,18 +16,13 @@ body {
   margin: 0;
 }
 
-button {
-  color: var(--header-emphasis-color);
-  background-color: var(--header-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-}
-
 h1 {
   color: var(--text-emphasis-color);
   margin: 0;
+}
+
+.spacer {
+  flex: 1;
 }
 
 .material-symbols-outlined {

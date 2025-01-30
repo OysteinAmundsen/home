@@ -9,6 +9,8 @@
   <button (click)="filter(2)">Widget 2</button>
   <button (click)="filter(3)">Widget 3</button>
   <button (click)="filter(undefined)">All</button>
+  <div class="spacer"></div>
+  <app-login></app-login>
 </nav>
 
 <section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()">
@@ -23,10 +25,4 @@
   }
 </section>
 
-<footer>
-  @if (!this.isRegistered()) {
-    <app-register></app-register>
-  } @else {
-    <app-login></app-login>
-  }
-</footer>
+<footer></footer>

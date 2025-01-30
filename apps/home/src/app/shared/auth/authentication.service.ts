@@ -6,6 +6,7 @@ import {
   Injectable,
   linkedSignal,
   PLATFORM_ID,
+  signal,
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
@@ -13,21 +14,28 @@ const bufferToBase64 = (buffer: ArrayBuffer) =>
   btoa(String.fromCharCode(...new Uint8Array(buffer)));
 const base64ToBuffer = (base64: string) =>
   Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+const CREDENTIALS_KEY = 'credentials';
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
   private readonly http = inject(HttpClient);
   private readonly platformId = inject(PLATFORM_ID);
 
+  /** The credential raw id stored in localStorage */
   credentials = linkedSignal(() =>
     isPlatformBrowser(this.platformId)
-      ? localStorage.getItem('credentials')
+      ? localStorage.getItem(CREDENTIALS_KEY)
       : '',
   );
+
+  /** Returns true if there exists credentials in localStorage */
   isRegistered = computed(() => !!this.credentials());
 
+  /** Returns true if user is currently logged in */
+  isLoggedIn = signal(false);
+
   private setCredentials(rawId: string) {
-    localStorage.setItem('credentials', JSON.stringify(rawId));
+    localStorage.setItem(CREDENTIALS_KEY, rawId);
     this.credentials.set(rawId);
   }
 
@@ -36,10 +44,10 @@ export class AuthenticationService {
    *
    * @param userName The username to register
    */
-  async register(userName: string) {
+  async register(userName: string, displayName: string) {
     // Get the registration options from the server
     const options = await firstValueFrom(
-      this.http.get<any>('/api/auth/registration-options'),
+      this.http.get<any>(`/api/auth/registration-options`),
     );
 
     // Create the webauth credentials
@@ -50,7 +58,7 @@ export class AuthenticationService {
         user: {
           id: new Uint8Array(options.user.id.data),
           name: userName,
-          displayName: userName,
+          displayName: displayName,
         },
       },
     })) as Credential;
@@ -60,7 +68,7 @@ export class AuthenticationService {
     const rawId = bufferToBase64((credential as any).rawId);
 
     // Send the credential to the server
-    await this.http.post('/api/auth/register', { credential: { rawId } });
+    await this.http.post(`/api/auth/register`, { credential: { rawId } });
 
     // Store the credential id in localStorage
     this.setCredentials(rawId);
@@ -68,9 +76,13 @@ export class AuthenticationService {
 
   /**
    * Remove the registration from the system
+   *
+   * NOTE: Webauthn does not currently support removing credentials, so we just
+   * remove the credential from the local storage. Beware that registerring and
+   * removing credentials a lot of times will fill up your passkey storage.
    */
   removeRegistration() {
-    localStorage.removeItem('credentials');
+    localStorage.removeItem(CREDENTIALS_KEY);
     this.credentials.set('');
   }
 
@@ -80,32 +92,80 @@ export class AuthenticationService {
   async authenticate() {
     // Get the authentication options from the server
     const options = await firstValueFrom(
-      this.http.get<any>('/api/auth/authentication-options'),
+      this.http.get<PublicKeyCredentialRequestOptions>(
+        `/api/auth/authentication-options`,
+      ),
     );
-    // Create the webauth credentials
-    const credential = (await navigator.credentials.get({
-      publicKey: {
-        ...options,
-        challenge: new Uint8Array(options.challenge.data),
-      },
-    })) as Credential;
 
-    // Send the credential to the server
-    // await this.http.post('/api/auth/authenticate', {
-    //   credential: {
-    //     rawId: bufferToBase64(credential.rawId),
-    //     response: {
-    //       authenticatorData: bufferToBase64(
-    //         (credential.response as AuthenticatorResponse).authenticatorData,
-    //       ),
-    //       clientDataJSON: bufferToBase64(
-    //         (credential.response as AuthenticatorResponse).clientDataJSON,
-    //       ),
-    //       signature: bufferToBase64(
-    //         (credential.response as AuthenticatorResponse).signature,
-    //       ),
-    //     },
-    //   },
-    // });
+    // Create the webauth credentials
+    const credential = await this.getCredentials(options);
+
+    // Do the actual authentication
+    if (credential) {
+      this.doAuthentication(credential);
+    }
+  }
+
+  private async getCredentials(
+    options: PublicKeyCredentialRequestOptions,
+  ): Promise<Credential | null> {
+    const credentialId = localStorage.getItem(CREDENTIALS_KEY) || '';
+    try {
+      return await navigator.credentials.get({
+        publicKey: {
+          ...options,
+          challenge: new Uint8Array((options as any).challenge.data),
+          allowCredentials: [
+            {
+              id: base64ToBuffer(credentialId),
+              type: 'public-key',
+              transports: ['internal'],
+            },
+          ],
+        },
+      });
+    } catch (ex) {
+      // Stored credentials not working for some reason.
+      // Fallback to removing the registration to allow user
+      // to re-register.
+      console.error('failed to get credentials', ex);
+      this.removeRegistration();
+      return null;
+    }
+  }
+
+  private async doAuthentication(credential: Credential) {
+    try {
+      return await firstValueFrom(
+        this.http.post(
+          `/api/auth/authenticate`,
+          {
+            credential: {
+              rawId: bufferToBase64((credential as any).rawId),
+              response: {
+                authenticatorData: bufferToBase64(
+                  (credential as any).response.authenticatorData,
+                ),
+                signature: bufferToBase64(
+                  (credential as any).response.signature,
+                ),
+                userHandle: bufferToBase64(
+                  (credential as any).response.userHandle,
+                ),
+                clientDataJSON: bufferToBase64(
+                  (credential as any).response.clientDataJSON,
+                ),
+                id: (credential as any).id,
+                type: (credential as any).type,
+              },
+            },
+          },
+          { withCredentials: true },
+        ),
+      );
+    } catch (e) {
+      console.error('authentication failed', e);
+      return null;
+    }
   }
 }
