@@ -68,10 +68,34 @@ export class AuthenticationService {
     const rawId = bufferToBase64((credential as any).rawId);
 
     // Send the credential to the server
-    await this.http.post(`/api/auth/register`, { credential: { rawId } });
+    try {
+      await firstValueFrom(
+        this.http.post(
+          `/api/auth/register`,
+          {
+            credential: {
+              rawId,
+              response: {
+                attestationObject: bufferToBase64(
+                  (credential as any).response.attestationObject,
+                ),
+                clientDataJSON: bufferToBase64(
+                  (credential as any).response.clientDataJSON,
+                ),
+                id: (credential as any).id,
+                type: (credential as any).type,
+              },
+            },
+          },
+          { withCredentials: true },
+        ),
+      );
 
-    // Store the credential id in localStorage
-    this.setCredentials(rawId);
+      // Store the credential id in localStorage
+      this.setCredentials(rawId);
+    } catch (e) {
+      console.error('registration failed', e);
+    }
   }
 
   /**

@@ -23,11 +23,7 @@ export class AuthenticatorService {
   });
 
   private arrayBufferToString(buf: ArrayBuffer): string {
-    return new TextDecoder().decode(new Uint8Array(buf).buffer);
-  }
-
-  private stringToArrayBuffer(str: string): ArrayBuffer {
-    return new Uint8Array(Buffer.from(str, 'base64')).buffer;
+    return new TextDecoder().decode(buf);
   }
 
   /**
@@ -35,7 +31,9 @@ export class AuthenticatorService {
    *
    * @returns
    */
-  async getRegistrationOptions(): Promise<PublicKeyCredentialCreationOptions> {
+  async getRegistrationOptions(
+    session: Record<string, any>,
+  ): Promise<PublicKeyCredentialCreationOptions> {
     const registrationOptions = await this.fido.attestationOptions();
     const retObj = Object.assign(registrationOptions, {
       user: { id: crypto.randomBytes(32) },
@@ -43,6 +41,11 @@ export class AuthenticatorService {
       // iOS
       authenticatorSelection: { authenticatorAttachment: 'platform' },
     });
+
+    // Add challenge and user to the session
+    session.challenge = registrationOptions.challenge;
+    session.userHandle = registrationOptions.user.id;
+
     return retObj;
   }
 
@@ -57,12 +60,14 @@ export class AuthenticatorService {
   async doRegister(
     credential: RegisterRequestCredential,
     session: Record<string, any>,
+    origin: string,
   ): Promise<boolean> {
     try {
-      const challenge = this.arrayBufferToString(session.challenge.data);
+      const challenge: ArrayBuffer = new Uint8Array(session.challenge.data)
+        .buffer;
       const regResult = await this.fido.attestationResult(
         {
-          rawId: this.stringToArrayBuffer(credential.rawId as string),
+          rawId: new Uint8Array(Buffer.from(credential.rawId, 'base64')).buffer,
           response: {
             attestationObject: base64url.decode(
               credential.response.attestationObject,
@@ -75,12 +80,13 @@ export class AuthenticatorService {
           },
         },
         {
-          challenge,
+          challenge: Buffer.from(challenge).toString('base64'),
           origin,
           factor: 'either' as Factor,
         },
       );
 
+      // Store the public key and counter in the session
       session.publicKey = regResult.authnrData.get('credentialPublicKeyPem');
       session.prevCounter = regResult.authnrData.get('counter');
 
@@ -95,12 +101,17 @@ export class AuthenticatorService {
    *
    * @returns
    */
-  async getAuthenticationOptions() {
+  async getAuthenticationOptions(session: Record<string, any>) {
     const authnOptions = await this.fido.assertionOptions();
-    const retObj = Object.assign(authnOptions, {
+    const authOptions = Object.assign(authnOptions, {
       challenge: Buffer.from(authnOptions.challenge),
     });
-    return retObj;
+
+    // Add challenge to the session
+    session.challenge = authOptions.challenge;
+    console.log(session);
+
+    return authOptions;
   }
 
   /**
@@ -112,22 +123,32 @@ export class AuthenticatorService {
     credential: any,
     session: Record<string, any>,
   ): Promise<Fido2AssertionResult> {
-    credential.rawId = this.stringToArrayBuffer(credential.rawId);
-    const challenge = this.arrayBufferToString(session.challenge.data);
-    const { publicKey, prevCounter } = session;
+    console.log(session);
+    credential.rawId = new Uint8Array(
+      Buffer.from(credential.rawId, 'base64'),
+    ).buffer;
+    const challenge = new Uint8Array(session.challenge.data).buffer;
+    const publicKey = session.publicKey;
+    const prevCounter = session.prevCounter;
+    const userHandle = new Uint8Array(session.userHandle).buffer;
 
     if (publicKey === 'undefined' || prevCounter === undefined) {
       throw 'No public key or counter found in session';
     } else {
-      const result = await this.fido.assertionResult(credential, {
-        challenge,
-        origin,
-        factor: 'either',
-        publicKey,
-        prevCounter,
-        userHandle: this.arrayBufferToString(session.userHandle),
-      });
-      return result;
+      try {
+        const result = await this.fido.assertionResult(credential, {
+          challenge: this.arrayBufferToString(challenge),
+          origin,
+          factor: 'either',
+          publicKey,
+          prevCounter,
+          userHandle: this.arrayBufferToString(userHandle),
+        });
+        return result;
+      } catch (e) {
+        console.log('error', e);
+        throw e;
+      }
     }
   }
 }

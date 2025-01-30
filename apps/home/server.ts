@@ -21,15 +21,15 @@ export async function bootstrap() {
   const server = app.getHttpAdapter().getInstance();
 
   // Setup session middleware
-  server.use(
+  app.use(
     session({
       secret: 'Not a real secret',
       resave: false,
       saveUninitialized: false,
-      cookie: {
-        secure: false,
-        maxAge: 1000 * 60, // 1 minute
-      },
+      // cookie: {
+      //   secure: false,
+      //   maxAge: 1000 * 60, // 1 minute
+      // },
     }),
   );
 

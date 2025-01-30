@@ -25,14 +25,7 @@
         "inlineStyleLanguage": "scss",
         "outputMode": "server",
         "externalDependencies": ["class-transformer/storage"],
-        "stylePreprocessorOptions": {
-          "silenceDeprecations": [
-            "mixed-decls",
-            "color-functions",
-            "global-builtin",
-            "import"
-          ]
-        },
+        "stylePreprocessorOptions": {},
         "assets": [
           {
             "glob": "**/*",

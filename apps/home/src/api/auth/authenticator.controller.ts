@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpException,
   HttpStatus,
   Post,
@@ -27,13 +28,7 @@ export class AuthenticatorController {
     description: 'Registration options retreived.',
   })
   async getRegistrationOptions(@Session() session: Record<string, any>) {
-    const registrationOptions = await this.authService.getRegistrationOptions();
-
-    // Add challenge and user to the session
-    session.challenge = registrationOptions.challenge;
-    session.userHandle = registrationOptions.user.id;
-
-    return registrationOptions;
+    return await this.authService.getRegistrationOptions(session);
   }
 
   @Post('register')
@@ -45,8 +40,13 @@ export class AuthenticatorController {
   async register(
     @Session() session: Record<string, any>,
     @Body() body: RegisterRequestBody,
+    @Headers() headers: Record<string, string>,
   ) {
-    const result = await this.authService.doRegister(body.credential, session);
+    const result = await this.authService.doRegister(
+      body.credential,
+      session,
+      headers['origin'] || '',
+    );
     if (result) {
       return { status: 'ok' };
     } else {
@@ -60,12 +60,7 @@ export class AuthenticatorController {
     description: 'Authentication options retreived.',
   })
   async getAuthenticationOptions(@Session() session: Record<string, any>) {
-    const authOptions = await this.authService.getAuthenticationOptions();
-
-    // Add challenge to the session
-    session.challenge = authOptions.challenge;
-
-    return authOptions;
+    return await this.authService.getAuthenticationOptions(session);
   }
 
   @Post('authenticate')
@@ -81,6 +76,7 @@ export class AuthenticatorController {
     try {
       return await this.authService.doAuthenticate(body.credential, session);
     } catch (error: any) {
+      console.log(error);
       throw new HttpException(error, HttpStatus.FORBIDDEN);
     }
   }
