@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "@angular-devkit/architect": "0.1900.7",
+    "@angular-devkit/core": "19.0.7",
     "esbuild": "^0.24.0",
     "rxjs": "~7.8.1",
     "tslib": "^2.3.0"
