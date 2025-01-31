@@ -13,7 +13,9 @@ import type { RegisterRequestBody } from './authenticator.model';
 import { AuthenticatorService } from './authenticator.service';
 
 /**
- * The controller for the /api/widgets route.
+ * The controller for the authenticator routes.
+ *
+ * This wraps the authenticator service in http routes.
  *
  * @param server
  */
@@ -22,6 +24,11 @@ import { AuthenticatorService } from './authenticator.service';
 export class AuthenticatorController {
   constructor(private authService: AuthenticatorService) {}
 
+  /**
+   *
+   * @param session
+   * @returns
+   */
   @Get('registration-options')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -31,6 +38,13 @@ export class AuthenticatorController {
     return await this.authService.getRegistrationOptions(session);
   }
 
+  /**
+   *
+   * @param session
+   * @param body
+   * @param headers
+   * @returns
+   */
   @Post('register')
   @ApiResponse({ status: HttpStatus.OK, description: 'Registerred.' })
   @ApiResponse({
@@ -39,21 +53,26 @@ export class AuthenticatorController {
   })
   async register(
     @Session() session: Record<string, any>,
-    @Body() body: RegisterRequestBody,
     @Headers() headers: Record<string, string>,
+    @Body() body: RegisterRequestBody,
   ) {
-    const result = await this.authService.doRegister(
-      body.credential,
-      session,
-      headers['origin'] || '',
-    );
-    if (result) {
-      return { status: 'ok' };
-    } else {
-      throw new HttpException('Failed to register', HttpStatus.BAD_REQUEST);
+    try {
+      const result = await this.authService.doRegister(
+        body.credential,
+        session,
+        headers['origin'] || '',
+      );
+      return { status: result ? 'ok' : 'failed' };
+    } catch (error: any) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
 
+  /**
+   *
+   * @param session
+   * @returns
+   */
   @Get('authentication-options')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -63,6 +82,12 @@ export class AuthenticatorController {
     return await this.authService.getAuthenticationOptions(session);
   }
 
+  /**
+   *
+   * @param session
+   * @param body
+   * @returns
+   */
   @Post('authenticate')
   @ApiResponse({ status: HttpStatus.OK, description: 'Authenticated.' })
   @ApiResponse({
@@ -71,12 +96,16 @@ export class AuthenticatorController {
   })
   async authenticate(
     @Session() session: Record<string, any>,
+    @Headers() headers: Record<string, string>,
     @Body() body: any,
   ) {
     try {
-      return await this.authService.doAuthenticate(body.credential, session);
+      return await this.authService.doAuthenticate(
+        body.credential,
+        session,
+        headers['origin'] || '',
+      );
     } catch (error: any) {
-      console.log(error);
       throw new HttpException(error, HttpStatus.FORBIDDEN);
     }
   }

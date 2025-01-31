@@ -52,9 +52,10 @@ export class AuthenticatorService {
   /**
    * Do a credential registration
    *
-   * @param challenge
    * @param credential
    * @param session
+   * @param origin
+   *
    * @returns
    */
   async doRegister(
@@ -62,39 +63,36 @@ export class AuthenticatorService {
     session: Record<string, any>,
     origin: string,
   ): Promise<boolean> {
-    try {
-      const challenge: ArrayBuffer = new Uint8Array(session.challenge.data)
-        .buffer;
-      const regResult = await this.fido.attestationResult(
-        {
-          rawId: new Uint8Array(Buffer.from(credential.rawId, 'base64')).buffer,
-          response: {
-            attestationObject: base64url.decode(
-              credential.response.attestationObject,
-              'base64',
-            ),
-            clientDataJSON: base64url.decode(
-              credential.response.clientDataJSON,
-              'base64',
-            ),
-          },
+    const challenge: ArrayBuffer = new Uint8Array(session.challenge.data)
+      .buffer;
+    const regResult = await this.fido.attestationResult(
+      {
+        rawId: new Uint8Array(Buffer.from(credential.rawId, 'base64')).buffer,
+        response: {
+          attestationObject: base64url.decode(
+            credential.response.attestationObject,
+            'base64',
+          ),
+          clientDataJSON: base64url.decode(
+            credential.response.clientDataJSON,
+            'base64',
+          ),
         },
-        {
-          challenge: Buffer.from(challenge).toString('base64'),
-          origin,
-          factor: 'either' as Factor,
-        },
-      );
+      },
+      {
+        challenge: Buffer.from(challenge).toString('base64'),
+        origin,
+        factor: 'either' as Factor,
+      },
+    );
 
-      // Store the public key and counter in the session
-      session.publicKey = regResult.authnrData.get('credentialPublicKeyPem');
-      session.prevCounter = regResult.authnrData.get('counter');
+    // Store the public key and counter in the session
+    // We should probably store this in a longer term storage somewhere
+    // and associate it with the user id
+    session.publicKey = regResult.authnrData.get('credentialPublicKeyPem');
+    session.prevCounter = regResult.authnrData.get('counter');
 
-      return true;
-    } catch (e) {
-      console.log('error', e);
-      return false;
-    }
+    return true;
   }
 
   /**
@@ -109,7 +107,6 @@ export class AuthenticatorService {
 
     // Add challenge to the session
     session.challenge = authOptions.challenge;
-    console.log(session);
 
     return authOptions;
   }
@@ -118,12 +115,13 @@ export class AuthenticatorService {
    *
    * @param credential
    * @param session
+   * @param origin
    */
   async doAuthenticate(
     credential: any,
     session: Record<string, any>,
+    origin: string,
   ): Promise<Fido2AssertionResult> {
-    console.log(session);
     credential.rawId = new Uint8Array(
       Buffer.from(credential.rawId, 'base64'),
     ).buffer;
@@ -135,20 +133,14 @@ export class AuthenticatorService {
     if (publicKey === 'undefined' || prevCounter === undefined) {
       throw 'No public key or counter found in session';
     } else {
-      try {
-        const result = await this.fido.assertionResult(credential, {
-          challenge: this.arrayBufferToString(challenge),
-          origin,
-          factor: 'either',
-          publicKey,
-          prevCounter,
-          userHandle: this.arrayBufferToString(userHandle),
-        });
-        return result;
-      } catch (e) {
-        console.log('error', e);
-        throw e;
-      }
+      return await this.fido.assertionResult(credential, {
+        challenge: this.arrayBufferToString(challenge),
+        origin,
+        factor: 'either',
+        publicKey,
+        prevCounter,
+        userHandle: this.arrayBufferToString(userHandle),
+      });
     }
   }
 }

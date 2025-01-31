@@ -168,6 +168,6 @@ export class LoginComponent {
 
   /** Remove stored credentials */
   removeUser() {
-    this.auth.removeRegistration();
+    this.auth.removeCredentials();
   }
 }
