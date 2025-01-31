@@ -11,7 +11,10 @@ import {
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
-import { GeoLocationService } from '../shared/geoLocation/geoLocation.service';
+import {
+  Geolocation,
+  GeoLocationService,
+} from '../shared/geoLocation/geoLocation.service';
 import { IconPipe } from '../shared/icons/icon.pipe';
 import { Widget } from '../shared/widget/widget.service';
 
@@ -78,8 +81,9 @@ export class WeatherComponent {
   data = input<Widget>();
 
   /** Fetch users current position using Geolocation API */
-  private location: ResourceRef<{ latitude: number; longitude: number }> =
-    rxResource({ loader: () => this.loc.watchLocation$ });
+  private location: ResourceRef<Geolocation | undefined> = rxResource({
+    loader: () => this.loc.watchLocation$,
+  });
 
   /** Fetch weather data for current position using yr.no api */
   weather = resource({

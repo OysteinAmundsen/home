@@ -5,7 +5,7 @@
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": true, // Needed by NestJS
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",

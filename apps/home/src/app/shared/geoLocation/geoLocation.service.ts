@@ -11,6 +11,8 @@ import {
   throwError,
 } from 'rxjs';
 
+export type Geolocation = { latitude: number; longitude: number };
+
 /**
  * A service which wraps the geolocation API in an observable.
  *
@@ -27,8 +29,8 @@ export class GeoLocationService implements OnDestroy {
   /**
    * An observable that watches the location of the device
    */
-  watchLocation$ = new Observable<{ latitude: number; longitude: number }>(
-    (observer: Subscriber<{ latitude: number; longitude: number }>) => {
+  watchLocation$ = new Observable<Geolocation>(
+    (observer: Subscriber<Geolocation>) => {
       if (typeof window === 'undefined') {
         // Do not ask for geolocation in SSR
         observer.error('Loading...');

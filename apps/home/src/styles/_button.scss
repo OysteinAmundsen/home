@@ -22,7 +22,7 @@ button {
     outline-style: solid;
     outline-color: var(--outline-color);
   }
-  &:active {
+  &:active:not([disabled]) {
     scale: 0.9;
   }
 
