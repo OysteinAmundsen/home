@@ -57,7 +57,9 @@ export class WidgetService {
       (this.widgetsLoader.error() as HttpErrorResponse)?.error.error ??
       undefined,
   );
-  isLoading = computed(() => this.widgetsLoader.isLoading());
+  isLoading = computed(
+    () => this.widgetsLoader.isLoading() && this.widgets.length < 1,
+  );
 
   /**
    * This acts as a repository for the widgets.

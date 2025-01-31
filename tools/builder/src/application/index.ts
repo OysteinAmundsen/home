@@ -5,6 +5,8 @@ import {
   scheduleTargetAndForget,
   targetFromTargetString,
 } from '@angular-devkit/architect';
+import { Builder } from '@angular-devkit/architect/src/internal';
+import { JsonObject } from '@angular-devkit/core';
 import * as esbuild from 'esbuild';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -27,7 +29,7 @@ const CACHE_BUST = /-[A-Z0-9]{8}\./;
  * But even though this runs the serve target and returns control to the
  * builder, I am unable to get the output files from the serve target.
  */
-const builder$ = createBuilder(
+const builder$ = createBuilder<ApplicationExecutorSchema, BuilderOutput>(
   (
     opt: ApplicationExecutorSchema,
     ctx: BuilderContext,
@@ -58,7 +60,10 @@ const builder$ = createBuilder(
  * FIXME: Works with `application` target. Not with `serve` target.
  * This reads the output files from disk and creates a manifest from them.
  */
-const builder = createBuilder(
+const builder: Builder<ApplicationExecutorSchema & JsonObject> = createBuilder<
+  ApplicationExecutorSchema,
+  BuilderOutput
+>(
   async (
     opt: ApplicationExecutorSchema,
     ctx: BuilderContext,

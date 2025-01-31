@@ -4,7 +4,7 @@
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   overflow: hidden;
-  box-shadow: 0.25rem 0.5rem 0.5rem -0.35rem var(--shadow-color);
+  box-shadow: var(--shadow1);
   view-transition-class: widget;
   view-transition-name: var(--widget-id);
 

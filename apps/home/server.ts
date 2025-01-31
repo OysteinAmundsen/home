@@ -7,6 +7,7 @@ import {
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import express from 'express';
+import session from 'express-session';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +19,19 @@ export async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(ApiModule);
   // Get the Express instance
   const server = app.getHttpAdapter().getInstance();
+
+  // Setup session middleware
+  app.use(
+    session({
+      secret: 'Not a real secret',
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        secure: false,
+        maxAge: 60000,
+      },
+    }),
+  );
 
   // Setup reverse proxy routes
   Object.entries(proxyRoutes).forEach(([path, config]) =>
@@ -53,7 +67,7 @@ export async function bootstrap() {
             '[SSR]',
             req.method,
             req.url,
-            req.headers.cookie,
+            // req.headers.cookie,
             response.status,
           );
           return n;

@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { WidgetController } from './widget/widget.controller';
-import { WidgetService } from './widget/widget.service';
+import { AuthenticatorModule } from './auth/authenticator.module';
+import { WidgetModule } from './widget/widget.module';
 
 @Module({
-  // Setup api routes
-  controllers: [WidgetController],
-  providers: [WidgetService],
+  // Setup backend modules
+  imports: [WidgetModule, AuthenticatorModule],
 })
 export class ApiModule {}

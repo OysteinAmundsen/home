@@ -1,0 +1,66 @@
+/**
+ * Buttons and variants
+ */
+button {
+  color: var(--header-emphasis-color);
+  background-color: var(--header-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  --outline-color: var(--border-focused-color);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition:
+    scale 0.1s ease-in-out,
+    outline 0.1s ease-in-out,
+    border 0.1s ease-in-out;
+
+  // States
+  &:hover:not(.flat):not([disabled]),
+  &:focus:not(.flat):not([disabled]) {
+    outline-offset: -1px;
+    outline-width: 2px;
+    outline-style: solid;
+    outline-color: var(--outline-color);
+  }
+  &:active {
+    scale: 0.9;
+  }
+
+  // Variants
+  &.flat {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--text-emphasis-color);
+  }
+  &.primary {
+    color: color-mix(in srgb, var(--header-emphasis-color), var(--primary) 10%);
+    --outline-color: color-mix(
+      in srgb,
+      var(--border-focused-color),
+      var(--primary) 30%
+    );
+    background-color: color-mix(
+      in srgb,
+      var(--header-background),
+      var(--primary) 50%
+    );
+  }
+  &.warn {
+    color: color-mix(in srgb, var(--header-emphasis-color), var(--warn) 10%);
+    --outline-color: color-mix(
+      in srgb,
+      var(--border-focused-color),
+      var(--warn) 30%
+    );
+    background-color: color-mix(
+      in srgb,
+      var(--header-background),
+      var(--warn) 50%
+    );
+  }
+  &[disabled] {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--text-disabled-color);
+  }
+}

@@ -2,6 +2,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
+import { AuthenticationService } from './shared/auth/authentication.service';
 import { WidgetService } from './shared/widget/widget.service';
 
 describe('AppComponent', () => {
@@ -14,10 +15,17 @@ describe('AppComponent', () => {
     loadWidget: jest.fn(),
   };
 
+  const authStub = {
+    isRegistered: signal(false),
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [RouterModule.forRoot([]), AppComponent],
-      providers: [{ provide: WidgetService, useValue: widgetStub }],
+      providers: [
+        { provide: WidgetService, useValue: widgetStub },
+        { provide: AuthenticationService, useValue: authStub },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);

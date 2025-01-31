@@ -1,6 +1,8 @@
 :root {
   color-scheme: light dark;
+  // Base colors
   --text-color: light-dark(hsl(0, 0%, 32%), hsl(0, 0%, 85%));
+  --text-disabled-color: light-dark(hsl(0, 0%, 60%), hsl(0, 0%, 40%));
   --text-emphasis-color: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
   --background-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 15%));
   --header-emphasis-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 97%));
@@ -8,9 +10,17 @@
   --header-background: light-dark(hsl(0, 0%, 30%), hsl(0, 0%, 24%));
   --shadow-color: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 4%));
   --border-color: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 30%));
-  --border-radius: 0.5rem;
+  --border-focused-color: light-dark(hsl(0, 0%, 29%), hsl(0, 0%, 63%));
 
+  // Theme colors
+  --primary: light-dark(hsl(200, 100%, 50%), hsl(210, 100%, 30%));
+  --warn: light-dark(hsl(14, 100%, 30%), hsl(2, 100%, 63%));
+
+  // Other variables
+  --border-radius: 0.5rem;
   --text-shadow: 0 0 3px light-dark(rgba(255, 255, 255, 1), rgba(0, 0, 0, 0.5));
+  --shadow1: 0.25rem 0.5rem 0.5rem -0.35rem var(--shadow-color);
+  --shadow2: 0rem 1rem 1.3rem -0.1rem var(--shadow-color);
 }
 
 html {
