@@ -10,7 +10,9 @@
   <button (click)="filter(3)">Widget 3</button>
   <button (click)="filter(undefined)">All</button>
   <div class="spacer"></div>
-  <app-login></app-login>
+  @defer {
+    <app-login></app-login>
+  }
 </nav>
 
 <section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()">

@@ -16,6 +16,7 @@ import {
   GeoLocationService,
 } from '../shared/geoLocation/geoLocation.service';
 import { IconPipe } from '../shared/icons/icon.pipe';
+import { cache } from '../shared/rxjs/cache';
 import { Widget } from '../shared/widget/widget.service';
 
 @Component({
@@ -100,8 +101,9 @@ export class WeatherComponent {
       if (request.location == null) return undefined;
       // Fetch weather data for location
       const { latitude, longitude } = request.location;
+      const cacheKey = () => `/api/weather?lat=${latitude}&lon=${longitude}`;
       return await firstValueFrom(
-        this.http.get<any>(`/api/weather?lat=${latitude}&lon=${longitude}`),
+        cache(() => this.http.get<any>(cacheKey()), { cacheKey }),
       );
     },
   });

@@ -12,12 +12,12 @@
     transition-behavior: allow-discrete;
     transition:
       opacity 0.25s ease-in,
-      transform 0.25s ease-in,
+      scale 0.25s ease-in,
       display 0.25s ease-in;
 
     // Enter animation
     @starting-style {
-      transform: translateX(-80px) scale(0.7);
+      scale: 0.7;
       opacity: 0;
     }
 
@@ -25,7 +25,7 @@
     // This property is not yet supported by web standards
     // This is why we are using angular animations to solve this for now
     // @exit-style {
-    //   transform: translateX(40px) scale(0.7);
+    //   scale: 0.7;
     //   opacity: 0;
     //   display: none;
     // }
@@ -45,5 +45,6 @@
   section {
     padding: 1rem;
     background-color: var(--background-color);
+    view-transition-class: widget-content;
   }
 }
