@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { cache } from '../rxjs/cache';
 
 export type Widget = {
   id: number;
@@ -24,10 +25,10 @@ export class WidgetService {
     loader: async ({ request }) => {
       // Cannot use fetch directly because Angular's SSR does not support it.
       // I get a `TypeError: Failed to parse URL` from SSR when using fetch.
+      const cacheKey = () =>
+        `/api/widgets${request.id ? '/' + request.id : ''}`;
       const widgets = await firstValueFrom(
-        this.http.get<Widget[]>(
-          `/api/widgets${request.id ? '/' + request.id : ''}`,
-        ),
+        cache(() => this.http.get<Widget[]>(cacheKey()), { cacheKey }),
       );
 
       // Remove old widgets from the cache

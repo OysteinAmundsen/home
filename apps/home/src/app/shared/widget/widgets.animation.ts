@@ -1,9 +1,9 @@
 import { animate, group, query, style, transition } from '@angular/animations';
 
 // The state of the widget before it enters the view
-const hidden = { opacity: 0, translate: '0 -80px', scale: 0.7, width: '0' };
+const hidden = { opacity: 0, scale: 0.7, width: '0' };
 // The state of the widget when it rests in the view
-const visible = { opacity: 1, translate: '0 0', scale: 1, width: 'auto' };
+const visible = { opacity: 1, scale: 1, width: 'auto' };
 // // The state of the widget after it leaves the view
 // const toState = { opacity: 0, translate: '40px 80px', scale: 0.7 };
 // The time it should take to animate the widget entering or leaving
