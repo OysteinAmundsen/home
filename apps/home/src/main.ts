@@ -4,7 +4,7 @@ import { AppComponent } from './app/app.component';
 import { appConfig } from './app/app.config';
 
 bootstrapApplication(AppComponent, appConfig)
-  .then(() => loadServiceWorker())
+  // .then(() => loadServiceWorker())
   .catch((err) => console.error(err));
 
 /**

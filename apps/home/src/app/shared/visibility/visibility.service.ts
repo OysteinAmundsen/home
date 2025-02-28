@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 /**
  * Service that provides information about the "visibility" of the document.
@@ -18,6 +19,7 @@ export class VisibilityService implements OnDestroy {
   private isTabActive = signal(this.isDocumentActive());
   /** Readonly flag set to true if the browser tab is active and in focus */
   public isBrowserActive = computed(() => this.isTabActive());
+  public browserActive$ = toObservable(this.isBrowserActive);
 
   constructor() {
     this.applyVisibilityChangeHandler();

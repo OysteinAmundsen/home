@@ -5,6 +5,7 @@
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
+    "isolatedModules": false,
     "emitDecoratorMetadata": true, // Needed by NestJS
     "experimentalDecorators": true,
     "importHelpers": true,

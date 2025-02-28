@@ -51,11 +51,7 @@ registerRoute(
   createHandlerBoundToURL('/index.html'),
 );
 
-/**
- * -------------------------------------------------------
- * Define cache strategy and routes here
- * -------------------------------------------------------
- */
+// #region Cache and routes
 // Cache the Google Fonts stylesheets with a stale-while-revalidate strategy.
 googleFontsCache({ cachePrefix: `${prefix}-fonts` });
 
@@ -86,12 +82,9 @@ registerRoute(
   }),
   'GET',
 );
-/**
- * -------------------------------------------------------
- * End of cache strategy and routes
- * -------------------------------------------------------
- */
+// #endregion
 
+// #region Activation
 // Clean outdated WB caches
 // This will compile to run inside an `activate` event handler and therefore
 // will only run once per activation of the service worker.

@@ -35,7 +35,6 @@
         "styles": ["apps/home/src/styles.scss"],
         "scripts": [],
         "server": "apps/home/src/main.server.ts",
-        "prerender": false,
         "ssr": {
           "entry": "apps/home/server.ts"
         },

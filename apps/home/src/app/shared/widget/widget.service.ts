@@ -1,7 +1,19 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { computed, inject, Injectable, resource, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  Injectable,
+  Injector,
+  NgModuleFactory,
+  resource,
+  signal,
+  Type,
+} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { widgetRoutes } from '../../views/widget.routes';
 import { cache } from '../rxjs/cache';
+import { DefaultExport } from '@angular/router';
 
 export type Widget = {
   id: number;
@@ -12,6 +24,8 @@ export type Widget = {
 @Injectable({ providedIn: 'root' })
 export class WidgetService {
   private http = inject(HttpClient);
+  private injector = inject(Injector);
+  private widgetRoutes = widgetRoutes;
 
   /** Filter widgets by id */
   filter = signal<number | undefined>(undefined);
@@ -64,28 +78,36 @@ export class WidgetService {
 
   /**
    * This acts as a repository for the widgets.
-   * Its main function is to load the component based on the componentName.
+   *
+   * It will lookup the widget in the widgetRoutes and try to
+   * load the component. If the component is not found or it fails
+   * to load, it will return the NotFoundComponent.
    *
    * @param componentName
    * @returns
    */
   async loadWidget(componentName: string | undefined) {
-    let component: any;
-    // TODO: Find a better way of handling this. Maybe use a Route[]?
-    switch (componentName) {
-      case 'weather':
-        component = (await import('../../views/weather.component'))
-          .WeatherComponent;
-        break;
-      case 'widget2':
-        component = (await import('../../views/widget2.component'))
-          .Widget2Component;
-        break;
-      default:
-        component = (await import('../../views/not-found.component'))
-          .NotFoundComponent;
-        break;
+    const route = this.widgetRoutes.find(
+      (route) => route.path === componentName,
+    );
+    if (
+      route &&
+      'loadChildren' in route &&
+      typeof route.loadChildren === 'function'
+    ) {
+      try {
+        const moduleOrComponent = await route.loadChildren();
+        if (moduleOrComponent instanceof NgModuleFactory) {
+          // Should not be a module, but if it is we will try to get the default component
+          const moduleRef = moduleOrComponent.create(this.injector);
+          const component = moduleRef.instance.default;
+          return component;
+        }
+        return moduleOrComponent;
+      } catch (error) {
+        console.error(error);
+      }
     }
-    return component;
+    return (await import('../../views/not-found.component')).default;
   }
 }

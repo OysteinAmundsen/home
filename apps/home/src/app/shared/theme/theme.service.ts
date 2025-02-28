@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { effect, inject, Injectable, linkedSignal } from '@angular/core';
 import { CookieService } from '../utils/cookie';
 import { doSafeTransition } from '../utils/transitions';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 export type Theme = 'light' | 'dark';
 
@@ -27,6 +28,8 @@ export class ThemeService {
       ? 'dark'
       : 'light';
   });
+
+  selectedTheme$ = toObservable(this.selectedTheme);
 
   private onChange = effect(() => {
     const theme = this.selectedTheme();

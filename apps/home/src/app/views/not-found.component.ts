@@ -5,6 +5,6 @@ import { Widget } from '../shared/widget/widget.service';
   selector: 'app-not-found',
   template: `{{ data()?.componentName }} not found`,
 })
-export class NotFoundComponent {
+export default class NotFoundComponent {
   data = input<Widget>();
 }

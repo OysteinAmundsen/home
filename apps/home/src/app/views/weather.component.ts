@@ -7,14 +7,9 @@ import {
   inject,
   input,
   resource,
-  ResourceRef,
 } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
-import {
-  Geolocation,
-  GeoLocationService,
-} from '../shared/geoLocation/geoLocation.service';
+import { GeoLocationService } from '../shared/geoLocation/geoLocation.service';
 import { IconPipe } from '../shared/icons/icon.pipe';
 import { cache } from '../shared/rxjs/cache';
 import { Widget } from '../shared/widget/widget.service';
@@ -76,22 +71,17 @@ import { Widget } from '../shared/widget/widget.service';
     }
   `,
 })
-export class WeatherComponent {
+export default class WeatherComponent {
   http = inject(HttpClient);
   loc = inject(GeoLocationService);
   data = input<Widget>();
-
-  /** Fetch users current position using Geolocation API */
-  private location: ResourceRef<Geolocation | undefined> = rxResource({
-    loader: () => this.loc.watchLocation$,
-  });
 
   /** Fetch weather data for current position using yr.no api */
   weather = resource({
     // Triggers
     request: () => ({
-      location: this.location.value(),
-      error: this.location.error(),
+      location: this.loc.currentLocation(),
+      error: this.loc.error(),
     }),
     // Actions
     loader: async ({ request }) => {
