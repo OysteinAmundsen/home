@@ -5,17 +5,18 @@ import {
   computed,
   effect,
   inject,
-  input,
+  linkedSignal,
+  OnDestroy,
   resource,
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { GeoLocationService } from '../shared/geoLocation/geoLocation.service';
-import { IconPipe } from '../shared/icons/icon.pipe';
-import { cache } from '../shared/rxjs/cache';
-import { Widget } from '../shared/widget/widget.service';
+import { GeoLocationService } from '../../shared/geoLocation/geoLocation.service';
+import { IconPipe } from '../../shared/icons/icon.pipe';
+import { cache, Cache } from '../../shared/rxjs/cache';
+import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
 
 @Component({
-  selector: 'app-weather-widget',
+  selector: 'app-widget-weather',
   imports: [CommonModule, IconPipe],
   template: `
     @if (weather.isLoading()) {
@@ -46,7 +47,12 @@ import { Widget } from '../shared/widget/widget.service';
     }
   `,
   styles: `
+    :host {
+      view-transition-class: 'widget';
+      view-transition-name: weather;
+    }
     section {
+      view-transition-name: weather-content;
       place-items: center;
       .time {
         display: flex;
@@ -61,6 +67,7 @@ import { Widget } from '../shared/widget/widget.service';
       }
     }
     footer {
+      view-transition-name: weather-footer;
       padding-top: 0.5rem;
       display: flex;
       place-items: center;
@@ -71,16 +78,27 @@ import { Widget } from '../shared/widget/widget.service';
     }
   `,
 })
-export default class WeatherComponent {
+export default class WeatherComponent
+  extends AbstractWidgetComponent
+  implements OnDestroy
+{
   http = inject(HttpClient);
   loc = inject(GeoLocationService);
-  data = input<Widget>();
+
+  timeout: NodeJS.Timeout | undefined;
+
+  /** Computes the url with location query params when location is updated */
+  private url = computed(() => {
+    const location = this.loc.currentLocation();
+    if (location == null) return undefined;
+    return `/api/weather?lat=${location.latitude}&lon=${location.longitude}`;
+  });
 
   /** Fetch weather data for current position using yr.no api */
   weather = resource({
     // Triggers
     request: () => ({
-      location: this.loc.currentLocation(),
+      url: this.url(),
       error: this.loc.error(),
     }),
     // Actions
@@ -88,38 +106,50 @@ export default class WeatherComponent {
       // Present error if location gave an error
       if (request.error) throw request.error;
       // Die if location is not available
-      if (request.location == null) return undefined;
+      if (request.url == null) return undefined;
       // Fetch weather data for location
-      const { latitude, longitude } = request.location;
-      const cacheKey = () => `/api/weather?lat=${latitude}&lon=${longitude}`;
       return await firstValueFrom(
-        cache(() => this.http.get<any>(cacheKey()), { cacheKey }),
+        cache(() => this.http.get<any>(`${request.url}`), request.url, {
+          expirationTime: this.cacheExpirationTime(),
+        }),
       );
     },
   });
+
+  /** Set initial expiration time to 30 minutes if no update time is available */
+  private cacheExpirationTime = linkedSignal(() => 30 * 60 * 1000);
 
   /** Holds yr.no last update time */
   lastUpdated = computed(
     () => this.weather.value()?.properties.meta.updated_at,
   );
-
-  /** Triggers next update when approx one hour has passed since yr.no update time */
-  private nextUpdate = effect(() => {
-    // Triggers
+  /** Computes next update time. Yr updates once per hour, so no need to ask more often */
+  private nextUpdate = computed(() => {
     const lastUpdated = this.lastUpdated();
-    if (lastUpdated == null) return;
-    // Actions
-    const now = new Date();
+    // If no update has been made, trigger now
+    if (lastUpdated == null) return new Date();
     const lastUpdatedTime = new Date(lastUpdated);
     // Update when one hour and 2 minutes has passed since last update
-    let nextUpdateTime = new Date(lastUpdatedTime.getTime() + 62 * 60 * 1000);
-    if (nextUpdateTime.getTime() < now.getTime()) {
-      // If the next update time is in the past, update in 2 minutes
-      nextUpdateTime = new Date(now.getTime() + 2 * 60 * 1000);
-    }
-    setTimeout(() => {
-      this.weather.reload();
-    }, nextUpdateTime.getTime() - Date.now());
+    return new Date(lastUpdatedTime.getTime() + 62 * 60 * 1000);
+  });
+
+  /** Triggers next update when approx one hour has passed since yr.no update time */
+  private triggerNextUpdate = effect(() => {
+    // Triggers
+    const nextUpdateTime = this.nextUpdate();
+
+    // Actions
+    // Calculate time until next update and update cache
+    const expirationTime = nextUpdateTime.getTime() - Date.now();
+    this.cacheExpirationTime.set(expirationTime);
+    Cache.update(`${this.url()}`, { options: { expirationTime } });
+
+    // Trigger reload when next update time has passed
+    if (this.timeout) clearTimeout(this.timeout);
+    this.timeout = setTimeout(
+      () => this.weather.reload(),
+      nextUpdateTime.getTime() - Date.now(),
+    );
   });
 
   /** Display only 12 hours in the widget */
@@ -128,4 +158,9 @@ export default class WeatherComponent {
       (this.weather.value()?.properties.timeseries || []) as Array<any>
     ).slice(0, 12);
   });
+
+  ngOnDestroy(): void {
+    // Cleanup triggers
+    if (this.timeout) clearTimeout(this.timeout);
+  }
 }

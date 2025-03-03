@@ -1,13 +1,14 @@
 import {
   Component,
+  computed,
   effect,
-  HostBinding,
   inject,
   input,
   resource,
   viewChild,
   ViewContainerRef,
 } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { Widget, WidgetService } from './widget.service';
 
 /**
@@ -17,9 +18,13 @@ import { Widget, WidgetService } from './widget.service';
  */
 @Component({
   selector: 'app-widget',
+  imports: [RouterModule],
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.scss'],
-  host: { class: 'widget' },
+  host: {
+    class: 'widget-wrapper',
+    '[style.--widget-id]': 'widgetId()',
+  },
 })
 export class WidgetComponent {
   private readonly widgetService = inject(WidgetService);
@@ -27,10 +32,13 @@ export class WidgetComponent {
 
   data = input<Widget>();
 
-  @HostBinding('style.--widget-id')
-  get widgetId() {
-    return `widget_${this.data()?.id}`;
-  }
+  widgetId = computed(() => `widget_${this.data()?.id}`);
+
+  route = computed(() => {
+    const data = this.data();
+    const route = this.widgetService.getRoute(data?.componentName);
+    return route ? [route.path] : [];
+  });
 
   /**
    * Dynamically load a component based on the `componentName` input.

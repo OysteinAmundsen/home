@@ -1,15 +1,12 @@
 import { trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import {
-  afterNextRender,
   AfterViewInit,
   Component,
-  effect,
+  computed,
   ElementRef,
-  HostBinding,
   HostListener,
   inject,
-  signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppSettingsService } from './app.settings';
@@ -18,17 +15,14 @@ import { LoginComponent } from './shared/auth/login.component';
 import { ConnectivityService } from './shared/connectivity/connectivity.service';
 import { ThemeComponent } from './shared/theme/theme.component';
 import { TimeComponent } from './shared/time.component';
-import { doSafeTransition } from './shared/utils/transitions';
 import { VisibilityService } from './shared/visibility/visibility.service';
-import { WidgetComponent } from './shared/widget/widget.component';
-import { Widget, WidgetService } from './shared/widget/widget.service';
+import { WidgetService } from './shared/widget/widget.service';
 import { widgetAnimation } from './shared/widget/widgets.animation';
 
 @Component({
   imports: [
     RouterModule,
     CommonModule,
-    WidgetComponent,
     TimeComponent,
     ThemeComponent,
     LoginComponent,
@@ -37,6 +31,10 @@ import { widgetAnimation } from './shared/widget/widgets.animation';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   animations: [trigger('widgets', [widgetAnimation])],
+  host: {
+    '[class.inactive]': 'isInactive()',
+    '[class.offline]': 'isOffline()',
+  },
 })
 export class AppComponent implements AfterViewInit {
   private readonly widgetService = inject(WidgetService);
@@ -46,36 +44,13 @@ export class AppComponent implements AfterViewInit {
   private readonly settings = inject(AppSettingsService);
   private readonly auth = inject(AuthenticationService);
 
-  protected animationDisabled = signal(true);
-
-  constructor() {
-    afterNextRender(() =>
-      this.animationDisabled() ? this.animationDisabled.set(false) : null,
-    );
-  }
-
   /** Is set if current document is inactive and not in focus */
-  @HostBinding('class.inactive')
-  get isInactive() {
-    return !this.visibility.isBrowserActive();
-  }
+  isInactive = computed(() => !this.visibility.isBrowserActive());
 
   /** Is set if browser looses connectivity */
-  @HostBinding('class.offline')
-  get isOffline() {
-    return this.connectivity.isBrowserOffline();
-  }
+  isOffline = computed(() => this.connectivity.isBrowserOffline());
 
   isRegistered = this.auth.isRegistered;
-
-  /** The resource loader for widgets is outsourced to an effect in order to animate this */
-  widgets = signal<Widget[]>([]);
-  error = this.widgetService.error;
-  isLoading = this.widgetService.isLoading;
-  widgetsLoader = effect(() => {
-    const widgets = this.widgetService.widgets();
-    doSafeTransition(() => this.widgets.set(widgets));
-  });
 
   /** The resource reactive signal for reloading */
   filter(id: number | undefined) {

@@ -1,0 +1,11 @@
+<section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()">
+  @for (widget of widgets(); track widget.id) {
+    <app-widget [data]="widget"> </app-widget>
+  } @empty {
+    @if (isLoading()) {
+      <span class="loading">Loading...</span>
+    } @else if (error()) {
+      <span class="error">{{ error() }}</span>
+    }
+  }
+</section>

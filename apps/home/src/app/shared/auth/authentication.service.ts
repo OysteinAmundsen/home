@@ -8,6 +8,7 @@ import {
   PLATFORM_ID,
   signal,
 } from '@angular/core';
+import { GetRegistrationOptionsResponse } from 'apps/home/src/api/auth/authenticator.model';
 import { firstValueFrom } from 'rxjs';
 
 const bufferToBase64 = (buffer: ArrayBuffer) =>
@@ -60,6 +61,7 @@ export class AuthenticationService {
     this.credentials.set('');
   }
 
+  // #region Registration
   /**
    * Register a new user to the system
    *
@@ -73,56 +75,12 @@ export class AuthenticationService {
    */
   async register(userName: string, displayName: string) {
     // Step 1: Get the registration options from the server
-    const options = await firstValueFrom(
-      this.http.get<any>(`/api/auth/registration-options`),
+    const { token, options } = await firstValueFrom(
+      this.http.get<GetRegistrationOptionsResponse>(`/api/auth/register`),
     );
 
     // Step 2 + 3: Get user consent and create the webauth credentials
-    const credential = await this.createCredentials(
-      options,
-      userName,
-      displayName,
-    );
-
-    // Step 4: Send the credential to the server
-    await this.postCredentials(credential);
-  }
-
-  /**
-   * Authenticate the user
-   */
-  async authenticate() {
-    // Get the server part of the authentication options
-    const options = await firstValueFrom(
-      this.http.get<PublicKeyCredentialRequestOptions>(
-        `/api/auth/authentication-options`,
-      ),
-    );
-
-    // Get the client part or our webauth credentials
-    const credential = await this.getCredentials(options);
-
-    // Do the actual authentication
-    if (credential) {
-      this.doAuthentication(credential);
-    }
-  }
-
-  // #region Private methods
-
-  /**
-   * Create credentials using the provided options
-   * @param options The public key credential creation options
-   * @param userName The username to register
-   * @param displayName The display name of the user
-   * @returns The created public key credential
-   */
-  private async createCredentials(
-    options: PublicKeyCredentialCreationOptions,
-    userName: string,
-    displayName: string,
-  ): Promise<PublicKeyCredential> {
-    return (await navigator.credentials.create({
+    const credential = (await navigator.credentials.create({
       publicKey: {
         ...options,
         challenge: new Uint8Array((options.challenge as any).data),
@@ -133,39 +91,9 @@ export class AuthenticationService {
         },
       },
     })) as PublicKeyCredential;
-  }
 
-  /**
-   * Get credentials using the provided options
-   * @param options The public key credential request options
-   * @returns The retrieved public key credential or null if failed
-   */
-  private async getCredentials(
-    options: PublicKeyCredentialRequestOptions,
-  ): Promise<PublicKeyCredential | null> {
-    const credentialId = localStorage.getItem(CREDENTIALS_KEY) || '';
-    try {
-      return (await navigator.credentials.get({
-        publicKey: {
-          ...options,
-          challenge: new Uint8Array((options as any).challenge.data),
-          allowCredentials: [
-            {
-              id: base64ToBuffer(credentialId),
-              type: 'public-key',
-              transports: ['internal'],
-            },
-          ],
-        },
-      })) as PublicKeyCredential;
-    } catch (ex) {
-      // Stored credentials not working for some reason.
-      // Fallback to removing the registration to allow user
-      // to re-register.
-      console.error('failed to get credentials', ex);
-      this.removeCredentials();
-      return null;
-    }
+    // Step 4: Send the credential to the server
+    await this.postCredentials(credential);
   }
 
   /**
@@ -203,6 +131,27 @@ export class AuthenticationService {
       this.setCredentials(rawId);
     } catch (e) {
       console.error('registration failed', e);
+    }
+  }
+
+  // #region Authentication
+  /**
+   * Authenticate the user
+   */
+  async authenticate() {
+    // Get the server part of the authentication options
+    const options = await firstValueFrom(
+      this.http.get<PublicKeyCredentialRequestOptions>(
+        `/api/auth/authenticate`,
+      ),
+    );
+
+    // Get the client part or our webauth credentials
+    const credential = await this.getCredentials(options);
+
+    // Do the actual authentication
+    if (credential) {
+      this.doAuthentication(credential);
     }
   }
 
@@ -246,5 +195,36 @@ export class AuthenticationService {
     }
   }
 
-  // #endregion
+  /**
+   * Get credentials using the provided options
+   * @param options The public key credential request options
+   * @returns The retrieved public key credential or null if failed
+   */
+  private async getCredentials(
+    options: PublicKeyCredentialRequestOptions,
+  ): Promise<PublicKeyCredential | null> {
+    const credentialId = localStorage.getItem(CREDENTIALS_KEY) || '';
+    try {
+      return (await navigator.credentials.get({
+        publicKey: {
+          ...options,
+          challenge: new Uint8Array((options as any).challenge.data),
+          allowCredentials: [
+            {
+              id: base64ToBuffer(credentialId),
+              type: 'public-key',
+              transports: ['internal'],
+            },
+          ],
+        },
+      })) as PublicKeyCredential;
+    } catch (ex) {
+      // Stored credentials not working for some reason.
+      // Fallback to removing the registration to allow user
+      // to re-register.
+      console.error('failed to get credentials', ex);
+      this.removeCredentials();
+      return null;
+    }
+  }
 }

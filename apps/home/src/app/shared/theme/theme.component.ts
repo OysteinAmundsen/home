@@ -11,10 +11,17 @@ import { ThemeService } from './theme.service';
     </button>
   `,
   styles: `
+    :host {
+      display: flex;
+      height: 100%;
+      place-items: center;
+    }
     button {
       color: var(--text-color);
       height: 1.5rem;
       line-height: 1.7rem;
+      padding-top: 1px;
+      padding-bottom: 0;
       span {
         font-size: 1rem;
         font-weight: bold;

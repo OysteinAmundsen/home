@@ -1,7 +1,7 @@
 :root {
   color-scheme: light dark;
   // Base colors
-  --text-color: light-dark(hsl(0, 0%, 32%), hsl(0, 0%, 85%));
+  --text-color: light-dark(hsl(0, 0%, 22%), hsl(0, 0%, 85%));
   --text-disabled-color: light-dark(hsl(0, 0%, 60%), hsl(0, 0%, 40%));
   --text-emphasis-color: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
   --background-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 15%));
@@ -28,8 +28,15 @@ html {
     color-scheme: dark;
     --text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
   }
+  // prettier-ignore
   &[data-schema='light'] {
     color-scheme: light;
-    --text-shadow: 0 0 3px rgba(255, 255, 255, 1), 0 0 1px rgba(0, 0, 0, 1);
+    --text-shadow: 
+      0 0 1px rgba(0, 0, 0, 1), 
+      0 0 1px rgba(0, 0, 0, 1), 
+      0 0 2px rgb(255 255 255),
+      0 0 2px rgb(255 255 255),
+      0 0 16px rgb(255 255 255),
+      0 0 32px rgb(255 255 255);
   }
 }

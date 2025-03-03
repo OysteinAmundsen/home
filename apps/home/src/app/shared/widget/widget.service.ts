@@ -1,19 +1,17 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {
-  Component,
   computed,
+  ElementRef,
   inject,
   Injectable,
   Injector,
   NgModuleFactory,
   resource,
   signal,
-  Type,
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { widgetRoutes } from '../../views/widget.routes';
 import { cache } from '../rxjs/cache';
-import { DefaultExport } from '@angular/router';
 
 export type Widget = {
   id: number;
@@ -29,20 +27,21 @@ export class WidgetService {
 
   /** Filter widgets by id */
   filter = signal<number | undefined>(undefined);
+  url = computed(() =>
+    this.filter() ? `/api/widgets/${this.filter()}` : '/api/widgets',
+  );
 
   /** Fetches the widgets from the server */
   private widgetsCache = [] as Widget[];
   private widgetsLoader = resource({
     // Triggers
-    request: () => ({ id: this.filter() }),
+    request: () => this.url(),
     // Actions
     loader: async ({ request }) => {
       // Cannot use fetch directly because Angular's SSR does not support it.
       // I get a `TypeError: Failed to parse URL` from SSR when using fetch.
-      const cacheKey = () =>
-        `/api/widgets${request.id ? '/' + request.id : ''}`;
       const widgets = await firstValueFrom(
-        cache(() => this.http.get<Widget[]>(cacheKey()), { cacheKey }),
+        cache(() => this.http.get<Widget[]>(request), request),
       );
 
       // Remove old widgets from the cache
@@ -76,6 +75,16 @@ export class WidgetService {
     () => this.widgetsLoader.isLoading() && this.widgets.length < 1,
   );
 
+  getRoute(componentName: string | undefined) {
+    if (!componentName) return;
+    return this.widgetRoutes.find((route) => route.path === componentName);
+  }
+
+  isDescendantOfWidget(elementRef: ElementRef<HTMLElement>) {
+    const element = elementRef.nativeElement;
+    return element.closest('app-widget') !== null;
+  }
+
   /**
    * This acts as a repository for the widgets.
    *
@@ -87,16 +96,14 @@ export class WidgetService {
    * @returns
    */
   async loadWidget(componentName: string | undefined) {
-    const route = this.widgetRoutes.find(
-      (route) => route.path === componentName,
-    );
+    const route = this.getRoute(componentName);
     if (
       route &&
-      'loadChildren' in route &&
-      typeof route.loadChildren === 'function'
+      'loadComponent' in route &&
+      typeof route.loadComponent === 'function'
     ) {
       try {
-        const moduleOrComponent = await route.loadChildren();
+        const moduleOrComponent = await route.loadComponent();
         if (moduleOrComponent instanceof NgModuleFactory) {
           // Should not be a module, but if it is we will try to get the default component
           const moduleRef = moduleOrComponent.create(this.injector);
@@ -108,6 +115,6 @@ export class WidgetService {
         console.error(error);
       }
     }
-    return (await import('../../views/not-found.component')).default;
+    return (await import('../../views/widgets/not-found.component')).default;
   }
 }

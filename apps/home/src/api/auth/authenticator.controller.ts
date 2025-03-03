@@ -29,7 +29,7 @@ export class AuthenticatorController {
    * @param session
    * @returns
    */
-  @Get('registration-options')
+  @Get('register')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Registration options retreived.',
@@ -73,7 +73,7 @@ export class AuthenticatorController {
    * @param session
    * @returns
    */
-  @Get('authentication-options')
+  @Get('authenticate')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Authentication options retreived.',

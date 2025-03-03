@@ -27,7 +27,7 @@ input {
     outline-style: solid;
     outline-color: var(--border-focused-color);
   }
-  &.ng-invalid {
+  &.ng-invalid:not(.ng-pristine) {
     --border-color: var(--warn);
     --border-focused-color: var(--warn);
     &::placeholder {

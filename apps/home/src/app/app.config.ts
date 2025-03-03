@@ -15,9 +15,9 @@ import { appRoutes } from './app.routes';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideClientHydration(withIncrementalHydration(), withEventReplay()),
+    provideRouter(appRoutes, withViewTransitions() /*withDebugTracing()*/),
     provideExperimentalZonelessChangeDetection(),
     // provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(appRoutes, withViewTransitions() /*withDebugTracing()*/),
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),
   ],

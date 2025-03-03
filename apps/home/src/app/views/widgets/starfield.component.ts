@@ -7,33 +7,54 @@ import {
   effect,
   ElementRef,
   inject,
-  input,
   linkedSignal,
   signal,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime } from 'rxjs';
-import { ThemeService } from '../shared/theme/theme.service';
-import { VisibilityService } from '../shared/visibility/visibility.service';
-import { Widget } from '../shared/widget/widget.service';
+import { ThemeService } from '../../shared/theme/theme.service';
+import { toHsl } from '../../shared/utils/color';
+import { VisibilityService } from '../../shared/visibility/visibility.service';
+import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
 
 @Component({
-  selector: 'app-widget2',
+  selector: 'app-widget-starfield',
   template: `
     <canvas #starfield [width]="width()" [height]="height()"></canvas>
   `,
   styles: [
     `
+      :host {
+        view-transition-class: 'widget';
+        view-transition-name: starfield;
+      }
+      // Displayed in fullscreen
+      :root:not(:has(app-widget)) :host {
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          color-mix(in srgb, var(--background-color), transparent 10%) 40%
+        );
+        width: calc(100% + 2rem);
+        height: calc(100% + 2rem);
+        margin: -1rem;
+        canvas {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+        }
+      }
+      // Displayed in dashboard
       canvas {
         display: block;
         min-width: 300px;
         width: calc(100% + 2rem);
         height: calc(100% + 2rem);
+        margin: -1rem;
         transition:
           opacity 0.3s,
           filter 0.3s;
-        margin: -1rem;
       }
       :root .inactive :host canvas {
         // opacity: 0.3;
@@ -42,13 +63,14 @@ import { Widget } from '../shared/widget/widget.service';
     `,
   ],
 })
-export default class StarFieldComponent implements AfterViewInit {
+export default class StarFieldComponent
+  extends AbstractWidgetComponent
+  implements AfterViewInit
+{
   private readonly theme = inject(ThemeService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly doc = inject(DOCUMENT);
   private readonly visibility = inject(VisibilityService);
-
-  data = input<Widget>();
 
   canvas = viewChild<ElementRef<HTMLCanvasElement>>('starfield');
   canvasEl = computed(() => this.canvas()?.nativeElement);
@@ -72,13 +94,15 @@ export default class StarFieldComponent implements AfterViewInit {
   animationFrame: number | undefined;
 
   ngAfterViewInit() {
+    if (this.canvas() == null) return;
+
     // Setup canvas
-    const maxStars = 1000;
+    const maxStars = this.isFullscreen() ? 5000 : 1000;
 
     // Initialize stars
     const stars = [];
     for (let i = 0; i < maxStars; i++) {
-      stars.push(new Star(this.canvas()!.nativeElement, this.ctx()!));
+      stars.push(new Star(this.canvasEl()!, this.ctx()!));
     }
     this.stars.set(stars);
 
@@ -131,7 +155,6 @@ export default class StarFieldComponent implements AfterViewInit {
 
     for (const star of this.stars()) {
       star.setCurrentColor(this.color());
-      star.update();
       star.draw();
     }
     this.ctx()!.translate(-centerX, -centerY);
@@ -148,7 +171,7 @@ export default class StarFieldComponent implements AfterViewInit {
     this.ctx()!.clearRect(0, 0, this.width(), this.height());
     this.ctx()!.translate(centerX, centerY);
     for (const star of this.stars()) {
-      star.setCurrentColor(this.color() + '44');
+      star.setCurrentColor(this.color());
       star.draw();
     }
 
@@ -160,27 +183,52 @@ export default class StarFieldComponent implements AfterViewInit {
   }
 }
 
+type Point = {
+  x: number;
+  y: number;
+};
+
+type Arc = {
+  x: number;
+  y: number;
+  radius: number;
+};
+
 // Star object
 class Star {
   canvas!: HTMLCanvasElement;
   ctx!: CanvasRenderingContext2D;
-  x!: number;
-  y!: number;
-  z!: number;
-  starX!: number;
-  starY!: number;
-  size!: number;
-  speed!: number;
-  angle!: number;
-  radius!: number;
   centerW!: number;
   centerH!: number;
   currentColor!: string;
   rect!: DOMRect;
+  large = false;
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  startPos!: Point;
+  curPos?: Point;
+  z!: number;
+
+  size!: number;
+  speed!: number;
+  angle!: number;
+  radius!: number;
+
+  arcs: Arc[] = [];
+  retainPositions = 3;
+
+  h = 0;
+  s = 0;
+  l = 0;
+
+  constructor(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    large = false,
+  ) {
     this.canvas = canvas;
     this.ctx = ctx;
+    this.large = large;
+    if (this.large) this.retainPositions = 5;
 
     // Initialize
     this.reset();
@@ -188,38 +236,68 @@ class Star {
 
   setCurrentColor(color: string) {
     this.currentColor = color;
+    const [h, s, l] = toHsl(this.currentColor);
+    this.h = h;
+    this.s = s;
+    this.l = l;
   }
 
   reset() {
     this.rect = this.canvas.getBoundingClientRect();
     this.centerW = this.rect.width / 2;
     this.centerH = this.rect.height / 2;
-    this.x = this.random(-this.centerW, this.centerW);
-    this.y = this.random(-this.centerH, this.centerH);
+    this.startPos = {
+      x: this.random(-this.centerW, this.centerW),
+      y: this.random(-this.centerH, this.centerH),
+    };
+    delete this.curPos;
     this.z = this.rect.width;
-    this.size = this.random(1, 2);
+    this.size = this.random(1, this.large ? 4 : 2);
     this.speed = this.random(1, 5);
     this.angle = this.random(0, this.rect.width) * 2 * Math.PI;
-  }
-
-  update() {
-    this.z -= this.speed;
-    if (this.z <= 0) {
-      this.reset();
-    }
-    const xRatio = this.x / this.z;
-    const yRatio = this.y / this.z;
-    this.starX = this.remap(xRatio, 0, 1, 0, this.rect.width);
-    this.starY = this.remap(yRatio, 0, 1, 0, this.rect.height);
-    this.radius = this.remap(this.z, 0, this.rect.width, this.size, 0);
+    this.arcs = [];
   }
 
   draw() {
+    this.z -= this.speed;
+
+    if (
+      this.z <= 0 ||
+      Math.abs(this.arcs[0]?.x) >= this.rect.width / 2 ||
+      Math.abs(this.arcs[0]?.y) >= this.rect.height / 2
+    ) {
+      // Star is off screen, reset
+      this.reset();
+    }
+
+    // lPercent should be either from 50 to 100 if this.l > 50,
+    // or from 50 to 0 if this.l < 50
+    const percent = (this.z * 100) / this.rect.width;
+    const lPercent = this.l > 50 ? 120 - percent : percent - 40;
+    const color = `hsl(${this.h}, ${this.s}%, ${lPercent.toFixed(2)}%)`;
+
+    this.curPos = {
+      x: this.remap(this.startPos.x / this.z, 0, 1, 0, this.rect.width),
+      y: this.remap(this.startPos.y / this.z, 0, 1, 0, this.rect.height),
+    };
+    this.radius = this.remap(this.z, 0, this.rect.width, this.size, 0);
+
+    this.arcs.push({ x: this.curPos.x, y: this.curPos.y, radius: this.radius });
+    if (this.arcs.length > this.retainPositions) {
+      this.arcs.shift();
+    }
     this.ctx.beginPath();
-    this.ctx.arc(this.starX, this.starY, this.radius, 0, Math.PI * 2, false);
-    this.ctx.closePath();
-    this.ctx.fillStyle = this.currentColor;
+    this.ctx.arc(this.curPos.x, this.curPos.y, this.radius, 0, Math.PI * 2);
+    this.ctx.fillStyle = color;
     this.ctx.fill();
+    this.ctx.closePath();
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.curPos.x, this.curPos.y);
+    this.ctx.lineTo(this.arcs[0].x, this.arcs[0].y);
+    this.ctx.strokeStyle = color;
+    this.ctx.stroke();
+    this.ctx.closePath();
   }
 
   random(min: number, max: number): number {

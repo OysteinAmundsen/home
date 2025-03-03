@@ -8,14 +8,20 @@ import { Route } from '@angular/router';
 export const widgetRoutes: Route[] = [
   {
     path: 'weather',
-    loadChildren: () => import('./weather.component').then((m) => m.default),
+    data: { widget: true },
+    loadComponent: () =>
+      import('./widgets/weather.component').then((m) => m.default),
   },
   {
     path: 'starfield',
-    loadChildren: () => import('./starfield.component').then((m) => m.default),
+    data: { widget: true },
+    loadComponent: () =>
+      import('./widgets/starfield.component').then((m) => m.default),
   },
   {
     path: 'not-found',
-    loadChildren: () => import('./not-found.component').then((m) => m.default),
+    data: { widget: true },
+    loadComponent: () =>
+      import('./widgets/not-found.component').then((m) => m.default),
   },
 ];
