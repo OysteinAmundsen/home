@@ -19,11 +19,11 @@ import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.com
   selector: 'app-widget-weather',
   imports: [CommonModule, IconPipe],
   template: `
-    @if (isFullscreen()) {}
+    <header>Weather</header>
     @if (weather.isLoading()) {
-      <header>Loading...</header>
+      <section>Loading...</section>
     } @else if (weather.error()) {
-      <header>{{ weather.error() }}</header>
+      <section>{{ weather.error() }}</section>
     } @else if (weather.value()) {
       <section>
         @for (time of todaysWeather(); track time.time) {
@@ -49,8 +49,19 @@ import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.com
   `,
   styles: `
     :host {
-      view-transition-class: 'widget';
+      view-transition-class: widget;
       view-transition-name: weather;
+      container-type: size;
+      display: block;
+      height: 100%;
+      width: 100%;
+      min-height: 16rem;
+    }
+    header {
+      display: none;
+      @container (min-height: 20rem) {
+        display: block;
+      }
     }
     section {
       view-transition-name: weather-content;

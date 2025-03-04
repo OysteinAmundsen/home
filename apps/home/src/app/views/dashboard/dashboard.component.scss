@@ -10,7 +10,13 @@ nav {
 
 section {
   display: flex;
-  flex: 1;
+  flex-wrap: wrap;
   gap: 1rem;
   view-transition-name: widget-container;
+  ::ng-deep app-widget {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: min-content;
+    min-width: 11rem;
+  }
 }

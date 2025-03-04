@@ -65,7 +65,6 @@ export class WidgetComponent {
       container?.clear();
       try {
         const componentRef = container?.createComponent(component);
-        componentRef?.setInput('data', this.data());
       } catch (error) {
         console.error('Error creating component:', error);
       }

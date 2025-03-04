@@ -28,7 +28,7 @@ import { AppSettingsService } from '../../app.settings';
   styles: [
     `
       :host {
-        view-transition-class: 'widget';
+        view-transition-class: widget;
         view-transition-name: starfield;
       }
       // Displayed in fullscreen
