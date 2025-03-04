@@ -37,6 +37,8 @@
     "@nestjs/swagger": "^11.0.3",
     "@nestjs/websockets": "^10.4.15",
     "@nx/devkit": "20.4.0",
+    "@simplewebauthn/browser": "^13.1.0",
+    "@simplewebauthn/server": "^13.1.1",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.5",
     "base64url": "^3.0.1",

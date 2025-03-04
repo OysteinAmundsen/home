@@ -18,6 +18,7 @@ import { ThemeService } from '../../shared/theme/theme.service';
 import { toHsl } from '../../shared/utils/color';
 import { VisibilityService } from '../../shared/visibility/visibility.service';
 import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
+import { AppSettingsService } from '../../app.settings';
 
 @Component({
   selector: 'app-widget-starfield',
@@ -32,10 +33,14 @@ import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.com
       }
       // Displayed in fullscreen
       :root:not(:has(app-widget)) :host {
+        background: var(--background-color);
         background: linear-gradient(
           to bottom,
-          transparent,
-          color-mix(in srgb, var(--background-color), transparent 10%) 40%
+          hsla(from var(--background-color) h s l / 0%),
+          hsla(from var(--background-color) h s l / 20%) 20%,
+          hsla(from var(--background-color) h s l / 55%) 30%,
+          hsla(from var(--background-color) h s l / 80%) 40%,
+          hsla(from var(--background-color) h s l / 95%) 60%
         );
         width: calc(100% + 2rem);
         height: calc(100% + 2rem);
@@ -74,6 +79,7 @@ export default class StarFieldComponent
   private readonly destroyRef = inject(DestroyRef);
   private readonly doc = inject(DOCUMENT);
   private readonly visibility = inject(VisibilityService);
+  private readonly settings = inject(AppSettingsService);
 
   resized$ = new BehaviorSubject<DOMRect | undefined>(undefined);
 
@@ -103,9 +109,6 @@ export default class StarFieldComponent
   onRectChange = effect(() => {
     const rect = JSON.stringify(this.rect());
     if (rect != this._oldRect) {
-      for (const star of this.stars()) {
-        star.reset();
-      }
       this._oldRect = rect;
     }
   });
@@ -145,15 +148,19 @@ export default class StarFieldComponent
       .subscribe(() => this.color.set(this.computedColor()));
 
     // Initialize
-    this.visibility.browserActive$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((active) => {
-        if (active) {
-          this.animate();
-        } else {
-          this.pause();
-        }
-      });
+    if (this.settings.pauseOnInactive()) {
+      this.visibility.browserActive$
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((active) => {
+          if (active) {
+            this.animate();
+          } else {
+            this.pause();
+          }
+        });
+    } else {
+      this.animate();
+    }
   }
 
   private computedColor() {
@@ -265,6 +272,7 @@ class Star {
   // Colors
   currentColor = signal('#fff');
   hslColor = linkedSignal(() => toHsl(this.currentColor()));
+  _lastColor = '';
   color = computed(() => {
     // Triggers
     const z = this.z();
@@ -272,16 +280,27 @@ class Star {
     const width = this.rect().width;
 
     // Calculation
-    const percent = l > 50 ? (z * 100) / width : 100 - (this.z() * 100) / width;
-    const lPercent = l > 50 ? 120 - percent : percent - 20;
-    return `hsl(${h}deg, ${s}%, ${lPercent.toFixed(2)}%)`;
+    const percent = (z * 100) / width;
+    const invPercent = 100 - percent;
+    let lPercent;
+    const alphaPercent = invPercent;
+    if (l > 50) {
+      // Current color lightness is more than 50%, we are seeing white stars
+      lPercent = invPercent;
+    } else {
+      // Current color lightness is less than 50%, we are seeing black stars
+      lPercent = percent;
+    }
+    return `hsl(${h}deg, ${s / 2}%, ${lPercent}%, ${alphaPercent}%)`;
   });
+  _lastHalfColor = '';
   halfColor = computed(() => {
     const [h, s, l] = this.hslColor();
-    return `hsl(${h}deg, ${s}%, ${l}%, 50%)`;
+    return `hsl(${h}deg, ${s / 2}%, ${l}%, 50%)`;
   });
   large = false;
 
+  // Position and movement
   startPos = signal<Point>({ x: 0, y: 0 });
   curPos = computed(() => {
     const z = this.z();
@@ -293,10 +312,9 @@ class Star {
     };
   });
   z = signal(0);
-
-  size!: number;
-  speed!: number;
-  angle!: number;
+  size = 0;
+  speed = 0;
+  angle = 0;
   radius = computed(() => {
     const z = this.z();
     const { width } = this.rect();
@@ -316,6 +334,7 @@ class Star {
   }
 
   canvasChanged() {
+    this.arcs = [];
     this.rect.set(
       (this.canvas()?.getBoundingClientRect() || {
         width: 0,
@@ -344,11 +363,11 @@ class Star {
       l,
     ]);
 
-    this.size = this.random(1, this.large ? 4 : 2);
+    this.size = this.random(1, this.large ? 6 : 2);
     this.speed = this.random(1, 5);
     this.angle = this.random(0, width) * 2 * Math.PI;
     this.z.set(
-      Math.abs(this.random(width / (this.size + this.speed * 2), width)),
+      Math.abs(this.random(width / ((this.size + this.speed) * 3), width)),
     );
     if (this.remap(this.z(), 0, width, this.size, 0) < 0) {
       this.z.set(width);
@@ -386,14 +405,20 @@ class Star {
 
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = color;
+    if (this._lastColor !== color) {
+      ctx.fillStyle = color;
+      this._lastColor = color;
+    }
     ctx.fill();
     ctx.closePath();
 
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(this.arcs[0].x, this.arcs[0].y);
-    ctx.strokeStyle = alpha;
+    if (this._lastHalfColor !== alpha) {
+      ctx.strokeStyle = alpha;
+      this._lastHalfColor = alpha;
+    }
     ctx.stroke();
     ctx.closePath();
   }
