@@ -1,19 +1,9 @@
 <header class="text-shadow">
   <h1>Home</h1>
+  <app-login></app-login>
   <app-theme></app-theme>
   <app-time></app-time>
 </header>
-
-<nav>
-  <button (click)="filter(1)">Widget 1</button>
-  <button (click)="filter(2)">Widget 2</button>
-  <button (click)="filter(3)">Widget 3</button>
-  <button (click)="filter(undefined)">All</button>
-  <div class="spacer"></div>
-  @defer {
-    <app-login></app-login>
-  }
-</nav>
 
 <router-outlet></router-outlet>
 

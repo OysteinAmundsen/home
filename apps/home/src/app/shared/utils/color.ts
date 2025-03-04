@@ -47,6 +47,11 @@ export function getAlpha(color: string): number {
   return a != null ? a : 255;
 }
 
+export function setAlpha(color: string, alpha: number): string {
+  const [h, s, l] = toHsl(color);
+  return calculate(color, h, s, l, alpha);
+}
+
 /**
  * Convert to HSLA and add the given percentage to the Lightness
  * Color will be returned in the format given (hex, rgb, hsl)
@@ -254,7 +259,9 @@ export function toHsl(color: string): number[] {
   return hsl
     .substring(hsl.indexOf('(') + 1, hsl.indexOf(')'))
     .split(',')
-    .map((n) => +(n.indexOf('%') > -1 ? n.substring(0, n.indexOf('%')) : n));
+    .map((n) => {
+      return +n.replace('%', '').replace('deg', '').trim();
+    });
 }
 
 function rgbStrToHsl(rgbString: string) {
@@ -317,7 +324,7 @@ function toFixed(value: number, digits: number) {
 }
 
 function calculate(color: string, h: number, s: number, l: number, a?: number) {
-  const newHslValue = `hsl${a && a > -1 ? 'a' : ''}(${h},${s}%, ${l}%)`;
+  const newHslValue = `hsl${a && a > -1 ? 'a' : ''}(${h}, ${s}%, ${l}%${a && a > -1 ? `, ${a * 100}%` : ''})`;
   if (color.startsWith('#')) {
     return toHex(newHslValue);
   }

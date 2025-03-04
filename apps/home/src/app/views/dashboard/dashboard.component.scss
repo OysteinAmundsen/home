@@ -1,5 +1,16 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+nav {
+  display: flex;
+  gap: 0.25rem;
+}
+
 section {
   display: flex;
+  flex: 1;
   gap: 1rem;
   view-transition-name: widget-container;
 }

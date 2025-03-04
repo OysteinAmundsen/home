@@ -1,6 +1,7 @@
 import { trigger } from '@angular/animations';
 import {
   afterNextRender,
+  AfterViewInit,
   Component,
   DestroyRef,
   effect,
@@ -22,7 +23,7 @@ import { widgetAnimation } from '../../shared/widget/widgets.animation';
   styleUrl: './dashboard.component.scss',
   animations: [trigger('widgets', [widgetAnimation])],
 })
-export class DashboardComponent {
+export class DashboardComponent implements AfterViewInit {
   private readonly widgetService = inject(WidgetService);
   private readonly router = inject(Router);
   private readonly destroyRef$ = inject(DestroyRef);
@@ -37,6 +38,11 @@ export class DashboardComponent {
     const widgets = this.widgetService.widgets();
     doSafeTransition(() => this.widgets.set(widgets));
   });
+
+  /** The resource reactive signal for reloading */
+  filter(id: number | undefined) {
+    this.widgetService.filter.set(id);
+  }
 
   constructor() {
     // Skip animation on initial load
@@ -53,5 +59,9 @@ export class DashboardComponent {
       .subscribe(() => {
         this.animationDisabled.set(true);
       });
+  }
+
+  ngAfterViewInit() {
+    this.filter(undefined);
   }
 }

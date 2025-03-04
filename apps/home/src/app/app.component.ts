@@ -1,7 +1,6 @@
 import { trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
   Component,
   computed,
   ElementRef,
@@ -16,7 +15,6 @@ import { ConnectivityService } from './shared/connectivity/connectivity.service'
 import { ThemeComponent } from './shared/theme/theme.component';
 import { TimeComponent } from './shared/time.component';
 import { VisibilityService } from './shared/visibility/visibility.service';
-import { WidgetService } from './shared/widget/widget.service';
 import { widgetAnimation } from './shared/widget/widgets.animation';
 
 @Component({
@@ -36,8 +34,7 @@ import { widgetAnimation } from './shared/widget/widgets.animation';
     '[class.offline]': 'isOffline()',
   },
 })
-export class AppComponent implements AfterViewInit {
-  private readonly widgetService = inject(WidgetService);
+export class AppComponent {
   private readonly visibility = inject(VisibilityService);
   private readonly connectivity = inject(ConnectivityService);
   private readonly el = inject(ElementRef);
@@ -51,11 +48,6 @@ export class AppComponent implements AfterViewInit {
   isOffline = computed(() => this.connectivity.isBrowserOffline());
 
   isRegistered = this.auth.isRegistered;
-
-  /** The resource reactive signal for reloading */
-  filter(id: number | undefined) {
-    this.widgetService.filter.set(id);
-  }
 
   /** Handle background position changes with mouse movements */
   @HostListener('mousemove', ['$event'])
@@ -76,9 +68,5 @@ export class AppComponent implements AfterViewInit {
         `${offsetY}%`,
       );
     }
-  }
-
-  ngAfterViewInit() {
-    this.filter(undefined);
   }
 }

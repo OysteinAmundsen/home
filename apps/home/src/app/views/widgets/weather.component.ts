@@ -19,6 +19,7 @@ import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.com
   selector: 'app-widget-weather',
   imports: [CommonModule, IconPipe],
   template: `
+    @if (isFullscreen()) {}
     @if (weather.isLoading()) {
       <header>Loading...</header>
     } @else if (weather.error()) {
@@ -71,6 +72,7 @@ import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.com
       padding-top: 0.5rem;
       display: flex;
       place-items: center;
+      place-content: center;
       time {
         color: var(--text-emphasis-color);
         font-style: italic;
