@@ -8,44 +8,47 @@ import {
   linkedSignal,
   OnDestroy,
   resource,
+  signal,
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { GeoLocationService } from '../../shared/geoLocation/geoLocation.service';
 import { IconPipe } from '../../shared/icons/icon.pipe';
 import { cache, Cache } from '../../shared/rxjs/cache';
 import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
+import { WidgetComponent } from '../../shared/widget/widget.component';
 
 @Component({
   selector: 'app-widget-weather',
-  imports: [CommonModule, IconPipe],
+  imports: [CommonModule, IconPipe, WidgetComponent],
   template: `
-    <header>Weather</header>
-    @if (weather.isLoading()) {
-      <section>Loading...</section>
-    } @else if (weather.error()) {
-      <section>{{ weather.error() }}</section>
-    } @else if (weather.value()) {
-      <section>
-        @for (time of todaysWeather(); track time.time) {
-          <div class="time">
-            <time>{{ time.time | date: 'HH:mm' }}</time>
-            <span
-              [outerHTML]="time.data.next_1_hours.summary.symbol_code | icon"
-            >
-            </span>
-            <span class="temp"
-              >{{
-                time.data.instant.details.air_temperature | number: '1.1'
-              }}°C</span
-            >
-          </div>
-        }
-      </section>
-      <footer>
-        <span class="material-symbols-outlined">update</span>
-        <time>{{ lastUpdated() | date: 'dd.MM.yyyy HH:mm' }}</time>
-      </footer>
-    }
+    <app-widget [host]="host()">
+      @if (weather.isLoading()) {
+        <section>Loading...</section>
+      } @else if (weather.error()) {
+        <section>{{ weather.error() }}</section>
+      } @else if (weather.value()) {
+        <section>
+          @for (time of todaysWeather(); track time.time) {
+            <div class="time">
+              <time>{{ time.time | date: 'HH:mm' }}</time>
+              <span
+                [outerHTML]="time.data.next_1_hours.summary.symbol_code | icon"
+              >
+              </span>
+              <span class="temp"
+                >{{
+                  time.data.instant.details.air_temperature | number: '1.1'
+                }}°C</span
+              >
+            </div>
+          }
+        </section>
+        <footer>
+          <span class="material-symbols-outlined">update</span>
+          <time>{{ lastUpdated() | date: 'dd.MM.yyyy HH:mm' }}</time>
+        </footer>
+      }
+    </app-widget>
   `,
   styles: `
     :host {
@@ -55,11 +58,11 @@ import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.com
       display: block;
       height: 100%;
       width: 100%;
-      min-height: 16rem;
+      min-height: 20rem;
     }
     header {
       display: none;
-      @container (min-height: 20rem) {
+      @container (min-height: 23rem) {
         display: block;
       }
     }
@@ -95,8 +98,10 @@ export default class WeatherComponent
   extends AbstractWidgetComponent
   implements OnDestroy
 {
-  http = inject(HttpClient);
-  loc = inject(GeoLocationService);
+  private readonly http = inject(HttpClient);
+  private readonly loc = inject(GeoLocationService);
+
+  id = signal('weather');
 
   timeout: NodeJS.Timeout | undefined;
 

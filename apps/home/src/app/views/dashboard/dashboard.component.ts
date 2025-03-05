@@ -12,13 +12,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { doSafeTransition } from '../../shared/utils/transitions';
-import { WidgetComponent } from '../../shared/widget/widget.component';
+import { WidgetLoaderComponent } from '../../shared/widget/widget-loader.component';
 import { Widget, WidgetService } from '../../shared/widget/widget.service';
 import { widgetAnimation } from '../../shared/widget/widgets.animation';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [WidgetComponent],
+  imports: [WidgetLoaderComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   animations: [trigger('widgets', [widgetAnimation])],

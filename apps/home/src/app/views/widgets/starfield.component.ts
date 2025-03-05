@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -14,16 +14,20 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { AppSettingsService } from '../../app.settings';
 import { ThemeService } from '../../shared/theme/theme.service';
 import { toHsl } from '../../shared/utils/color';
 import { VisibilityService } from '../../shared/visibility/visibility.service';
 import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
-import { AppSettingsService } from '../../app.settings';
+import { WidgetComponent } from '../../shared/widget/widget.component';
 
 @Component({
   selector: 'app-widget-starfield',
+  imports: [WidgetComponent],
   template: `
-    <canvas #starfield [width]="width()" [height]="height()"></canvas>
+    <app-widget [host]="host()">
+      <canvas #starfield [width]="width()" [height]="height()"></canvas>
+    </app-widget>
   `,
   styles: [
     `
@@ -32,7 +36,7 @@ import { AppSettingsService } from '../../app.settings';
         view-transition-name: starfield;
       }
       // Displayed in fullscreen
-      :root:not(:has(app-widget)) :host {
+      :root:not(:has(app-widget-loader)) :host {
         background: var(--background-color);
         background: linear-gradient(
           to bottom,
@@ -57,15 +61,12 @@ import { AppSettingsService } from '../../app.settings';
         min-width: 300px;
         width: calc(100% + 2rem);
         height: calc(100% + 2rem);
-        // max-height: calc(100vh - 10rem);
         margin: -1rem;
         transition:
           opacity 0.3s,
           filter 0.3s;
       }
       :root .inactive :host canvas {
-        // opacity: 0.3;
-        // filter: blur(3px);
       }
     `,
   ],
@@ -81,11 +82,14 @@ export default class StarFieldComponent
   private readonly visibility = inject(VisibilityService);
   private readonly settings = inject(AppSettingsService);
 
-  resized$ = new BehaviorSubject<DOMRect | undefined>(undefined);
+  id = signal('starfield');
 
   canvas = viewChild<ElementRef<HTMLCanvasElement>>('starfield');
   canvasEl = computed(() => this.canvas()?.nativeElement);
-  ctx = computed(() => this.canvasEl()?.getContext('2d'));
+  ctx = computed(
+    () =>
+      isPlatformBrowser(this.platformId) && this.canvasEl()?.getContext('2d'),
+  );
   rect = linkedSignal<DOMRect>(() => this.getDOMRect());
   width = computed(() => this.rect()?.width ?? 0);
   height = computed(() => this.rect()?.height ?? 0);
@@ -97,14 +101,14 @@ export default class StarFieldComponent
     const stars = this.stars();
 
     // Action
+    if (stars.length === 0) return;
     for (const star of stars) {
       star.setCurrentColor(color);
     }
   });
 
-  observer = new ResizeObserver((changes) =>
-    this.resized$.next(changes[0].contentRect),
-  );
+  resized$ = new BehaviorSubject<DOMRect | undefined>(undefined);
+  observer: any;
   _oldRect = '';
   onRectChange = effect(() => {
     const rect = JSON.stringify(this.rect());
@@ -118,26 +122,34 @@ export default class StarFieldComponent
   ngAfterViewInit() {
     if (this.canvas() == null) return;
 
-    this.observer.observe(this.canvasEl()!);
-    this.resized$
-      .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(200))
-      .subscribe((rect) => {
-        this.rect.set(rect as DOMRect);
-        for (const star of this.stars()) {
-          star.canvasChanged();
-        }
-      });
+    // Resize handler
+    if (isPlatformBrowser(this.platformId)) {
+      this.observer = new ResizeObserver((changes) =>
+        this.resized$.next(changes[0].contentRect),
+      );
+      this.observer.observe(this.canvasEl()!);
+      this.resized$
+        .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(200))
+        .subscribe((rect) => {
+          this.rect.set(rect as DOMRect);
+          for (const star of this.stars()) {
+            star.canvasChanged();
+          }
+        });
+    }
 
     // Setup canvas
     // const maxStars = 1;
     const maxStars = this.isFullscreen() ? 1000 : 200;
 
     // Initialize stars
-    const stars = [];
-    for (let i = 0; i < maxStars; i++) {
-      stars.push(new Star(this.canvasEl()!, this.isFullscreen()));
+    if (isPlatformBrowser(this.platformId)) {
+      const stars = [];
+      for (let i = 0; i < maxStars; i++) {
+        stars.push(new Star(this.canvasEl()!, this.isFullscreen()));
+      }
+      this.stars.set(stars);
     }
-    this.stars.set(stars);
 
     this.theme.selectedTheme$
       .pipe(
@@ -175,6 +187,7 @@ export default class StarFieldComponent
 
   private getDOMRect() {
     if (
+      isPlatformBrowser(this.platformId) &&
       this.el.nativeElement != null &&
       'getBoundingClientRect' in this.el.nativeElement
     ) {
@@ -188,19 +201,22 @@ export default class StarFieldComponent
     // Update canvas size
     const width = this.width();
     const height = this.height();
-    if (width > 1) {
+    const stars = this.stars();
+    if (width > 1 && stars.length > 0) {
       const centerX = width / 2;
       const centerY = height / 2;
       const ctx = this.ctx()!;
 
       // Clear
-      ctx.clearRect(0, 0, width, height);
-      ctx.translate(centerX, centerY);
+      if (ctx) {
+        ctx.clearRect(0, 0, width, height);
+        ctx.translate(centerX, centerY);
 
-      for (const star of this.stars()) {
-        star.draw();
+        for (const star of stars) {
+          star.draw();
+        }
+        ctx.translate(-centerX, -centerY);
       }
-      ctx.translate(-centerX, -centerY);
     }
     this.animationFrame = requestAnimationFrame(() => this.animate());
   }
@@ -216,28 +232,31 @@ export default class StarFieldComponent
     const centerY = height / 2;
     const ctx = this.ctx()!;
     const color = this.color();
+    const stars = this.stars();
 
-    ctx.clearRect(0, 0, width, height);
-    ctx.translate(centerX, centerY);
-    for (const star of this.stars()) {
-      try {
-        star.setCurrentColor(color);
-        star.draw();
-      } catch (e) {
-        console.error(e);
+    if (width > 1 && stars.length > 0 && ctx) {
+      ctx.clearRect(0, 0, width, height);
+      ctx.translate(centerX, centerY);
+      for (const star of stars) {
+        try {
+          star.setCurrentColor(color);
+          star.draw();
+        } catch (e) {
+          console.error(e);
+        }
       }
-    }
 
-    ctx.font = '16px Arial';
-    ctx.fillStyle = color;
-    ctx.textAlign = 'center';
-    ctx.fillText('Interstellar travel paused', 0, 0);
-    ctx.translate(-centerX, -centerY);
+      ctx.font = '16px Arial';
+      ctx.fillStyle = color;
+      ctx.textAlign = 'center';
+      ctx.fillText('Interstellar travel paused', 0, 0);
+      ctx.translate(-centerX, -centerY);
+    }
   }
 
   ngOnDestroy(): void {
     if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
-    this.observer.disconnect();
+    if (this.observer) this.observer.disconnect();
   }
 }
 

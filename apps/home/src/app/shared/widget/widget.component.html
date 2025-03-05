@@ -1,9 +1,0 @@
-<header [attr.style]="'view-transition-name: ' + this.widgetId + '-header'">
-  <span>{{ data()?.name }}</span>
-  @if (route().length) {
-    <a [routerLink]="route()">Open</a>
-  }
-</header>
-<section [attr.style]="'view-transition-name: ' + this.widgetId + '-content'">
-  <ng-container #container></ng-container>
-</section>
