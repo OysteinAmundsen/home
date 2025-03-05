@@ -8,8 +8,8 @@ import {
   PLATFORM_ID,
   signal,
 } from '@angular/core';
-import { GetRegistrationOptionsResponse } from 'apps/home/src/api/auth/authenticator.model';
 import { firstValueFrom } from 'rxjs';
+import { GetRegistrationOptionsResponse } from '../../../api/auth/authenticator.model';
 
 const bufferToBase64 = (buffer: ArrayBuffer) =>
   btoa(String.fromCharCode(...new Uint8Array(buffer)));
