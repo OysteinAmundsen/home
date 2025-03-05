@@ -1,8 +1,7 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
+import { widgetRoutes } from './views/widget.routes';
 
 export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Server },
-  { path: 'weather', renderMode: RenderMode.Client },
-  { path: 'starfield', renderMode: RenderMode.Client },
-  { path: 'not-found', renderMode: RenderMode.Client },
+  ...widgetRoutes.map((route) => ({ path: `${route.path}`, renderMode: RenderMode.Server }) as ServerRoute),
 ];
