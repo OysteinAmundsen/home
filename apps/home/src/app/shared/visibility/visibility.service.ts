@@ -29,20 +29,14 @@ export class VisibilityService implements OnDestroy {
     // Cleanup window state event listeners
     this.window.removeEventListener('focus', this.updateTabState.bind(this));
     this.window.removeEventListener('blur', this.updateTabState.bind(this));
-    this.document.removeEventListener(
-      'visibilitychange',
-      this.updateTabState.bind(this),
-    );
+    this.document.removeEventListener('visibilitychange', this.updateTabState.bind(this));
   }
 
   /* Event handler for document visibility and focus state changes */
   private applyVisibilityChangeHandler() {
     this.window.addEventListener('focus', this.updateTabState.bind(this));
     this.window.addEventListener('blur', this.updateTabState.bind(this));
-    this.document.addEventListener(
-      'visibilitychange',
-      this.updateTabState.bind(this),
-    );
+    this.document.addEventListener('visibilitychange', this.updateTabState.bind(this));
   }
 
   private updateTabState() {
@@ -51,10 +45,6 @@ export class VisibilityService implements OnDestroy {
 
   // Abstraction for checking document state
   private isDocumentActive() {
-    return (
-      !this.document.hidden &&
-      'hasFocus' in this.document &&
-      this.document.hasFocus()
-    );
+    return !this.document.hidden && 'hasFocus' in this.document && this.document.hasFocus();
   }
 }

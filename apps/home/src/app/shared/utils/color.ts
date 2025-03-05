@@ -12,13 +12,7 @@ export function getHue(color: string): number {
  */
 export function addHue(color: string, degrees: number): string {
   const [h, s, l, a] = toHsl(color);
-  return calculate(
-    color,
-    h + degrees > 360 ? h + degrees - 360 : h + degrees,
-    s,
-    l,
-    a,
-  );
+  return calculate(color, h + degrees > 360 ? h + degrees - 360 : h + degrees, s, l, a);
 }
 
 /** Return the saturation of any color value */
@@ -114,12 +108,7 @@ function rgbStrToHex(rgbString: string): string {
  * Convert red, green and blue values to a hexadecimal color code.
  * Will also accept alpha
  */
-export const rgbToHex = (
-  r: number,
-  g: number,
-  b: number,
-  a?: number,
-): string => {
+export const rgbToHex = (r: number, g: number, b: number, a?: number): string => {
   const color =
     [r, g, b]
       .filter((x) => x != null)
@@ -160,10 +149,7 @@ export function toRgb(color: string) {
  */
 function hexToRgb(hex: string) {
   const res = hex
-    .replace(
-      /^#?([a-f\d])([a-f\d])([a-f\d])$/i,
-      (m, r, g, b) => '#' + r + r + g + g + b + b,
-    )
+    .replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (m, r, g, b) => '#' + r + r + g + g + b + b)
     .substring(1)
     .match(/.{2}/g)
     ?.map((x) => parseInt(x, 16));
@@ -318,9 +304,7 @@ function rgbToHsl(r: number, g: number, b: number, a?: number): string {
 }
 
 function toFixed(value: number, digits: number) {
-  return Number.isFinite(value) && Number.isFinite(digits)
-    ? value.toFixed(digits)
-    : value;
+  return Number.isFinite(value) && Number.isFinite(digits) ? value.toFixed(digits) : value;
 }
 
 function calculate(color: string, h: number, s: number, l: number, a?: number) {

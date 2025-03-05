@@ -1,13 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  resource,
-  viewChild,
-  ViewContainerRef,
-} from '@angular/core';
+import { Component, computed, effect, inject, input, resource, viewChild, ViewContainerRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Widget, WidgetService } from './widget.service';
 

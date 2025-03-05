@@ -38,9 +38,7 @@ export abstract class AbstractWidgetComponent {
   protected readonly platformId = inject(PLATFORM_ID);
 
   abstract id: Signal<string>;
-  protected widgetConfig = computed(() =>
-    this.widgetService.getRoute(this.id()),
-  );
+  protected widgetConfig = computed(() => this.widgetService.getRoute(this.id()));
 
   host = signal(this); // Allows the widget.component to access this base class
   data = input<Widget>(); // Will be provided in dashboard

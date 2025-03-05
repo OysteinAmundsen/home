@@ -67,10 +67,7 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
     `,
   ],
 })
-export default class StarFieldComponent
-  extends AbstractWidgetComponent
-  implements AfterViewInit, OnDestroy
-{
+export default class StarFieldComponent extends AbstractWidgetComponent implements AfterViewInit, OnDestroy {
   private readonly el = inject(ElementRef);
   private readonly theme = inject(ThemeService);
   private readonly destroyRef = inject(DestroyRef);
@@ -82,10 +79,7 @@ export default class StarFieldComponent
 
   canvas = viewChild<ElementRef<HTMLCanvasElement>>('starfield');
   canvasEl = computed(() => this.canvas()?.nativeElement);
-  ctx = computed(
-    () =>
-      isPlatformBrowser(this.platformId) && this.canvasEl()?.getContext('2d'),
-  );
+  ctx = computed(() => isPlatformBrowser(this.platformId) && this.canvasEl()?.getContext('2d'));
   rect = linkedSignal<DOMRect>(() => this.getDOMRect());
   width = computed(() => this.rect()?.width ?? 0);
   height = computed(() => this.rect()?.height ?? 0);
@@ -120,18 +114,14 @@ export default class StarFieldComponent
 
     // Resize handler
     if (isPlatformBrowser(this.platformId)) {
-      this.observer = new ResizeObserver((changes) =>
-        this.resized$.next(changes[0].contentRect),
-      );
+      this.observer = new ResizeObserver((changes) => this.resized$.next(changes[0].contentRect));
       this.observer.observe(this.canvasEl()!);
-      this.resized$
-        .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(200))
-        .subscribe((rect) => {
-          this.rect.set(rect as DOMRect);
-          for (const star of this.stars()) {
-            star.canvasChanged();
-          }
-        });
+      this.resized$.pipe(takeUntilDestroyed(this.destroyRef), debounceTime(200)).subscribe((rect) => {
+        this.rect.set(rect as DOMRect);
+        for (const star of this.stars()) {
+          star.canvasChanged();
+        }
+      });
     }
 
     // Setup canvas
@@ -148,24 +138,18 @@ export default class StarFieldComponent
     }
 
     this.theme.selectedTheme$
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        debounceTime(200),
-        distinctUntilChanged(),
-      )
+      .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(200), distinctUntilChanged())
       .subscribe(() => this.color.set(this.computedColor()));
 
     // Initialize
     if (this.settings.pauseOnInactive()) {
-      this.visibility.browserActive$
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((active) => {
-          if (active) {
-            this.animate();
-          } else {
-            this.pause();
-          }
-        });
+      this.visibility.browserActive$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((active) => {
+        if (active) {
+          this.animate();
+        } else {
+          this.pause();
+        }
+      });
     } else {
       this.animate();
     }
@@ -271,14 +255,8 @@ type Arc = {
 class Star {
   // Canvas and sizes
   canvas = signal<HTMLCanvasElement | undefined>(undefined);
-  ctx = computed<CanvasRenderingContext2D | undefined>(
-    () => this.canvas()?.getContext('2d') || undefined,
-  );
-  rect = linkedSignal<DOMRect>(
-    () =>
-      this.canvas()?.getBoundingClientRect() ||
-      ({ width: 0, height: 0 } as DOMRect),
-  );
+  ctx = computed<CanvasRenderingContext2D | undefined>(() => this.canvas()?.getContext('2d') || undefined);
+  rect = linkedSignal<DOMRect>(() => this.canvas()?.getBoundingClientRect() || ({ width: 0, height: 0 } as DOMRect));
   center = computed<Point>(() => ({
     x: this.rect().width / 2,
     y: this.rect().height / 2,
@@ -372,18 +350,12 @@ class Star {
     const { width } = this.rect();
     const [h, s, l] = toHsl(this.currentColor());
     const variation = 100;
-    this.hslColor.set([
-      this.random(h - variation, h + variation),
-      this.random(s - variation, s + variation),
-      l,
-    ]);
+    this.hslColor.set([this.random(h - variation, h + variation), this.random(s - variation, s + variation), l]);
 
     this.size = this.random(1, this.large ? 6 : 2);
     this.speed = this.random(1, 5);
     this.angle = this.random(0, width) * 2 * Math.PI;
-    this.z.set(
-      Math.abs(this.random(width / ((this.size + this.speed) * 3), width)),
-    );
+    this.z.set(Math.abs(this.random(width / ((this.size + this.speed) * 3), width)));
     if (this.remap(this.z(), 0, width, this.size, 0) < 0) {
       this.z.set(width);
     }
@@ -399,12 +371,7 @@ class Star {
     const center = this.center();
     const r = this.radius();
 
-    if (
-      z <= 0 ||
-      Math.abs(arc?.x) >= center.x ||
-      Math.abs(arc?.y) >= center.y ||
-      r < 0
-    ) {
+    if (z <= 0 || Math.abs(arc?.x) >= center.x || Math.abs(arc?.y) >= center.y || r < 0) {
       // Star is off screen, reset
       this.reset();
       return;
@@ -442,13 +409,7 @@ class Star {
     return Math.random() * (max - min + 1) + min;
   }
 
-  remap(
-    value: number,
-    istart: number,
-    istop: number,
-    ostart: number,
-    ostop: number,
-  ): number {
+  remap(value: number, istart: number, istop: number, ostart: number, ostop: number): number {
     const deltaI = istop - istart;
     const deltaO = ostop - ostart;
     return ostart + deltaO * ((value - istart) / deltaI);

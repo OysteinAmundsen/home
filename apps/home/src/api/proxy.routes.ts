@@ -15,11 +15,7 @@ export const proxyRoutes: Record<string, Options> = {
     followRedirects: true,
     pathRewrite: (path: string, req: any) => {
       const now = new Date();
-      const seed = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-      ).getTime();
+      const seed = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
       return `/seed/${seed}/1920/1080?grayscale&blur=8`;
     },
     // on: {

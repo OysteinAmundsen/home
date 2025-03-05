@@ -1,10 +1,5 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import {
-  inject,
-  Injectable,
-  PLATFORM_ID,
-  REQUEST_CONTEXT,
-} from '@angular/core';
+import { inject, Injectable, PLATFORM_ID, REQUEST_CONTEXT } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class CookieService {
@@ -38,11 +33,7 @@ export class CookieService {
    *                - `expireIn` The number of days until the cookie expires
    *                - `maxAge` The maximum age of the cookie in seconds
    */
-  setCookie(
-    name: string,
-    value: string,
-    options?: { expireIn?: number; maxAge?: number },
-  ): void {
+  setCookie(name: string, value: string, options?: { expireIn?: number; maxAge?: number }): void {
     const cookie = [`${name}=${encodeURIComponent(value)}`];
 
     if (options?.expireIn) {

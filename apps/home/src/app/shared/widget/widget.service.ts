@@ -1,14 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import {
-  computed,
-  ElementRef,
-  inject,
-  Injectable,
-  Injector,
-  NgModuleFactory,
-  resource,
-  signal,
-} from '@angular/core';
+import { computed, ElementRef, inject, Injectable, Injector, NgModuleFactory, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { widgetRoutes } from '../../views/widget.routes';
 import { cache } from '../rxjs/cache';
@@ -27,9 +18,7 @@ export class WidgetService {
 
   /** Filter widgets by id */
   filter = signal<number | undefined>(undefined);
-  url = computed(() =>
-    this.filter() ? `/api/widgets/${this.filter()}` : '/api/widgets',
-  );
+  url = computed(() => (this.filter() ? `/api/widgets/${this.filter()}` : '/api/widgets'));
 
   /** Fetches the widgets from the server */
   private widgetsCache = [] as Widget[];
@@ -40,14 +29,10 @@ export class WidgetService {
     loader: async ({ request }) => {
       // Cannot use fetch directly because Angular's SSR does not support it.
       // I get a `TypeError: Failed to parse URL` from SSR when using fetch.
-      const widgets = await firstValueFrom(
-        cache(() => this.http.get<Widget[]>(request), request),
-      );
+      const widgets = await firstValueFrom(cache(() => this.http.get<Widget[]>(request), request));
 
       // Remove old widgets from the cache
-      this.widgetsCache = this.widgetsCache.filter((widget) =>
-        widgets.find((w) => w.id === widget.id),
-      );
+      this.widgetsCache = this.widgetsCache.filter((widget) => widgets.find((w) => w.id === widget.id));
 
       // Add new widgets to the cache
       widgets.forEach((widget) => {
@@ -62,18 +47,12 @@ export class WidgetService {
 
   widgets = computed<Widget[]>(() =>
     // Make sure that widgets always returns an array, even when loading new widgets
-    this.widgetsLoader.isLoading()
-      ? this.widgetsCache
-      : (this.widgetsLoader.value() as Widget[]),
+    this.widgetsLoader.isLoading() ? this.widgetsCache : (this.widgetsLoader.value() as Widget[]),
   );
   error = computed<string | undefined>(
-    () =>
-      (this.widgetsLoader.error() as HttpErrorResponse)?.error.error ??
-      undefined,
+    () => (this.widgetsLoader.error() as HttpErrorResponse)?.error.error ?? undefined,
   );
-  isLoading = computed(
-    () => this.widgetsLoader.isLoading() && this.widgets.length < 1,
-  );
+  isLoading = computed(() => this.widgetsLoader.isLoading() && this.widgets.length < 1);
 
   getRoute(componentName: string | undefined) {
     if (!componentName) return;
@@ -97,11 +76,7 @@ export class WidgetService {
    */
   async loadWidget(componentName: string | undefined) {
     const route = this.getRoute(componentName);
-    if (
-      route &&
-      'loadComponent' in route &&
-      typeof route.loadComponent === 'function'
-    ) {
+    if (route && 'loadComponent' in route && typeof route.loadComponent === 'function') {
       try {
         const moduleOrComponent = await route.loadComponent();
         if (moduleOrComponent instanceof NgModuleFactory) {

@@ -1,12 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  TemplateRef,
-  viewChild,
-} from '@angular/core';
+import { Component, computed, inject, input, TemplateRef, viewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AbstractWidgetComponent } from './abstract-widget.component';
 import { WidgetService } from './widget.service';
@@ -25,24 +18,17 @@ import { WidgetService } from './widget.service';
     </ng-template>
 
     @if (!isFullscreen()) {
-      <header
-        [attr.style]="'view-transition-name: ' + this.widgetId() + '-header'"
-      >
+      <header [attr.style]="'view-transition-name: ' + this.widgetId() + '-header'">
         <span>{{ data()?.name }}</span>
         @if (route().length) {
           <a [routerLink]="route()">Open</a>
         }
       </header>
-      <div
-        class="widget-content"
-        [attr.style]="'view-transition-name: ' + this.widgetId() + '-content'"
-      >
+      <div class="widget-content" [attr.style]="'view-transition-name: ' + this.widgetId() + '-content'">
         <ng-container *ngTemplateOutlet="tpl"></ng-container>
       </div>
     } @else {
-      <header
-        [attr.style]="'view-transition-name: ' + this.widgetId() + '-header'"
-      >
+      <header [attr.style]="'view-transition-name: ' + this.widgetId() + '-header'">
         <h2>{{ data()?.name }}</h2>
         @if (route().length) {
           <a [routerLink]="['/']">Close</a>
@@ -61,12 +47,9 @@ export class WidgetComponent {
 
   host = input.required<AbstractWidgetComponent>();
   isFullscreen = computed(() => this.host()?.isFullscreen() === true);
-  data = computed(
-    () =>
-      this.host()?.resolvedData() ?? { id: '', name: '', componentName: '' },
-  );
+  data = computed(() => this.host()?.resolvedData() ?? { id: '', name: '', componentName: '' });
 
-  widgetId = computed(() => `widget_${this.data()?.componentName}`);
+  widgetId = computed(() => `widget-${this.host()?.widgetId()}`);
   route = computed(() => {
     const data = this.data();
     if (data) {

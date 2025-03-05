@@ -1,8 +1,8 @@
 import { DOCUMENT } from '@angular/common';
 import { effect, inject, Injectable, linkedSignal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { CookieService } from '../utils/cookie';
 import { doSafeTransition } from '../utils/transitions';
-import { toObservable } from '@angular/core/rxjs-interop';
 
 export type Theme = 'light' | 'dark';
 
@@ -22,11 +22,8 @@ export class ThemeService {
     const cookie = this.cookieService.getCookie('theme');
     if (cookie && ['light', 'dark'].includes(cookie)) return cookie as Theme;
 
-    if (typeof window === 'undefined' || !('matchMedia' in window))
-      return 'light'; // Do not run on server
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
+    if (typeof window === 'undefined' || !('matchMedia' in window)) return 'light'; // Do not run on server
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
   selectedTheme$ = toObservable(this.selectedTheme);
@@ -37,8 +34,6 @@ export class ThemeService {
     // Store the selection in a cookie
     this.cookieService.setCookie('theme', theme, { expireIn: 365 });
 
-    doSafeTransition(() =>
-      this.doc.documentElement.setAttribute('data-schema', theme),
-    );
+    doSafeTransition(() => this.doc.documentElement.setAttribute('data-schema', theme));
   });
 }

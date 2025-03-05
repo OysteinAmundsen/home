@@ -18,27 +18,19 @@ function loadServiceWorker() {
 
       // Log out events in sequence:
       // [installing -> installed -> redundant -> waiting -> activating -> controlling -> activated]
-      wb.addEventListener('installing', () =>
-        console.log('Installing service worker'),
-      );
+      wb.addEventListener('installing', () => console.log('Installing service worker'));
       wb.addEventListener('installed', () => console.log('Installed!'));
-      wb.addEventListener('redundant', () =>
-        console.log('Redundant service worker found'),
-      );
+      wb.addEventListener('redundant', () => console.log('Redundant service worker found'));
       wb.addEventListener('waiting', () => {
         console.log('Waiting to activate service worker <- Auto skip');
         wb.messageSkipWaiting();
       });
-      wb.addEventListener('activating', () =>
-        console.log('Activating service worker'),
-      );
+      wb.addEventListener('activating', () => console.log('Activating service worker'));
       wb.addEventListener('controlling', () => {
         console.log('Service worker controlling page <- Reloading');
         window.location.reload();
       });
-      wb.addEventListener('activated', () =>
-        console.log('New service worker activated!'),
-      );
+      wb.addEventListener('activated', () => console.log('New service worker activated!'));
 
       // Register the service worker
       wb.register({ immediate: true })

@@ -34,9 +34,7 @@ export async function bootstrap() {
   );
 
   // Setup reverse proxy routes
-  Object.entries(proxyRoutes).forEach(([path, config]) =>
-    server.get(path, createProxyMiddleware(config)),
-  );
+  Object.entries(proxyRoutes).forEach(([path, config]) => server.get(path, createProxyMiddleware(config)));
 
   // Serve static files from the browser distribution folder
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));

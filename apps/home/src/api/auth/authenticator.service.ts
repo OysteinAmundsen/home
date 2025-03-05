@@ -31,9 +31,7 @@ export class AuthenticatorService {
    *
    * @returns
    */
-  async getRegistrationOptions(
-    session: Record<string, any>,
-  ): Promise<PublicKeyCredentialCreationOptions> {
+  async getRegistrationOptions(session: Record<string, any>): Promise<PublicKeyCredentialCreationOptions> {
     const registrationOptions = await this.fido.attestationOptions();
     const retObj = Object.assign(registrationOptions, {
       user: { id: crypto.randomBytes(32) },
@@ -63,20 +61,13 @@ export class AuthenticatorService {
     session: Record<string, any>,
     origin: string,
   ): Promise<boolean> {
-    const challenge: ArrayBuffer = new Uint8Array(session.challenge.data)
-      .buffer;
+    const challenge: ArrayBuffer = new Uint8Array(session.challenge.data).buffer;
     const regResult = await this.fido.attestationResult(
       {
         rawId: new Uint8Array(Buffer.from(credential.rawId, 'base64')).buffer,
         response: {
-          attestationObject: base64url.decode(
-            credential.response.attestationObject,
-            'base64',
-          ),
-          clientDataJSON: base64url.decode(
-            credential.response.clientDataJSON,
-            'base64',
-          ),
+          attestationObject: base64url.decode(credential.response.attestationObject, 'base64'),
+          clientDataJSON: base64url.decode(credential.response.clientDataJSON, 'base64'),
         },
       },
       {
@@ -117,14 +108,8 @@ export class AuthenticatorService {
    * @param session
    * @param origin
    */
-  async doAuthenticate(
-    credential: any,
-    session: Record<string, any>,
-    origin: string,
-  ): Promise<Fido2AssertionResult> {
-    credential.rawId = new Uint8Array(
-      Buffer.from(credential.rawId, 'base64'),
-    ).buffer;
+  async doAuthenticate(credential: any, session: Record<string, any>, origin: string): Promise<Fido2AssertionResult> {
+    credential.rawId = new Uint8Array(Buffer.from(credential.rawId, 'base64')).buffer;
     const challenge = new Uint8Array(session.challenge.data).buffer;
     const publicKey = session.publicKey;
     const prevCounter = session.prevCounter;

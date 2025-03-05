@@ -36,11 +36,7 @@ export class JWTHandler {
     });
   }
 
-  sign(
-    tokenData: object,
-    tokenKey: jwt.Secret | jwt.PrivateKey,
-    expiration: StringValue | number,
-  ): Promise<string> {
+  sign(tokenData: object, tokenKey: jwt.Secret | jwt.PrivateKey, expiration: StringValue | number): Promise<string> {
     return new Promise((resolve, reject) => {
       tokenData = Object.assign(
         {

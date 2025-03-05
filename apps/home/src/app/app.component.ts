@@ -1,12 +1,6 @@
 import { trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  computed,
-  ElementRef,
-  HostListener,
-  inject,
-} from '@angular/core';
+import { Component, computed, ElementRef, HostListener, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppSettingsService } from './app.settings';
 import { AuthenticationService } from './shared/auth/authentication.service';
@@ -18,13 +12,7 @@ import { VisibilityService } from './shared/visibility/visibility.service';
 import { widgetAnimation } from './shared/widget/widgets.animation';
 
 @Component({
-  imports: [
-    RouterModule,
-    CommonModule,
-    TimeComponent,
-    ThemeComponent,
-    LoginComponent,
-  ],
+  imports: [RouterModule, CommonModule, TimeComponent, ThemeComponent, LoginComponent],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -59,14 +47,8 @@ export class AppComponent {
       const mouseY = event.clientY;
       const offsetX = (mouseX / viewportWidth) * 108 - 4;
       const offsetY = (mouseY / viewportHeight) * 108 - 4;
-      this.el.nativeElement.style.setProperty(
-        '--background-position-x',
-        `${offsetX}%`,
-      );
-      this.el.nativeElement.style.setProperty(
-        '--background-position-y',
-        `${offsetY}%`,
-      );
+      this.el.nativeElement.style.setProperty('--background-position-x', `${offsetX}%`);
+      this.el.nativeElement.style.setProperty('--background-position-y', `${offsetY}%`);
     }
   }
 }

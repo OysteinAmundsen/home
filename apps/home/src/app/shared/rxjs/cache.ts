@@ -49,11 +49,7 @@ export class Cache {
  * @param options
  * @returns
  */
-export function cache<T>(
-  callback: () => Observable<T>,
-  cacheKey: CacheKey,
-  options?: CacheOptions,
-): Observable<T> {
+export function cache<T>(callback: () => Observable<T>, cacheKey: CacheKey, options?: CacheOptions): Observable<T> {
   return new Observable<T>((observer) => {
     const now = Date.now();
     const key = typeof cacheKey === 'function' ? cacheKey() : cacheKey;
@@ -62,11 +58,7 @@ export function cache<T>(
       options = { ...options, ...cacheEntry.options };
     }
 
-    if (
-      !cacheEntry ||
-      (options?.expirationTime &&
-        now - cacheEntry.timestamp > options.expirationTime)
-    ) {
+    if (!cacheEntry || (options?.expirationTime && now - cacheEntry.timestamp > options.expirationTime)) {
       const observable = callback().pipe(shareReplay(CACHE_SIZE));
       cacheEntry = { observable, timestamp: now, options };
       Cache.set(key, cacheEntry);

@@ -66,35 +66,24 @@ const wbInject: Plugin = {
       if (result.errors.length !== 0) return;
 
       // Add build output to manifest
-      const files =
-        result.outputFiles?.filter(
-          (f) => f.path.match(MATCH_FILES) && !f.path.match(/sw/),
-        ) || [];
+      const files = result.outputFiles?.filter((f) => f.path.match(MATCH_FILES) && !f.path.match(/sw/)) || [];
       for (const file of files) await addToManifest(file.path, file.contents);
       // Add index.html to manifest if it doesn't exist
       if (manifest.findIndex((i) => i.url === 'index.html') === -1) {
         manifest.push({ url: 'index.html', revision: '' } as ManifestEntry);
       }
 
-      const workerFile = result.outputFiles?.find((file) =>
-        file.path.match(/sw.*\.js$/),
-      );
-      const workerSourceMap = result.outputFiles?.find((file) =>
-        file.path.match(/sw.*\.js.map$/),
-      );
+      const workerFile = result.outputFiles?.find((file) => file.path.match(/sw.*\.js$/));
+      const workerSourceMap = result.outputFiles?.find((file) => file.path.match(/sw.*\.js.map$/));
       if (!workerFile) return;
 
       // Remove cache busting from worker file
-      [
-        workerFile,
-        ...(workerSourceMap != null ? [workerSourceMap] : []),
-      ].forEach((file) => (file.path = file.path.replace(CACHE_BUST, '.')));
+      [workerFile, ...(workerSourceMap != null ? [workerSourceMap] : [])].forEach(
+        (file) => (file.path = file.path.replace(CACHE_BUST, '.')),
+      );
 
       // Inject manifest into worker
-      const updatedWorkerCode = workerCode.replace(
-        'self.__WB_MANIFEST',
-        JSON.stringify(manifest),
-      );
+      const updatedWorkerCode = workerCode.replace('self.__WB_MANIFEST', JSON.stringify(manifest));
       console.log('Injected manifest: ', manifest);
 
       // Update the worker file in the output

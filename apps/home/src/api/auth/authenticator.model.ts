@@ -1,8 +1,4 @@
-import type {
-  AuthenticatorTransportFuture,
-  Base64URLString,
-  CredentialDeviceType,
-} from '@simplewebauthn/server';
+import type { AuthenticatorTransportFuture, Base64URLString, CredentialDeviceType } from '@simplewebauthn/server';
 
 type User = {
   id: any;

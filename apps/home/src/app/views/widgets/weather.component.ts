@@ -1,15 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  linkedSignal,
-  OnDestroy,
-  resource,
-  signal,
-} from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, OnDestroy, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { GeoLocationService } from '../../shared/geoLocation/geoLocation.service';
 import { IconPipe } from '../../shared/icons/icon.pipe';
@@ -31,15 +22,8 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
           @for (time of todaysWeather(); track time.time) {
             <div class="time">
               <time>{{ time.time | date: 'HH:mm' }}</time>
-              <span
-                [outerHTML]="time.data.next_1_hours.summary.symbol_code | icon"
-              >
-              </span>
-              <span class="temp"
-                >{{
-                  time.data.instant.details.air_temperature | number: '1.1'
-                }}°C</span
-              >
+              <span [outerHTML]="time.data.next_1_hours.summary.symbol_code | icon"> </span>
+              <span class="temp">{{ time.data.instant.details.air_temperature | number: '1.1' }}°C</span>
             </div>
           }
         </section>
@@ -92,10 +76,7 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
     }
   `,
 })
-export default class WeatherComponent
-  extends AbstractWidgetComponent
-  implements OnDestroy
-{
+export default class WeatherComponent extends AbstractWidgetComponent implements OnDestroy {
   private readonly http = inject(HttpClient);
   private readonly loc = inject(GeoLocationService);
 
@@ -136,9 +117,7 @@ export default class WeatherComponent
   private cacheExpirationTime = linkedSignal(() => 30 * 60 * 1000);
 
   /** Holds yr.no last update time */
-  lastUpdated = computed(
-    () => this.weather.value()?.properties.meta.updated_at,
-  );
+  lastUpdated = computed(() => this.weather.value()?.properties.meta.updated_at);
   /** Computes next update time. Yr updates once per hour, so no need to ask more often */
   private nextUpdate = computed(() => {
     const lastUpdated = this.lastUpdated();
@@ -162,17 +141,12 @@ export default class WeatherComponent
 
     // Trigger reload when next update time has passed
     if (this.timeout) clearTimeout(this.timeout);
-    this.timeout = setTimeout(
-      () => this.weather.reload(),
-      nextUpdateTime.getTime() - Date.now(),
-    );
+    this.timeout = setTimeout(() => this.weather.reload(), nextUpdateTime.getTime() - Date.now());
   });
 
   /** Display only 12 hours in the widget */
   todaysWeather = computed(() => {
-    return (
-      (this.weather.value()?.properties.timeseries || []) as Array<any>
-    ).slice(0, 12);
+    return ((this.weather.value()?.properties.timeseries || []) as Array<any>).slice(0, 12);
   });
 
   ngOnDestroy(): void {

@@ -1,20 +1,11 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import {
-  computed,
-  inject,
-  Injectable,
-  linkedSignal,
-  PLATFORM_ID,
-  signal,
-} from '@angular/core';
+import { computed, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { GetRegistrationOptionsResponse } from '../../../api/auth/authenticator.model';
 
-const bufferToBase64 = (buffer: ArrayBuffer) =>
-  btoa(String.fromCharCode(...new Uint8Array(buffer)));
-const base64ToBuffer = (base64: string) =>
-  Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+const bufferToBase64 = (buffer: ArrayBuffer) => btoa(String.fromCharCode(...new Uint8Array(buffer)));
+const base64ToBuffer = (base64: string) => Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
 const CREDENTIALS_KEY = 'credentials';
 
 /**
@@ -28,11 +19,7 @@ export class AuthenticationService {
   private readonly platformId = inject(PLATFORM_ID);
 
   /** The credential raw id stored in localStorage */
-  credentials = linkedSignal(() =>
-    isPlatformBrowser(this.platformId)
-      ? localStorage.getItem(CREDENTIALS_KEY)
-      : '',
-  );
+  credentials = linkedSignal(() => (isPlatformBrowser(this.platformId) ? localStorage.getItem(CREDENTIALS_KEY) : ''));
 
   /** Returns true if there exists credentials in localStorage */
   isRegistered = computed(() => !!this.credentials());
@@ -110,12 +97,8 @@ export class AuthenticationService {
             credential: {
               rawId,
               response: {
-                attestationObject: bufferToBase64(
-                  (credential.response as any).attestationObject,
-                ),
-                clientDataJSON: bufferToBase64(
-                  credential.response.clientDataJSON,
-                ),
+                attestationObject: bufferToBase64((credential.response as any).attestationObject),
+                clientDataJSON: bufferToBase64(credential.response.clientDataJSON),
                 id: credential.id,
                 type: credential.type,
               },
@@ -140,11 +123,7 @@ export class AuthenticationService {
    */
   async authenticate() {
     // Get the server part of the authentication options
-    const options = await firstValueFrom(
-      this.http.get<PublicKeyCredentialRequestOptions>(
-        `/api/auth/authenticate`,
-      ),
-    );
+    const options = await firstValueFrom(this.http.get<PublicKeyCredentialRequestOptions>(`/api/auth/authenticate`));
 
     // Get the client part or our webauth credentials
     const credential = await this.getCredentials(options);
@@ -169,18 +148,10 @@ export class AuthenticationService {
             credential: {
               rawId: bufferToBase64((credential as any).rawId),
               response: {
-                authenticatorData: bufferToBase64(
-                  (credential as any).response.authenticatorData,
-                ),
-                signature: bufferToBase64(
-                  (credential as any).response.signature,
-                ),
-                userHandle: bufferToBase64(
-                  (credential as any).response.userHandle,
-                ),
-                clientDataJSON: bufferToBase64(
-                  (credential as any).response.clientDataJSON,
-                ),
+                authenticatorData: bufferToBase64((credential as any).response.authenticatorData),
+                signature: bufferToBase64((credential as any).response.signature),
+                userHandle: bufferToBase64((credential as any).response.userHandle),
+                clientDataJSON: bufferToBase64((credential as any).response.clientDataJSON),
                 id: (credential as any).id,
                 type: (credential as any).type,
               },
@@ -200,9 +171,7 @@ export class AuthenticationService {
    * @param options The public key credential request options
    * @returns The retrieved public key credential or null if failed
    */
-  private async getCredentials(
-    options: PublicKeyCredentialRequestOptions,
-  ): Promise<PublicKeyCredential | null> {
+  private async getCredentials(options: PublicKeyCredentialRequestOptions): Promise<PublicKeyCredential | null> {
     const credentialId = localStorage.getItem(CREDENTIALS_KEY) || '';
     try {
       return (await navigator.credentials.get({

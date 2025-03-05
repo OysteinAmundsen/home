@@ -36,8 +36,6 @@ export class ThemeComponent {
   theme = this.themeService.selectedTheme;
 
   toggleTheme() {
-    this.themeService.selectedTheme.set(
-      this.theme() === 'light' ? 'dark' : 'light',
-    );
+    this.themeService.selectedTheme.set(this.theme() === 'light' ? 'dark' : 'light');
   }
 }

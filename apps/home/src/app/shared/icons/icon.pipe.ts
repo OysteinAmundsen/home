@@ -30,15 +30,10 @@ export class IconPipe implements PipeTransform {
   transform(value: any, ...args: any[]): any {
     // Lookup the given value in the synonyms list and return the synonym key if it exists
     // Otherwise return the original value
-    const translated = Object.entries(this.synonyms).reduce(
-      (acc, [key, values]) => {
-        return values.includes(value) ? key : acc;
-      },
-      value,
-    );
+    const translated = Object.entries(this.synonyms).reduce((acc, [key, values]) => {
+      return values.includes(value) ? key : acc;
+    }, value);
     // Render the translated value as a material icon
-    return this.sec.bypassSecurityTrustHtml(
-      `<span class="material-symbols-outlined">${translated}</span>`,
-    );
+    return this.sec.bypassSecurityTrustHtml(`<span class="material-symbols-outlined">${translated}</span>`);
   }
 }

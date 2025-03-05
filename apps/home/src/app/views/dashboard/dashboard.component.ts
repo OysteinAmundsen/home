@@ -1,13 +1,5 @@
 import { trigger } from '@angular/animations';
-import {
-  afterNextRender,
-  AfterViewInit,
-  Component,
-  DestroyRef,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
+import { afterNextRender, AfterViewInit, Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
@@ -46,9 +38,7 @@ export class DashboardComponent implements AfterViewInit {
 
   constructor() {
     // Skip animation on initial load
-    afterNextRender(() =>
-      this.animationDisabled() ? this.animationDisabled.set(false) : null,
-    );
+    afterNextRender(() => (this.animationDisabled() ? this.animationDisabled.set(false) : null));
 
     // Skip animation on route change
     this.router.events

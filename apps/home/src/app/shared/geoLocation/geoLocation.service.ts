@@ -1,24 +1,7 @@
 import { DOCUMENT } from '@angular/common';
-import {
-  DestroyRef,
-  inject,
-  Injectable,
-  linkedSignal,
-  OnDestroy,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { DestroyRef, inject, Injectable, linkedSignal, OnDestroy, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  concatMap,
-  delay,
-  Observable,
-  of,
-  retryWhen,
-  Subscriber,
-  take,
-  throwError,
-} from 'rxjs';
+import { concatMap, delay, Observable, of, retryWhen, Subscriber, take, throwError } from 'rxjs';
 
 export type Geolocation = { latitude: number; longitude: number };
 
@@ -42,71 +25,66 @@ export class GeoLocationService implements OnDestroy {
   /**
    * An observable that watches the location of the device
    */
-  private watchLocation$ = new Observable<Geolocation>(
-    (observer: Subscriber<Geolocation>) => {
-      if (typeof window === 'undefined') {
-        // Do not ask for geolocation in SSR
-        observer.error('Loading...');
-        return;
-      }
-      if (!navigator.geolocation) {
-        // Browser does not support geolocation
-        observer.error('Geolocation is not supported by your browser');
-        return;
-      }
+  private watchLocation$ = new Observable<Geolocation>((observer: Subscriber<Geolocation>) => {
+    if (typeof window === 'undefined') {
+      // Do not ask for geolocation in SSR
+      observer.error('Loading...');
+      return;
+    }
+    if (!navigator.geolocation) {
+      // Browser does not support geolocation
+      observer.error('Geolocation is not supported by your browser');
+      return;
+    }
 
-      // There can only be one watch at a time
-      if (this.watchID) this.cleanup();
+    // There can only be one watch at a time
+    if (this.watchID) this.cleanup();
 
-      // Start with the cached location
-      if (this.currentLocation()) observer.next(this.currentLocation());
+    // Start with the cached location
+    if (this.currentLocation()) observer.next(this.currentLocation());
 
-      // Watch the location and report changes
-      this.watchID = navigator.geolocation.watchPosition(
-        (position: GeolocationPosition) => {
-          // Will trigger every time device location changes
-          const pos = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          } as Geolocation;
-          if (JSON.stringify(pos) !== JSON.stringify(this.currentLocation())) {
-            // Current position differs from stored position
-            // Cache the location for later
-            this.window.localStorage.setItem('location', JSON.stringify(pos));
-            // Return current position
-            observer.next(pos);
-          }
-        },
-        (error: GeolocationPositionError) => {
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              observer.error('You denied the request for Geolocation.');
-              break;
-            case error.POSITION_UNAVAILABLE:
-              observer.error('Location information is unavailable.');
-              break;
-            case error.TIMEOUT:
-              observer.error('The request to get location timed out.');
-              break;
-            default:
-              observer.error(error.message);
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0,
-        },
-      );
-    },
-  ).pipe(
+    // Watch the location and report changes
+    this.watchID = navigator.geolocation.watchPosition(
+      (position: GeolocationPosition) => {
+        // Will trigger every time device location changes
+        const pos = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        } as Geolocation;
+        if (JSON.stringify(pos) !== JSON.stringify(this.currentLocation())) {
+          // Current position differs from stored position
+          // Cache the location for later
+          this.window.localStorage.setItem('location', JSON.stringify(pos));
+          // Return current position
+          observer.next(pos);
+        }
+      },
+      (error: GeolocationPositionError) => {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            observer.error('You denied the request for Geolocation.');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            observer.error('Location information is unavailable.');
+            break;
+          case error.TIMEOUT:
+            observer.error('The request to get location timed out.');
+            break;
+          default:
+            observer.error(error.message);
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      },
+    );
+  }).pipe(
     retryWhen((errors) =>
       errors.pipe(
         concatMap((error, count) => {
-          if (
-            count < this.maxRetries &&
-            error === 'The request to get location timed out.'
-          ) {
+          if (count < this.maxRetries && error === 'The request to get location timed out.') {
             return of(error).pipe(delay(this.retryTimeout));
           }
           return throwError(error);

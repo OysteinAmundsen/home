@@ -1,11 +1,7 @@
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { setCacheNameDetails } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
-import {
-  cleanupOutdatedCaches,
-  createHandlerBoundToURL,
-  precacheAndRoute,
-} from 'workbox-precaching';
+import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { googleFontsCache } from 'workbox-recipes';
 import { registerRoute, setDefaultHandler } from 'workbox-routing';
 import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';

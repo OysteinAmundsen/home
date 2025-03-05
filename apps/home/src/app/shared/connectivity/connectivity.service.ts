@@ -11,9 +11,7 @@ export class ConnectivityService implements OnDestroy {
   // from angulars DOCUMENT object.
   private window = globalThis.window || this.document.defaultView;
   //Appear online if ssr rendered. This is to avoid the flickering of the offline gradient.
-  private isOffline = signal(
-    typeof window === 'undefined' ? false : !navigator.onLine,
-  );
+  private isOffline = signal(typeof window === 'undefined' ? false : !navigator.onLine);
   /** Readonly flag set to true if browser looses connectivity */
   public isBrowserOffline = computed(() => this.isOffline());
 
@@ -24,24 +22,14 @@ export class ConnectivityService implements OnDestroy {
   /* Cleanup event listeners */
   ngOnDestroy(): void {
     // Cleanup connectivity event listeners
-    this.window.removeEventListener('online', () =>
-      this.updateConnectivityState.bind(this),
-    );
-    this.window.removeEventListener('offline', () =>
-      this.updateConnectivityState.bind(this),
-    );
+    this.window.removeEventListener('online', () => this.updateConnectivityState.bind(this));
+    this.window.removeEventListener('offline', () => this.updateConnectivityState.bind(this));
   }
 
   /* Apply event listeners */
   private applyConnectivityChangeHandler() {
-    this.window.addEventListener(
-      'online',
-      this.updateConnectivityState.bind(this),
-    );
-    this.window.addEventListener(
-      'offline',
-      this.updateConnectivityState.bind(this),
-    );
+    this.window.addEventListener('online', this.updateConnectivityState.bind(this));
+    this.window.addEventListener('offline', this.updateConnectivityState.bind(this));
   }
 
   /* Event handler for connectivity state changes */

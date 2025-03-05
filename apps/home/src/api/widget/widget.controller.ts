@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Param,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe } from '@nestjs/common';
 import { WidgetService } from './widget.service';
 
 /**
@@ -30,10 +23,7 @@ export class WidgetController {
    */
   @Get(':id')
   findOne(
-    @Param(
-      'id',
-      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-    )
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
     id: number,
   ) {
     const widget = this.widgetService.getWidgets(id);

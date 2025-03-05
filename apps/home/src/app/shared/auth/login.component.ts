@@ -1,13 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  computed,
-  ElementRef,
-  inject,
-  linkedSignal,
-  Signal,
-  viewChild,
-} from '@angular/core';
+import { Component, computed, ElementRef, inject, linkedSignal, Signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { map, merge } from 'rxjs';
@@ -20,30 +12,15 @@ import { AuthenticationService } from './authentication.service';
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     @if (!isRegistered()) {
-      <button type="button" class="primary" (click)="openDialog()">
-        Register
-      </button>
+      <button type="button" class="primary" (click)="openDialog()">Register</button>
     } @else if (!isLoggedIn()) {
       <button type="button" class="primary" (click)="doLogin()">Login</button>
     } @else {
-      <button type="button" class="warn" (click)="removeUser()">
-        Remove user
-      </button>
+      <button type="button" class="warn" (click)="removeUser()">Remove user</button>
     }
 
-    <dialog
-      #dialog
-      (click)="closeDialog()"
-      (close)="onClose()"
-      (keydown)="keydown($event)"
-      tabindex="0"
-    >
-      <form
-        [formGroup]="form"
-        (submit)="doRegister()"
-        (click)="$event.stopPropagation()"
-        (keydown)="keydown($event)"
-      >
+    <dialog #dialog (click)="closeDialog()" (close)="onClose()" (keydown)="keydown($event)" tabindex="0">
+      <form [formGroup]="form" (submit)="doRegister()" (click)="$event.stopPropagation()" (keydown)="keydown($event)">
         <header><h2>Register user</h2></header>
 
         <div class="form-field">
@@ -54,9 +31,7 @@ import { AuthenticationService } from './authentication.service';
             placeholder="Email"
             autocomplete="email"
             (blur)="emailBlur()"
-            [class.ng-invalid]="
-              showValidationErrors() && form.get('email')?.invalid
-            "
+            [class.ng-invalid]="showValidationErrors() && form.get('email')?.invalid"
           />
           <small class="hint">
             @if (showValidationErrors() && form.dirty) {
@@ -71,17 +46,11 @@ import { AuthenticationService } from './authentication.service';
           </small>
         </div>
         <div class="form-field">
-          <input
-            type="text"
-            formControlName="displayName"
-            [attr.placeholder]="displayName()"
-          />
+          <input type="text" formControlName="displayName" [attr.placeholder]="displayName()" />
         </div>
         <footer>
           <button type="submit" [disabled]="isInvalid()">Register</button>
-          <button type="button" class="flat" (click)="closeDialog()">
-            Cancel
-          </button>
+          <button type="button" class="flat" (click)="closeDialog()">Cancel</button>
         </footer>
       </form>
     </dialog>
@@ -112,10 +81,7 @@ export class LoginComponent {
   /** The registration form to fill out */
   form = this.fb.group(
     {
-      email: [
-        null,
-        [Validators.required, Validators.email, Validators.minLength(6)],
-      ],
+      email: [null, [Validators.required, Validators.email, Validators.minLength(6)]],
       displayName: [null, []],
     },
     { updateOn: 'change' },
@@ -149,11 +115,7 @@ export class LoginComponent {
 
   displayName = computed(() => {
     const change = this.onFormChanged();
-    return (
-      titleCase(
-        (change?.value.email ?? '').split('@')[0].replace('.', ' '),
-      ).replace(' ', '') || 'Display name'
-    );
+    return titleCase((change?.value.email ?? '').split('@')[0].replace('.', ' ')).replace(' ', '') || 'Display name';
   });
 
   /** Open the dialog and focus the email field */

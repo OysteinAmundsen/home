@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Headers,
-  HttpException,
-  HttpStatus,
-  Post,
-  Session,
-} from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpException, HttpStatus, Post, Session } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { RegisterRequestBody } from './authenticator.model';
 import { AuthenticatorService } from './authenticator.service';
@@ -57,11 +48,7 @@ export class AuthenticatorController {
     @Body() body: RegisterRequestBody,
   ) {
     try {
-      const result = await this.authService.doRegister(
-        body.credential,
-        session,
-        headers['origin'] || '',
-      );
+      const result = await this.authService.doRegister(body.credential, session, headers['origin'] || '');
       return { status: result ? 'ok' : 'failed' };
     } catch (error: any) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
@@ -100,11 +87,7 @@ export class AuthenticatorController {
     @Body() body: any,
   ) {
     try {
-      return await this.authService.doAuthenticate(
-        body.credential,
-        session,
-        headers['origin'] || '',
-      );
+      return await this.authService.doAuthenticate(body.credential, session, headers['origin'] || '');
     } catch (error: any) {
       throw new HttpException(error, HttpStatus.FORBIDDEN);
     }
