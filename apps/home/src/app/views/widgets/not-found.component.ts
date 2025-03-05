@@ -1,15 +1,19 @@
-import { Component, input } from '@angular/core';
-import { Widget } from '../../shared/widget/widget.service';
+import { Component, signal } from '@angular/core';
+import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
+import { WidgetComponent } from '../../shared/widget/widget.component';
 
 @Component({
   selector: 'app-not-found',
+  imports: [WidgetComponent],
   template: `
-    <header>
-      <h1>{{ data()?.componentName }} not found</h1>
-    </header>
-    <section>
-      <p>Sorry, the widget you are looking for does not exist.</p>
-    </section>
+    <app-widget [host]="host()">
+      <header>
+        <h1>{{ resolvedData()?.componentName }} not found</h1>
+      </header>
+      <section>
+        <p>Sorry, the widget you are looking for does not exist.</p>
+      </section>
+    </app-widget>
   `,
   styles: `
     :host {
@@ -19,12 +23,20 @@ import { Widget } from '../../shared/widget/widget.service';
       justify-content: center;
       height: 100%;
       width: 100%;
+      ::ng-deep .widget-content {
+        place-content: center;
+        place-items: center;
+      }
     }
     p {
       word-break: break-word;
     }
   `,
+  host: {
+    class: 'widget',
+  },
 })
-export default class NotFoundComponent {
-  data = input<Widget>();
+export default class NotFoundComponent extends AbstractWidgetComponent {
+  id = signal('not-found');
+  // data = input<Widget>();
 }

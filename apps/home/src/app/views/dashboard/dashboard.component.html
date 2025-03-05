@@ -9,7 +9,7 @@
 
 <section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()">
   @for (widget of widgets(); track widget.id) {
-    <app-widget [data]="widget"> </app-widget>
+    <app-widget-loader [data]="widget"> </app-widget-loader>
   } @empty {
     @if (isLoading()) {
       <span class="loading">Loading...</span>

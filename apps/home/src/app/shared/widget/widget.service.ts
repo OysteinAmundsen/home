@@ -82,7 +82,7 @@ export class WidgetService {
 
   isDescendantOfWidget(elementRef: ElementRef<HTMLElement>) {
     const element = elementRef.nativeElement;
-    return element.closest('app-widget') !== null;
+    return element.closest('app-widget-loader') !== null;
   }
 
   /**
