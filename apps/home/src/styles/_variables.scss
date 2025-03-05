@@ -6,7 +6,7 @@
   --color-text-disabled: light-dark(hsl(0, 0%, 60%), hsl(0, 0%, 40%));
   --color-text-highlight: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
   --color-text-button: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 97%));
-  --color-background: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 15%));
+  --color-background: light-dark(hsl(0, 0%, 80%), hsl(0, 0%, 15%));
   --color-background-button: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 24%));
   --color-border: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 30%));
   --color-border-focused: light-dark(hsl(0, 0%, 29%), hsl(0, 0%, 63%));
@@ -46,7 +46,7 @@ html {
     color-scheme: light; // Manually set color scheme to light
     // Special overrides for light mode
     --text-shadow:
-      0 0 1px rgba(0, 0, 0, 1),
+      0 0 0px rgba(0, 0, 0, 1),
       0 0 1px rgba(0, 0, 0, 1),
       0 0 2px rgb(255 255 255),
       0 0 2px rgb(255 255 255),

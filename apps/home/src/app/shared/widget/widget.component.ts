@@ -33,7 +33,7 @@ import { WidgetService } from './widget.service';
       <header [attr.style]="'view-transition-name: ' + widgetId() + '-header'">
         <h2>{{ data()?.name }}</h2>
         @if (route().length) {
-          <a [routerLink]="['/']">
+          <a [routerLink]="['/']" class="button">
             <span class="material-symbols-outlined"> close_fullscreen </span>
           </a>
         }

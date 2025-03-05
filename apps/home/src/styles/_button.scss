@@ -1,7 +1,8 @@
 /**
  * Buttons and variants
  */
-button {
+button,
+.button {
   --outline-color: var(--color-border-focused);
   color: var(--color-text-button);
   background-color: var(--color-background-button);
