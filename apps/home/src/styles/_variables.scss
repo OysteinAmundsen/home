@@ -1,39 +1,53 @@
 :root {
+  // Specify to the browser that we support both light and dark color schemes
   color-scheme: light dark;
   // Base colors
-  --text-color: light-dark(hsl(0, 0%, 22%), hsl(0, 0%, 85%));
-  --text-disabled-color: light-dark(hsl(0, 0%, 60%), hsl(0, 0%, 40%));
-  --text-emphasis-color: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
-  --background-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 15%));
-  --header-emphasis-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 97%));
-  --header-color: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 63%));
-  --header-background: light-dark(hsl(0, 0%, 30%), hsl(0, 0%, 24%));
-  --shadow-color: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 4%));
-  --border-color: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 30%));
-  --border-focused-color: light-dark(hsl(0, 0%, 29%), hsl(0, 0%, 63%));
+  --color-text: light-dark(hsl(0, 0%, 22%), hsl(0, 0%, 85%));
+  --color-text-disabled: light-dark(hsl(0, 0%, 60%), hsl(0, 0%, 40%));
+  --color-text-highlight: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
+  --color-text-button: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 97%));
+  --color-background: light-dark(hsl(0, 0%, 94%), hsl(0, 0%, 15%));
+  --color-background-button: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 24%));
+  --color-border: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 30%));
+  --color-border-focused: light-dark(hsl(0, 0%, 29%), hsl(0, 0%, 63%));
+  --color-shadow: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 4%));
 
   // Theme colors
-  --primary: light-dark(hsl(200, 100%, 50%), hsl(210, 100%, 30%));
-  --warn: light-dark(hsl(14, 100%, 30%), hsl(2, 100%, 63%));
+  --color-primary: light-dark(hsl(200, 100%, 50%), hsl(210, 100%, 30%));
+  --color-warn: light-dark(hsl(14, 100%, 30%), hsl(2, 100%, 63%));
 
   // Other variables
   --border-radius: 0.5rem;
   --text-shadow: 0 0 3px light-dark(rgba(255, 255, 255, 1), rgba(0, 0, 0, 0.5));
-  --shadow1: 0.25rem 0.5rem 0.5rem -0.35rem var(--shadow-color);
-  --shadow2: 0rem 1rem 1.3rem -0.1rem var(--shadow-color);
+  --shadow1: 0.25rem 0.5rem 0.5rem -0.35rem var(--color-shadow);
+  --shadow2: 0rem 1rem 1.3rem -0.1rem var(--color-shadow);
 }
 
+/**
+ * Apply dark or light color scheme based on user preference
+ *
+ * This allows us to have a toggle button in our app to
+ * switch between dark and light mode instead of only
+ * relying on the user's system preference.
+ *
+ * The toggle button is responsible for setting the
+ * `data-schema` attribute on the `html` element to either
+ * `dark` or `light`, which will then override the default
+ * color scheme set by the system.
+ */
 html {
   &[data-schema='dark'] {
-    color-scheme: dark;
+    color-scheme: dark; // Manually set color scheme to dark
+    // Special overrides for dark mode
     --text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
   }
   // prettier-ignore
   &[data-schema='light'] {
-    color-scheme: light;
-    --text-shadow: 
-      0 0 1px rgba(0, 0, 0, 1), 
-      0 0 1px rgba(0, 0, 0, 1), 
+    color-scheme: light; // Manually set color scheme to light
+    // Special overrides for light mode
+    --text-shadow:
+      0 0 1px rgba(0, 0, 0, 1),
+      0 0 1px rgba(0, 0, 0, 1),
       0 0 2px rgb(255 255 255),
       0 0 2px rgb(255 255 255),
       0 0 16px rgb(255 255 255),

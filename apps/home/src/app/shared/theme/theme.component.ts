@@ -17,7 +17,7 @@ import { ThemeService } from './theme.service';
       place-items: center;
     }
     button {
-      color: var(--text-color);
+      color: var(--color-text);
       height: 1.5rem;
       line-height: 1.7rem;
       padding-top: 1px;

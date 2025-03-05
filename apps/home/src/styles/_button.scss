@@ -2,12 +2,13 @@
  * Buttons and variants
  */
 button {
-  color: var(--header-emphasis-color);
-  background-color: var(--header-background);
-  border: 1px solid var(--border-color);
+  --outline-color: var(--color-border-focused);
+  color: var(--color-text-button);
+  background-color: var(--color-background-button);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  --outline-color: var(--border-focused-color);
   padding: 0.5rem 1rem;
+  outline-color: var(--outline-color);
   cursor: pointer;
   transition:
     scale 0.1s ease-in-out,
@@ -20,7 +21,6 @@ button {
     outline-offset: -1px;
     outline-width: 2px;
     outline-style: solid;
-    outline-color: var(--outline-color);
   }
   &:active:not([disabled]) {
     scale: 0.9;
@@ -30,37 +30,41 @@ button {
   &.flat {
     background-color: transparent;
     border-color: transparent;
-    color: var(--text-emphasis-color);
+    color: var(--color-text-highlight);
   }
   &.primary {
-    color: color-mix(in srgb, var(--header-emphasis-color), var(--primary) 10%);
+    color: color-mix(
+      in srgb,
+      var(--color-text-button),
+      var(--color-primary) 10%
+    );
     --outline-color: color-mix(
       in srgb,
-      var(--border-focused-color),
-      var(--primary) 30%
+      var(--color-border-focused),
+      var(--color-primary) 30%
     );
     background-color: color-mix(
       in srgb,
-      var(--header-background),
-      var(--primary) 50%
+      var(--color-background-button),
+      var(--color-primary) 50%
     );
   }
   &.warn {
-    color: color-mix(in srgb, var(--header-emphasis-color), var(--warn) 10%);
+    color: color-mix(in srgb, var(--color-text-button), var(--color-warn) 10%);
     --outline-color: color-mix(
       in srgb,
-      var(--border-focused-color),
-      var(--warn) 30%
+      var(--color-border-focused),
+      var(--color-warn) 30%
     );
     background-color: color-mix(
       in srgb,
-      var(--header-background),
-      var(--warn) 50%
+      var(--color-background-button),
+      var(--color-warn) 50%
     );
   }
   &[disabled] {
     background-color: transparent;
     border-color: transparent;
-    color: var(--text-disabled-color);
+    color: var(--color-text-disabled);
   }
 }

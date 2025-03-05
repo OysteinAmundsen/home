@@ -10,15 +10,29 @@ body {
 html,
 body {
   font-family: 'Roboto', sans-serif;
-  color: var(--text-color);
-  background-color: var(--background-color);
+  color: var(--color-text);
+  background-color: var(--color-background);
   padding: 0;
   margin: 0;
 }
 
 h1 {
-  color: var(--text-emphasis-color);
+  color: var(--color-text-highlight);
   margin: 0;
+}
+
+a {
+  transition: color 0.2s ease;
+  text-decoration: none;
+  text-underline-offset: 4px;
+  &:hover {
+    text-decoration: underline;
+    color: color-mix(in srgb, currentColor, var(--color-primary) 40%);
+  }
+}
+a,
+a:visited {
+  color: inherit;
 }
 
 .spacer {

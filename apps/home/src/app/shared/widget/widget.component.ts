@@ -18,20 +18,24 @@ import { WidgetService } from './widget.service';
     </ng-template>
 
     @if (!isFullscreen()) {
-      <header [attr.style]="'view-transition-name: ' + this.widgetId() + '-header'">
-        <span>{{ data()?.name }}</span>
-        @if (route().length) {
-          <a [routerLink]="route()">Open</a>
-        }
-      </header>
-      <div class="widget-content" [attr.style]="'view-transition-name: ' + this.widgetId() + '-content'">
+      @if (route().length > 0) {
+        <header [attr.style]="'view-transition-name: ' + widgetId() + '-header'">
+          <span>{{ data()?.name }}</span>
+          <a [routerLink]="route()" [title]="'Open ' + data()?.name + ' in fullscreen mode'">
+            <span class="material-symbols-outlined"> open_in_new </span>
+          </a>
+        </header>
+      }
+      <div class="widget-content" [attr.style]="'view-transition-name: ' + widgetId() + '-content'">
         <ng-container *ngTemplateOutlet="tpl"></ng-container>
       </div>
     } @else {
-      <header [attr.style]="'view-transition-name: ' + this.widgetId() + '-header'">
+      <header [attr.style]="'view-transition-name: ' + widgetId() + '-header'">
         <h2>{{ data()?.name }}</h2>
         @if (route().length) {
-          <a [routerLink]="['/']">Close</a>
+          <a [routerLink]="['/']">
+            <span class="material-symbols-outlined"> close_fullscreen </span>
+          </a>
         }
       </header>
 

@@ -33,14 +33,14 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
     `
       // Displayed in fullscreen
       :root:not(:has(app-widget-loader)) :host {
-        background: var(--background-color);
+        background: var(--color-background);
         background: linear-gradient(
           to bottom,
-          hsla(from var(--background-color) h s l / 0%),
-          hsla(from var(--background-color) h s l / 20%) 20%,
-          hsla(from var(--background-color) h s l / 55%) 30%,
-          hsla(from var(--background-color) h s l / 80%) 40%,
-          hsla(from var(--background-color) h s l / 95%) 60%
+          hsla(from var(--color-background) h s l / 0%),
+          hsla(from var(--color-background) h s l / 20%) 20%,
+          hsla(from var(--color-background) h s l / 55%) 30%,
+          hsla(from var(--color-background) h s l / 80%) 40%,
+          hsla(from var(--color-background) h s l / 95%) 60%
         );
         width: calc(100% + 2rem);
         height: calc(100% + 2rem);
@@ -157,7 +157,7 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
 
   private computedColor() {
     const tmp = this.doc.createElement('div');
-    tmp.style.cssText = 'color: var(--text-color)';
+    tmp.style.cssText = 'color: var(--color-text)';
     this.doc.body.appendChild(tmp);
     const window = globalThis.window || this.doc.defaultView;
     const currentColor = window.getComputedStyle(tmp).color;

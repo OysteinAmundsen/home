@@ -19,22 +19,22 @@ form {
 
 input {
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: calc(var(--border-radius) / 2);
   transition: border 0.1s ease-in-out;
   &:focus,
   &:focus-visible {
     outline-style: solid;
-    outline-color: var(--border-focused-color);
+    outline-color: var(--color-border-focused);
   }
   &.ng-invalid:not(.ng-pristine) {
-    --border-color: var(--warn);
-    --border-focused-color: var(--warn);
+    --color-border: var(--color-warn);
+    --color-border-focused: var(--color-warn);
     &::placeholder {
-      color: var(--warn);
+      color: var(--color-warn);
     }
     + .hint {
-      color: var(--warn);
+      color: var(--color-warn);
     }
   }
 }

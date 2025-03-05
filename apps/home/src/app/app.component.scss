@@ -41,7 +41,7 @@
     background-image: radial-gradient(
       circle at center center,
       transparent 0%,
-      var(--vignette-color, var(--background-color)) 100%
+      var(--vignette-color, var(--color-background)) 100%
     );
     z-index: -1;
     opacity: 0.2;
@@ -59,7 +59,7 @@
     padding: 1rem 1rem 0 1rem;
     background: linear-gradient(
       to bottom,
-      var(--header-background),
+      var(--color-background-button),
       transparent
     );
     h1 {

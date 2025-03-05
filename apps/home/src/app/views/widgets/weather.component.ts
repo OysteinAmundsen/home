@@ -55,7 +55,7 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
         display: flex;
         gap: 0.5rem;
         ::ng-deep .material-symbols-outlined {
-          color: var(--text-emphasis-color);
+          color: var(--color-text-highlight);
         }
         .temp {
           width: 3rem;
@@ -69,8 +69,9 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
       display: flex;
       place-items: center;
       place-content: center;
+      gap: 0.5rem;
       time {
-        color: var(--text-emphasis-color);
+        color: var(--color-text-highlight);
         font-style: italic;
       }
     }
