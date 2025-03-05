@@ -20,27 +20,13 @@ import { Widget, WidgetService } from './widget.service';
   selector: 'app-widget-loader',
   imports: [RouterModule],
   template: `<ng-container #container></ng-container>`,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 100%;
-      view-transition-class: widget-loader;
-    }
-  `,
-  host: {
-    class: 'widget-loader',
-    '[style.--widget-id]': 'widgetId()',
-  },
+  host: { class: 'widget-loader' },
 })
 export class WidgetLoaderComponent {
   private readonly widgetService = inject(WidgetService);
   private container = viewChild('container', { read: ViewContainerRef });
 
   data = input<Widget>();
-
-  widgetId = computed(() => `widget_${this.data()?.id}`);
 
   route = computed(() => {
     const data = this.data();

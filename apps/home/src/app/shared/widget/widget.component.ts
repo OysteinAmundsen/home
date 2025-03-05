@@ -52,59 +52,7 @@ import { WidgetService } from './widget.service';
       <ng-container *ngTemplateOutlet="tpl"></ng-container>
     }
   `,
-  styles: `
-    :host {
-      display: grid;
-      grid-template-rows: auto 1fr;
-      border-radius: var(--border-radius);
-      overflow: hidden;
-      view-transition-class: widget;
-      view-transition-name: var(--widget-id);
-
-      @layer widget {
-        transition-behavior: allow-discrete;
-        transition:
-          opacity 0.25s ease-in,
-          scale 0.25s ease-in,
-          display 0.25s ease-in;
-
-        // Enter animation
-        @starting-style {
-          scale: 0.7;
-          opacity: 0;
-        }
-      }
-
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        color: var(--header-color);
-        font-size: 0.9rem;
-        view-transition-class: widget-header;
-      }
-
-      .widget-content {
-        padding: 1rem;
-        background-color: var(--background-color);
-        view-transition-class: widget-content;
-        min-height: fit-content;
-      }
-    }
-
-    // Dashboard view
-    :root .widget:not(.fullscreen) :host {
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow1);
-      header {
-        background: var(--header-background);
-      }
-    }
-  `,
-  host: {
-    class: 'widget-wrapper',
-  },
+  host: { class: 'widget-wrapper' },
 })
 export class WidgetComponent {
   private readonly widgetService = inject(WidgetService);

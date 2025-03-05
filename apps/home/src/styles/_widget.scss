@@ -1,11 +1,65 @@
+.widget-loader {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  view-transition-class: widget-loader;
+}
+
 .widget {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  view-transition-class: widget;
+  view-transition-name: var(--widget-id);
   .widget-wrapper {
     flex: 1;
     width: 100%;
     height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+
+    @layer widget {
+      transition-behavior: allow-discrete;
+      transition:
+        opacity 0.25s ease-in,
+        scale 0.25s ease-in,
+        display 0.25s ease-in;
+
+      // Enter animation
+      @starting-style {
+        scale: 0.7;
+        opacity: 0;
+      }
+    }
+
+    > header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      color: var(--header-color);
+      font-size: 0.9rem;
+      view-transition-class: widget-header;
+    }
+
+    .widget-content {
+      padding: 1rem;
+      background-color: var(--background-color);
+      view-transition-class: widget-content;
+      min-height: fit-content;
+    }
+  }
+
+  // Dashboard view
+  &:not(.fullscreen) .widget-wrapper {
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow1);
+    > header {
+      background: var(--header-background);
+    }
   }
 }

@@ -31,10 +31,6 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
   `,
   styles: [
     `
-      :host {
-        view-transition-class: widget;
-        view-transition-name: starfield;
-      }
       // Displayed in fullscreen
       :root:not(:has(app-widget-loader)) :host {
         background: var(--background-color);

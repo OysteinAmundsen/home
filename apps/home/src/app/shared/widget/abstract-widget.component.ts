@@ -26,7 +26,7 @@ const WIDGET_KEY = makeStateKey<any>('widget-host');
   host: {
     class: 'widget',
     '[class.fullscreen]': 'isFullscreen()',
-    // '[style.--widget-id]': 'widgetId()',
+    '[style.--widget-id]': 'widgetId()',
   },
 })
 export abstract class AbstractWidgetComponent {
@@ -42,12 +42,13 @@ export abstract class AbstractWidgetComponent {
     this.widgetService.getRoute(this.id()),
   );
 
-  data = input<Widget>();
-  host = signal(this);
+  host = signal(this); // Allows the widget.component to access this base class
+  data = input<Widget>(); // Will be provided in dashboard
   resolvedData = computed(() => {
     const data = this.data();
     if (data) return data;
-
+    // If the data is not provided, try to resolve it from the widget service
+    // using routes and the provided id string
     const resolved = this.widgetConfig();
     return resolved
       ? {
@@ -57,6 +58,7 @@ export abstract class AbstractWidgetComponent {
         }
       : undefined;
   });
+  widgetId = computed(() => this.resolvedData()?.componentName);
 
   isFullscreen = toSignal<boolean>(
     this.router.events.pipe(
@@ -67,12 +69,14 @@ export abstract class AbstractWidgetComponent {
   );
 
   constructor() {
+    // SSR gave me trouble, so I had to use TransferState to pass this
+    // data between server and client
     if (isPlatformServer(this.platformId)) {
-      // On the server, set the widget data
+      // On the server, set the host class
       this.host.set(this);
       this.transferState.set(WIDGET_KEY, this.host);
     } else if (isPlatformBrowser(this.platformId)) {
-      // On the client, retrieve the widget data
+      // On the client, retrieve the host class
       this.host.set(this.transferState.get(WIDGET_KEY, this));
     }
   }

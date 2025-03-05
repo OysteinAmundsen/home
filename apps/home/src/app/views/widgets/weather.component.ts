@@ -52,8 +52,6 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
   `,
   styles: `
     :host {
-      view-transition-class: widget;
-      view-transition-name: weather;
       container-type: size;
       display: block;
       height: 100%;

@@ -32,9 +32,6 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
       word-break: break-word;
     }
   `,
-  host: {
-    class: 'widget',
-  },
 })
 export default class NotFoundComponent extends AbstractWidgetComponent {
   id = signal('not-found');
