@@ -3,6 +3,11 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged, map, switchMap, timer } from 'rxjs';
 import { VisibilityService } from './visibility/visibility.service';
 
+/**
+ * Renders a date and time component
+ *
+ * It updates every second, exactly on the second.
+ */
 @Component({
   selector: 'app-time',
   template: `<time>{{ time() }}</time>`,

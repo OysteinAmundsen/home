@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input, TemplateRef, viewChild } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AbstractWidgetComponent } from './abstract-widget.component';
 import { WidgetService } from './widget.service';
@@ -47,13 +47,21 @@ import { WidgetService } from './widget.service';
 export class WidgetComponent {
   private readonly widgetService = inject(WidgetService);
 
-  tpl = viewChild<TemplateRef<any>>('tpl');
-
+  /** Holds a reference to the base class of all widgets */
   host = input.required<AbstractWidgetComponent>();
+
+  /** A proxy to the base class signal of the same name */
   isFullscreen = computed(() => this.host()?.isFullscreen() === true);
+
+  /**
+   * Data is only input here if widget is displayed in a dashboard.
+   *
+   * If widget is displayed fullscreen, data is derived from whatever
+   * the actual widget is willing to provide us.
+   */
   data = computed(() => this.host()?.resolvedData() ?? { id: '', name: '', componentName: '' });
 
-  widgetId = computed(() => `widget-${this.host()?.widgetId()}`);
+  widgetId = computed(() => `widget-${this.host()?.widgetName()}`);
   route = computed(() => {
     const data = this.data();
     if (data) {

@@ -21,6 +21,9 @@ import { VisibilityService } from '../../shared/visibility/visibility.service';
 import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
 import { WidgetComponent } from '../../shared/widget/widget.component';
 
+/**
+ * A widget that displays a starfield animation
+ */
 @Component({
   selector: 'app-widget-starfield',
   imports: [WidgetComponent],

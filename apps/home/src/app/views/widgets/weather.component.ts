@@ -8,6 +8,9 @@ import { cache, Cache } from '../../shared/rxjs/cache';
 import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
 import { WidgetComponent } from '../../shared/widget/widget.component';
 
+/**
+ * A widget integrating with the yr.no weather API
+ */
 @Component({
   selector: 'app-widget-weather',
   imports: [CommonModule, IconPipe, WidgetComponent],

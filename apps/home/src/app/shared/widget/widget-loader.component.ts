@@ -3,9 +3,13 @@ import { RouterModule } from '@angular/router';
 import { Widget, WidgetService } from './widget.service';
 
 /**
- * Container for widget components.
+ * A loader for widgets
  *
- * This renders a standard ui wrapper for all widgets when displayed in the dashboard.
+ * This takes in a component name and dynamically loads and renders the component.
+ * Useful for lazy loading components inside a dashboard where the components are not known
+ * at compile time. For instance if the dashboard is user customizable and users can
+ * choose themselves which widgets to display. This allows the application to load only
+ * the components that should actually be visible.
  */
 @Component({
   selector: 'app-widget-loader',

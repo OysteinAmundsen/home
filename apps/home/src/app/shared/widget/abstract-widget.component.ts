@@ -26,7 +26,7 @@ const WIDGET_KEY = makeStateKey<any>('widget-host');
   host: {
     class: 'widget',
     '[class.fullscreen]': 'isFullscreen()',
-    '[style.--widget-id]': 'widgetId()',
+    '[style.--widget-id]': 'widgetName()',
   },
 })
 export abstract class AbstractWidgetComponent {
@@ -38,26 +38,46 @@ export abstract class AbstractWidgetComponent {
   protected readonly platformId = inject(PLATFORM_ID);
 
   abstract id: Signal<string>;
+
+  /** Holds a reference to this widgets route config */
   protected widgetConfig = computed(() => this.widgetService.getRoute(this.id()));
 
-  host = signal(this); // Allows the widget.component to access this base class
-  data = input<Widget>(); // Will be provided in dashboard
-  resolvedData = computed(() => {
+  /** Allows the widget.component to access this base class */
+  host = signal(this);
+
+  /**
+   * Configuration input to the widget.
+   *
+   * NOTE: Do not query this directly, use `resolvedData` instead.
+   */
+  data = input<Widget>();
+
+  /**
+   * The `data` signal should never be accessed directly.
+   *
+   * Since widgets can be displayed either through a dashboard or as a standalone
+   * component, this will make sure we provide the nescessary data
+   * always.
+   */
+  resolvedData = computed<Widget | undefined>(() => {
     const data = this.data();
     if (data) return data;
     // If the data is not provided, try to resolve it from the widget service
     // using routes and the provided id string
     const resolved = this.widgetConfig();
     return resolved
-      ? {
-          id: -1,
+      ? ({
+          id: -1, // We do not actually need the ID client side
           componentName: resolved.path,
           name: titleCase(`${resolved.path}`),
-        }
+        } as Widget)
       : undefined;
   });
-  widgetId = computed(() => this.resolvedData()?.componentName);
 
+  /** Returns the component name of this widget */
+  widgetName = computed<string>(() => this.resolvedData()?.componentName ?? '');
+
+  /** Returns true if this element is NOT a descendant of the dashboard elements */
   isFullscreen = toSignal<boolean>(
     this.router.events.pipe(
       takeUntilDestroyed(this.destroyRef$),

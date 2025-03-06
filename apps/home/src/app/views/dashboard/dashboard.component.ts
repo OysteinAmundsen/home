@@ -8,6 +8,11 @@ import { WidgetLoaderComponent } from '../../shared/widget/widget-loader.compone
 import { Widget, WidgetService } from '../../shared/widget/widget.service';
 import { widgetAnimation } from '../../shared/widget/widgets.animation';
 
+/**
+ * The dashboard component
+ *
+ * This holds all the widgets for this dashboard.
+ */
 @Component({
   selector: 'app-dashboard',
   imports: [WidgetLoaderComponent],

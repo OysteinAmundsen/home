@@ -1,5 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, ElementRef, inject, Injectable, Injector, NgModuleFactory, resource, signal } from '@angular/core';
+import { Route } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { widgetRoutes } from '../../views/widget.routes';
 import { cache } from '../rxjs/cache';
@@ -14,10 +15,14 @@ export type Widget = {
 export class WidgetService {
   private http = inject(HttpClient);
   private injector = inject(Injector);
+
+  // The routes for the widgets
   private widgetRoutes = widgetRoutes;
 
   /** Filter widgets by id */
   filter = signal<number | undefined>(undefined);
+
+  /** The url to load widgets from */
   url = computed(() => (this.filter() ? `/api/widgets/${this.filter()}` : '/api/widgets'));
 
   /** Fetches the widgets from the server */
@@ -45,34 +50,53 @@ export class WidgetService {
     },
   });
 
+  /** Exposes either the cached or loaded widgets */
   widgets = computed<Widget[]>(() =>
     // Make sure that widgets always returns an array, even when loading new widgets
     this.widgetsLoader.isLoading() ? this.widgetsCache : (this.widgetsLoader.value() as Widget[]),
   );
+
+  /** Exposes any errors from the loading process */
   error = computed<string | undefined>(
     () => (this.widgetsLoader.error() as HttpErrorResponse)?.error.error ?? undefined,
   );
+
+  /** Exposes the loading state */
   isLoading = computed(() => this.widgetsLoader.isLoading() && this.widgets.length < 1);
 
-  getRoute(componentName: string | undefined) {
-    if (!componentName) return;
-    return this.widgetRoutes.find((route) => route.path === componentName);
-  }
-
+  /**
+   * Check if this element is used in the dashboard or not.
+   *
+   * If this returns false, the element is probably viewed in "fullscreen" mode.
+   *
+   * @param elementRef The element to check
+   * @returns true if the element is a descendant of a widget loader
+   */
   isDescendantOfWidget(elementRef: ElementRef<HTMLElement>) {
     const element = elementRef.nativeElement;
     return element.closest('app-widget-loader') !== null;
   }
 
   /**
-   * This acts as a repository for the widgets.
+   * Lookup a component name in the widget routes
    *
-   * It will lookup the widget in the widgetRoutes and try to
-   * load the component. If the component is not found or it fails
-   * to load, it will return the NotFoundComponent.
+   * @param componentName The component to lookup
+   * @returns the Route config for this component
+   */
+  getRoute(componentName: string | undefined): Route | undefined {
+    if (!componentName) return undefined;
+    return this.widgetRoutes.find((route) => route.path === componentName);
+  }
+
+  /**
+   * This will lazily load a component and return a reference to it.
    *
-   * @param componentName
-   * @returns
+   * The component to load must be registered in the widgetRoutes array.
+   * If the component is not found or it fails to load, it will return
+   * the `NotFoundComponent`.
+   *
+   * @param componentName the name of the component to load
+   * @returns a reference to the component class
    */
   async loadWidget(componentName: string | undefined) {
     const route = this.getRoute(componentName);

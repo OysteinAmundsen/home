@@ -2,13 +2,19 @@ import { Component, signal } from '@angular/core';
 import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
 import { WidgetComponent } from '../../shared/widget/widget.component';
 
+/**
+ * A "cacth-all" widget to display if a requested widget is not found
+ * 
+ * In order to find a widget, a widget must be registerred in the 
+ * `widget.routes.ts` file.
+ */
 @Component({
   selector: 'app-not-found',
   imports: [WidgetComponent],
   template: `
     <app-widget [host]="host()">
       <header>
-        <h1>{{ resolvedData()?.componentName }} not found</h1>
+        <h1>{{ widgetName() }} not found</h1>
       </header>
       <section>
         <p>Sorry, the widget you are looking for does not exist.</p>

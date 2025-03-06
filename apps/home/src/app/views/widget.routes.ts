@@ -16,9 +16,4 @@ export const widgetRoutes: Route[] = [
     data: { widget: true },
     loadComponent: () => import('./widgets/starfield.component').then((m) => m.default),
   },
-  {
-    path: 'not-found',
-    data: { widget: true },
-    loadComponent: () => import('./widgets/not-found.component').then((m) => m.default),
-  },
 ];
