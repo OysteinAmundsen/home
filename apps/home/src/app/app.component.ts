@@ -9,14 +9,14 @@ import { ConnectivityService } from './shared/connectivity/connectivity.service'
 import { ThemeComponent } from './shared/theme/theme.component';
 import { TimeComponent } from './shared/time.component';
 import { VisibilityService } from './shared/visibility/visibility.service';
-import { widgetAnimation } from './shared/widget/widgets.animation';
+import { dashboardAnimation } from './views/dashboard/dashboard.animation';
 
 @Component({
   imports: [RouterModule, CommonModule, TimeComponent, ThemeComponent, LoginComponent],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  animations: [trigger('widgets', [widgetAnimation])],
+  animations: [trigger('widgets', [dashboardAnimation])],
   host: {
     '[class.inactive]': 'isInactive()',
     '[class.offline]': 'isOffline()',

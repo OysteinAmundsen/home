@@ -12,7 +12,7 @@ const time = '250ms ease-in';
 /**
  * Animation for when widgets enter or leave the view
  */
-export const widgetAnimation = transition('* <=> *', [
+export const dashboardAnimation = transition('* <=> *', [
   // Run both enter and leave in paralell
   group([
     // When elements enters the array

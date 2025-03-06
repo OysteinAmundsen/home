@@ -6,7 +6,7 @@ import { filter } from 'rxjs';
 import { doSafeTransition } from '../../shared/utils/transitions';
 import { WidgetLoaderComponent } from '../../shared/widget/widget-loader.component';
 import { Widget, WidgetService } from '../../shared/widget/widget.service';
-import { widgetAnimation } from '../../shared/widget/widgets.animation';
+import { dashboardAnimation } from './dashboard.animation';
 
 /**
  * The dashboard component
@@ -18,7 +18,7 @@ import { widgetAnimation } from '../../shared/widget/widgets.animation';
   imports: [WidgetLoaderComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
-  animations: [trigger('widgets', [widgetAnimation])],
+  animations: [trigger('widgets', [dashboardAnimation])],
 })
 export class DashboardComponent implements AfterViewInit {
   private readonly widgetService = inject(WidgetService);

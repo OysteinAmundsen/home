@@ -21,7 +21,7 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
       } @else if (weather.error()) {
         <section>{{ weather.error() }}</section>
       } @else if (weather.value()) {
-        <section>
+        <section [attr.style]="'view-transition-name: ' + widgetId() + '-content-list'">
           @for (time of todaysWeather(); track time.time) {
             <div class="time">
               <time>{{ time.time | date: 'HH:mm' }}</time>
@@ -30,7 +30,7 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
             </div>
           }
         </section>
-        <footer>
+        <footer [attr.style]="'view-transition-name: ' + widgetId() + '-footer'">
           <span class="material-symbols-outlined">update</span>
           <time>{{ lastUpdated() | date: 'dd.MM.yyyy HH:mm' }}</time>
         </footer>
@@ -53,6 +53,7 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
     }
     section {
       place-items: center;
+      // view-transition-name: widget-weather-content-list;
       .time {
         display: flex;
         gap: 0.5rem;
