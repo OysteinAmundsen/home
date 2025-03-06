@@ -112,7 +112,7 @@ export const rgbToHex = (r: number, g: number, b: number, a?: number): string =>
   const color =
     [r, g, b]
       .filter((x) => x != null)
-      .map((x) => x?.toString(16).padStart(2, '0'))
+      .map((x) => x.toString(16).padStart(2, '0'))
       .join('') + (a != null ? alphaToHex(a) : '');
   return `#${color}`;
 };
@@ -160,7 +160,7 @@ function hslStrToRgb(color: string): string {
   const [h, s, l, a] = color
     .substring(color.indexOf('(') + 1, color.indexOf(')'))
     .split(',')
-    .map((n) => +(n.indexOf('%') > -1 ? n.substring(0, n.indexOf('%')) : n));
+    .map((n) => +n.replace('%', '').replace('deg', '').trim());
   return hslToRgb(h, s, l, a);
 }
 
@@ -210,7 +210,7 @@ function hslToRgb(h: number, s: number, l: number, a?: number): string {
   g = Math.round((g + m) * 255);
   b = Math.round((b + m) * 255);
 
-  return `rgb${a && a > -1 ? 'a' : ''}(${r}, ${g}, ${b} ${a && a > -1 ? ', ' + a : ''})`;
+  return `rgb${a && a > -1 ? 'a' : ''}(${r}, ${g}, ${b}${a && a > -1 ? ', ' + a : ''})`;
 }
 
 // #region hsl
@@ -286,7 +286,7 @@ function rgbToHsl(r: number, g: number, b: number, a?: number): string {
     h = (r - g) / delta + 4;
   } // Blue is max
 
-  h = Math.round(h * 60);
+  h = Math.round(h * 60 * 100) / 100;
 
   if (h < 0) {
     h += 360;
@@ -298,13 +298,13 @@ function rgbToHsl(r: number, g: number, b: number, a?: number): string {
   s = +(s * 100).toFixed(1);
   l = +(l * 100).toFixed(1);
 
-  return `hsl${a != null && a > -1 ? 'a' : ''}(${toFixed(h, 1)},${toFixed(s, 3)}%, ${toFixed(l, 3)}%${
-    a != null && a > -1 ? ', ' + a + '%' : 1
+  return `hsl${a != null && a > -1 ? 'a' : ''}(${toFixed(h, 2).replace('.00', '')},${toFixed(s, 3).replace('.000', '')}%, ${toFixed(l, 3).replace('.000', '')}%${
+    a != null && a > -1 ? ', ' + a + '%' : ''
   })`;
 }
 
-function toFixed(value: number, digits: number) {
-  return Number.isFinite(value) && Number.isFinite(digits) ? value.toFixed(digits) : value;
+function toFixed(value: number, digits: number): string {
+  return Number.isFinite(value) && Number.isFinite(digits) ? value.toFixed(digits) : `${value}`;
 }
 
 function calculate(color: string, h: number, s: number, l: number, a?: number) {
