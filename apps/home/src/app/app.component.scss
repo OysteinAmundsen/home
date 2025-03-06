@@ -4,7 +4,6 @@
   flex-direction: column;
   gap: 0.5rem;
   height: 100%;
-  padding: 1rem;
   position: relative;
   z-index: 0;
   overflow: hidden;
@@ -52,10 +51,9 @@
   }
 
   // Other styles
-  header {
+  > header {
     display: flex;
     place-items: center;
-    margin: -1rem -1rem 0 -1rem; // Compensate for parent element padding
     padding: 1rem 1rem 0 1rem;
     background: linear-gradient(
       to bottom,

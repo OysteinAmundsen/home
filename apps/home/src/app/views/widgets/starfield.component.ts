@@ -34,38 +34,14 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
   `,
   styles: [
     `
-      // Displayed in fullscreen
-      :root:not(:has(app-widget-loader)) :host {
-        background: var(--color-background);
-        background: linear-gradient(
-          to bottom,
-          hsla(from var(--color-background) h s l / 0%),
-          hsla(from var(--color-background) h s l / 20%) 20%,
-          hsla(from var(--color-background) h s l / 55%) 30%,
-          hsla(from var(--color-background) h s l / 80%) 40%,
-          hsla(from var(--color-background) h s l / 95%) 60%
-        );
-        width: calc(100% + 2rem);
-        height: calc(100% + 2rem);
-        margin: -1rem;
-        canvas {
-          width: 100%;
-          height: 100%;
-          margin: 0;
-        }
-      }
-      // Displayed in dashboard
       canvas {
         display: block;
         min-width: 300px;
-        width: calc(100% + 2rem);
-        height: calc(100% + 2rem);
-        margin: -1rem;
+        width: 100%;
+        height: 100%;
         transition:
           opacity 0.3s,
           filter 0.3s;
-      }
-      :root .inactive :host canvas {
       }
     `,
   ],

@@ -72,9 +72,9 @@ export class WidgetService {
    * @param elementRef The element to check
    * @returns true if the element is a descendant of a widget loader
    */
-  isDescendantOfWidget(elementRef: ElementRef<HTMLElement>) {
+  isDescendantOfDashboard(elementRef: ElementRef<HTMLElement>) {
     const element = elementRef.nativeElement;
-    return element.closest('app-widget-loader') !== null;
+    return document.querySelector('app-dashboard')?.contains(element);
   }
 
   /**

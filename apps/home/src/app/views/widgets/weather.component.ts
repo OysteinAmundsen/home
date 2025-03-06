@@ -52,7 +52,6 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
       }
     }
     section {
-      view-transition-name: weather-content;
       place-items: center;
       .time {
         display: flex;
@@ -67,7 +66,6 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
       }
     }
     footer {
-      view-transition-name: weather-footer;
       padding-top: 0.5rem;
       display: flex;
       place-items: center;

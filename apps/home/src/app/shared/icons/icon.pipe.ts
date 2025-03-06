@@ -13,7 +13,7 @@ export class IconPipe implements PipeTransform {
   // prettier-ignore
   private readonly synonyms = {
     bedtime: ['clearsky_night', 'fair_night'],
-    clear_day: ['clearsky_day'],
+    clear_day: ['clearsky_day', 'fair_day'],
     cloud: ['cloudy'],
     cloudy_snowing: ['snowshowers_night'],
     foggy: ['fog'],

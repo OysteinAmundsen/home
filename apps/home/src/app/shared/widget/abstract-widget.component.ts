@@ -26,7 +26,7 @@ const WIDGET_KEY = makeStateKey<any>('widget-host');
   host: {
     class: 'widget',
     '[class.fullscreen]': 'isFullscreen()',
-    '[style.--widget-id]': 'widgetName()',
+    '[style.view-transition-name]': 'widgetId()',
   },
 })
 export abstract class AbstractWidgetComponent {
@@ -74,6 +74,7 @@ export abstract class AbstractWidgetComponent {
       : undefined;
   });
 
+  widgetId = computed(() => `widget-${this.id()}`);
   /** Returns the component name of this widget */
   widgetName = computed<string>(() => this.resolvedData()?.componentName ?? '');
 
@@ -82,7 +83,7 @@ export abstract class AbstractWidgetComponent {
     this.router.events.pipe(
       takeUntilDestroyed(this.destroyRef$),
       filter((event) => event instanceof NavigationEnd),
-      map(() => !this.widgetService.isDescendantOfWidget(this.elementRef)),
+      map(() => !this.widgetService.isDescendantOfDashboard(this.elementRef)),
     ),
   );
 

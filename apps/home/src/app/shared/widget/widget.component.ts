@@ -17,30 +17,33 @@ import { WidgetService } from './widget.service';
       <ng-content></ng-content>
     </ng-template>
 
-    @if (!isFullscreen()) {
-      @if (route().length > 0) {
-        <header [attr.style]="'view-transition-name: ' + widgetId() + '-header'">
-          <span>{{ data()?.name }}</span>
+    @if (route().length > 0) {
+      <header [attr.style]="'view-transition-name: ' + widgetId() + '-header'" class="widget-header">
+        <h2 [attr.style]="'view-transition-name: ' + widgetId() + '-header-text'">{{ data()?.name }}</h2>
+        @if (!isFullscreen()) {
           <a [routerLink]="route()" [title]="'Open ' + data()?.name + ' in fullscreen mode'">
-            <span class="material-symbols-outlined"> open_in_new </span>
+            <span
+              class="material-symbols-outlined"
+              [attr.style]="'view-transition-name: ' + widgetId() + '-header-icon'"
+            >
+              open_in_new
+            </span>
           </a>
-        </header>
-      }
-      <div class="widget-content" [attr.style]="'view-transition-name: ' + widgetId() + '-content'">
-        <ng-container *ngTemplateOutlet="tpl"></ng-container>
-      </div>
-    } @else {
-      <header [attr.style]="'view-transition-name: ' + widgetId() + '-header'">
-        <h2>{{ data()?.name }}</h2>
-        @if (route().length) {
-          <a [routerLink]="['/']" class="button">
-            <span class="material-symbols-outlined"> close_fullscreen </span>
+        } @else {
+          <a [routerLink]="['/']" class="button" [title]="'Go back to dashboard'">
+            <span
+              class="material-symbols-outlined"
+              [attr.style]="'view-transition-name: ' + widgetId() + '-header-icon'"
+            >
+              close_fullscreen
+            </span>
           </a>
         }
       </header>
-
-      <ng-container *ngTemplateOutlet="tpl"></ng-container>
     }
+    <div class="widget-content" [attr.style]="'view-transition-name: ' + widgetId() + '-content'">
+      <ng-container *ngTemplateOutlet="tpl"></ng-container>
+    </div>
   `,
   host: { class: 'widget-wrapper' },
 })
@@ -61,7 +64,7 @@ export class WidgetComponent {
    */
   data = computed(() => this.host()?.resolvedData() ?? { id: '', name: '', componentName: '' });
 
-  widgetId = computed(() => `widget-${this.host()?.widgetName()}`);
+  widgetId = computed(() => this.host()?.widgetId());
   route = computed(() => {
     const data = this.data();
     if (data) {
