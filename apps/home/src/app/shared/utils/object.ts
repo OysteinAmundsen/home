@@ -93,15 +93,12 @@ function deepMergeObject(target: Record<string, unknown>, ...source: any[]): Rec
  * Safely convert an object to a string. This will remove circular dependencies,
  * so the object might not be able to be converted back to a valid object.
  *
- * @param obj
- * @returns a string representation of the object
- *
  * @example
  * ```ts
  * objToString({ a: 1, b: { c: 2 } }) // '{"a":1,"b":{"c":2}}'
  * ```
- * @params str the string to convert
- * @returns the converted string
+ * @param obj the object to convert
+ * @returns a string representation of the object
  */
 export function objToString(obj: any): string {
   if (obj == null || typeof obj !== 'object') return '' + obj;
