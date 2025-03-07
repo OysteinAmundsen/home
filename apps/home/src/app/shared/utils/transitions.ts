@@ -10,7 +10,7 @@ const viewTransitionMockReturnObject = {
   ready: Promise.resolve(undefined),
   updateCallbackDone: Promise.resolve(undefined),
   skipTransition: () => ({}),
-} as ViewTransition;
+} as unknown as ViewTransition;
 
 /**
  * Helper function to do a safe view transition.

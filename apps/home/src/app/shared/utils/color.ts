@@ -1,46 +1,118 @@
 // ------------------------------------------------------
 // COLOR UTILITIES
 // ------------------------------------------------------
-/** Return the hue of any color value */
+/**
+ * Return the hue of any color value
+ *
+ * @example
+ * ```ts
+ * getHue('rgb(255, 255, 255)'); // => 0
+ * getHue('rgba(255, 255, 255, 1)'); // => 0
+ * getHue('hsl(255, 255%, 255%)'); // => 255
+ * getHue('hsla(255deg, 255%, 255%, 100%)'); // => 255
+ * getHue('#FFFFFF');            // => 0
+ * ```
+ */
 export function getHue(color: string): number {
   const [h, s, l, a] = toHsl(color);
   return h;
 }
+
 /**
  * Convert to HSLA and add the given percentage to the Hue.
  * Color will be returned in the format given (hex, rgb, hsl)
+ *
+ * @example
+ * ```ts
+ * addHue('rgb(204 238 255)', 10);    // => 'rgb(204 229 255)'
+ * addHue('hsl(200, 100%, 90%)', 10); // => 'hsl(210, 100%, 90%)'
+ * addHue('#cceeff', 10);             // => '#cce5ff'
+ * ```
  */
 export function addHue(color: string, degrees: number): string {
   const [h, s, l, a] = toHsl(color);
   return calculate(color, h + degrees > 360 ? h + degrees - 360 : h + degrees, s, l, a);
 }
 
-/** Return the saturation of any color value */
+/**
+ * Return the saturation of any color value
+ *
+ * @example
+ * ```ts
+ * getSaturation('rgb(255, 255, 255)');             // => 255
+ * getSaturation('rgba(255, 255, 255, 1)');         // => 255
+ * getSaturation('hsl(255, 255%, 255%)');           // => 255
+ * getSaturation('hsla(255deg, 255%, 255%, 100%)'); // => 255
+ * getSaturation('#FFFFFF');                        // => 255
+ * ```
+ */
 export function getSaturation(color: string): number {
   const [h, s, l, a] = toHsl(color);
   return s;
 }
+
 /**
  * Convert to HSLA and rewrite the Saturation with the given percentage.
  * Color will be returned in the format given (hex, rgb, hsl)
+ *
+ * @example
+ * ```ts
+ * setSaturation('rgb(204 238 255)', 50);    // => 'rgb(204 238 255)'
+ * setSaturation('hsl(200, 100%, 90%)', 50); // => 'hsl(200, 50%, 90%)'
+ * setSaturation('#cceeff', 50);             // => '#cceeff'
+ * ```
  */
 export function setSaturation(color: string, percent: number): string {
   const [h, s, l, a] = toHsl(color);
   return calculate(color, h, percent, l, a);
 }
 
-/** Return the lightness of any color value */
+/**
+ * Return the lightness of any color value
+ *
+ * @example
+ * ```ts
+ * getLightness('rgb(255, 255, 255)');             // => 255
+ * getLightness('rgba(255, 255, 255, 1)');         // => 255
+ * getLightness('hsl(255, 255%, 255%)');           // => 255
+ * getLightness('hsla(255deg, 255%, 255%, 100%)'); // => 255
+ * getLightness('#FFFFFF');                        // => 255
+ * ```
+ */
 export function getLightness(color: string): number {
   const [h, s, l, a] = toHsl(color);
   return l;
 }
 
-/** Return the alpha value of any color value */
+/**
+ * Return the alpha value of any color value
+ *
+ * @example
+ * ```ts
+ * getAlpha('rgb(255, 255, 255)');             // => 255
+ * getAlpha('rgba(255, 255, 255, 1)');         // => 255
+ * getAlpha('hsl(255, 255%, 255%)');           // => 255
+ * getAlpha('hsla(255deg, 255%, 255%, 100%)'); // => 255
+ * getAlpha('#FFFFFF');                        // => 255
+ * ```
+ */
 export function getAlpha(color: string): number {
   const [h, s, l, a] = toHsl(color);
   return a != null ? a : 255;
 }
 
+/**
+ * Set the alpha value of any color value
+ *
+ * @example
+ * ```ts
+ * setAlpha('rgb(255, 255, 255)', 0.5);             // => 'rgba(255, 255, 255, 0.5)'
+ * setAlpha('rgba(255, 255, 255, 1)', 0.5);         // => 'rgba(255, 255, 255, 0.5)'
+ * setAlpha('hsl(255, 255%, 255%)', 0.5);           // => 'hsla(255, 255%, 255%, 0.5)'
+ * setAlpha('hsla(255deg, 255%, 255%, 100%)', 0.5); // => 'hsla(255deg, 255%, 255%, 0.5)'
+ * setAlpha('#FFFFFF', 0.5);                        // => '#FFFFFF80'
+ * ```
+ */
 export function setAlpha(color: string, alpha: number): string {
   const [h, s, l] = toHsl(color);
   return calculate(color, h, s, l, alpha);
@@ -49,6 +121,13 @@ export function setAlpha(color: string, alpha: number): string {
 /**
  * Convert to HSLA and add the given percentage to the Lightness
  * Color will be returned in the format given (hex, rgb, hsl)
+ *
+ * @example
+ * ```ts
+ * lighten('rgb(204, 238, 255)', 10);    // => 'rgb(229, 243, 255)'
+ * lighten('hsl(200, 100%, 90%)', 10);   // => 'hsl(200, 100%, 100%)'
+ * lighten('#cceeff', 10);               // => '#e0f4ff'
+ * ```
  */
 export function lighten(color: string, percent: number): string {
   const [h, s, l, a] = toHsl(color);
@@ -57,6 +136,13 @@ export function lighten(color: string, percent: number): string {
 /**
  * Convert to HSLA and subtract the given percentage to the Lightness
  * Color will be returned in the format given (hex, rgb, hsl)
+ *
+ * @example
+ * ```ts
+ * darken('rgb(204, 238, 255)', 10);    // => 'rgb(179, 233, 255)'
+ * darken('hsl(200, 100%, 90%)', 10);   // => 'hsl(200, 100%, 80%)'
+ * darken('#cceeff', 10);               // => '#b3d9ff'
+ * ```
  */
 export function darken(color: string, percent: number): string {
   const [h, s, l, a] = toHsl(color);
@@ -81,10 +167,12 @@ function luminance(r: number, g: number, b: number): number {
  * Convert any color string to hex.
  * Accepts alpha values.
  *
- * USAGE:
- * `toHex('rgb(255, 255, 255)')` => '#FFFFFF';
- * `toHex('hsl(255, 255, 255)')` => '#FFFFFF';
- * `toHex('#FFFFFF')` => '#FFFFFF';
+ * @example
+ * ```ts
+ * toHex('rgb(255, 255, 255)'); // => '#FFFFFF'
+ * toHex('hsl(255, 255, 255)'); // => '#FFFFFF'
+ * toHex('#FFFFFF');            // => '#FFFFFF'
+ * ```
  */
 export const toHex = (color: string) => {
   if (color.startsWith('rgb')) return rgbStrToHex(color);
@@ -95,6 +183,12 @@ export const toHex = (color: string) => {
 /**
  * Convert a `rgb(rrr, ggg, bbb)` string value to a hexadecimal color code.
  * Will also accept alpha.
+ *
+ * @example
+ * ```ts
+ * rgbStrToHex('rgb(255, 255, 255)'); // => '#FFFFFF'
+ * rgbStrToHex('rgba(255, 255, 255, 1)'); // => '#FFFFFF'
+ * ```
  */
 function rgbStrToHex(rgbString: string): string {
   const [r, g, b, a] = rgbString
@@ -107,6 +201,12 @@ function rgbStrToHex(rgbString: string): string {
 /**
  * Convert red, green and blue values to a hexadecimal color code.
  * Will also accept alpha
+ *
+ * @example
+ * ```ts
+ * rgbToHex(255, 255, 255); // => '#FFFFFF'
+ * rgbToHex(255, 255, 255, 1); // => '#FFFFFF'
+ * ```
  */
 export const rgbToHex = (r: number, g: number, b: number, a?: number): string => {
   const color =
@@ -128,10 +228,12 @@ export function alphaToHex(a: number) {
  * Convert any color string to rgb.
  * Accepts alpha values.
  *
- * USAGE:
- * `toRgb('rgb(255, 255, 255)')` => 'rgb(255, 255, 255)';
- * `toRgb('hsl(255, 255, 255)')` => 'rgb(255, 255, 255)';
- * `toRgb('#FFFFFF')` => 'rgb(255, 255, 255)';
+ * @example
+ * ```ts
+ * toRgb('rgb(255, 255, 255)'); // => 'rgb(255, 255, 255)'
+ * toRgb('hsl(255, 255, 255)'); // => 'rgb(255, 255, 255)'
+ * toRgb('#FFFFFF');            // => 'rgb(255, 255, 255)'
+ * ```
  */
 export function toRgb(color: string) {
   if (color.startsWith('#')) {
@@ -146,6 +248,12 @@ export function toRgb(color: string) {
 /**
  * Convert a hexadecimal color code to `rgb(rrr, ggg, bbb)` value
  * Will also accept alpha
+ *
+ * @example
+ * ```ts
+ * hexToRgb('#FFFFFF'); // => 'rgb(255, 255, 255)'
+ * hexToRgb('#FFFFFFFF'); // => 'rgba(255, 255, 255, 1)'
+ * ```
  */
 function hexToRgb(hex: string) {
   const res = hex
@@ -218,10 +326,12 @@ function hslToRgb(h: number, s: number, l: number, a?: number): string {
  * Convert any color string to hsl.
  * Accepts alpha values.
  *
- * USAGE:
- * `toHex('rgb(255, 255, 255)')` => 'hsl(255, 255, 255)')';
- * `toHex('hsl(255, 255, 255)')` => 'hsl(255, 255, 255)')';
- * `toHex('#FFFFFF')` => 'hsl(255, 255, 255)')';
+ * @example
+ * ```ts
+ * toHslString('rgb(255, 255, 255)'); // => hsl(0, 0%, 100%)
+ * toHslString('hsl(255, 255, 255)'); // => hsl(255, 255, 255)
+ * toHslString('#FFFFFF');            // => hsl(0, 0%, 100%)
+ * ```
  */
 export function toHslString(color: string) {
   let col = color;
@@ -236,9 +346,15 @@ export function toHslString(color: string) {
 }
 
 /**
+ * Convert any color string to hsl.
+ * Accepts alpha values.
  *
- * @param color
- * @returns
+ * @example
+ * ```ts
+ * toHsl('rgb(255, 255, 255)'); // => [0, 0, 100]
+ * toHsl('hsl(255, 255, 255)'); // => [255, 255, 255]
+ * toHsl('#FFFFFF');            // => [0, 0, 100]
+ * ```
  */
 export function toHsl(color: string): number[] {
   const hsl = toHslString(color);

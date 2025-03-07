@@ -1,5 +1,12 @@
 /**
  * Convert string to camelCase text.
+ *
+ * @example
+ * ```ts
+ * camelCase('Hello World') // 'helloWorld'
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function camelCase(str: string): string {
   if (!str || typeof str !== 'string') return str;
@@ -12,6 +19,13 @@ export function camelCase(str: string): string {
 
 /**
  * Add space between camelCase text.
+ *
+ * @example
+ * ```ts
+ * unCamelCase('helloWorld') // 'hello world'
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function unCamelCase(str: string): string {
   if (!str || typeof str !== 'string') return str;
@@ -24,6 +38,13 @@ export function unCamelCase(str: string): string {
 
 /**
  * UPPERCASE first char of each word.
+ *
+ * @example
+ * ```ts
+ * titleCase('hello world') // 'Hello World'
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function titleCase(str: string): string {
   if (!str || typeof str !== 'string') return str;
@@ -34,6 +55,13 @@ export function titleCase(str: string): string {
 
 /**
  * camelCase + UPPERCASE first char
+ *
+ * @example
+ * ```ts
+ * pascalCase('hello world') // 'HelloWorld'
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function pascalCase(str: string): string {
   if (!str || typeof str !== 'string') return str;
@@ -42,6 +70,13 @@ export function pascalCase(str: string): string {
 
 /**
  * UPPERCASE first char of each sentence and lowercase other chars.
+ *
+ * @example
+ * ```ts
+ * sentenceCase('hello world. this is a test.') // 'Hello world. This is a test.'
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function sentenceCase(str: string): string {
   if (!str || typeof str !== 'string') return str;
@@ -56,6 +91,15 @@ export function sentenceCase(str: string): string {
  * Convert to lower case, remove accents, remove non-word chars and
  * replace spaces with the specified delimiter.
  * Does not split camelCase text.
+ *
+ * @example
+ * ```ts
+ * slugify('Hello World') // 'hello-world'
+ * slugify('Hello World', '_') // 'hello_world'
+ * ```
+ * @params str the string to convert
+ * @params delimiter an optional delimiter to use
+ * @returns the converted string
  */
 export function slugify(str: string, delimiter = '-'): string {
   if (!str || typeof str !== 'string') return str;
@@ -66,7 +110,15 @@ export function slugify(str: string, delimiter = '-'): string {
 }
 
 /**
- * Replaces spaces with hyphens, split camelCase text, remove non-word chars, remove accents and convert to lower case.
+ * Replaces spaces with hyphens, split camelCase text, remove non-word
+ * chars, remove accents and convert to lower case.
+ *
+ * @example
+ * ```ts
+ * hyphenate('helloWorld') // 'hello-world'
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function hyphenate(str: string): string {
   if (!str || typeof str !== 'string') return str;
@@ -76,6 +128,13 @@ export function hyphenate(str: string): string {
 
 /**
  * Replaces hyphens with spaces. (only hyphens between word chars)
+ *
+ * @example
+ * ```ts
+ * unhyphenate('hello-world') // 'hello world'
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function unhyphenate(str: string): string {
   if (!str || typeof str !== 'string') return str;
@@ -85,6 +144,13 @@ export function unhyphenate(str: string): string {
 /**
  * Replaces spaces with underscores, split camelCase text, remove
  * non-word chars, remove accents and convert to lower case.
+ *
+ * @example
+ * ```ts
+ * underscore('helloWorld') // 'hello_world'
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function underscore(str: string): string {
   if (!str || typeof str !== 'string') return str;
@@ -94,6 +160,13 @@ export function underscore(str: string): string {
 
 /**
  * Remove non-word chars.
+ *
+ * @example
+ * ```ts
+ * removeNonWord('hello@world!') // 'hello world '
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function removeNonWord(str: string): string {
   if (!str || typeof str !== 'string') return str;
@@ -106,6 +179,13 @@ export function removeNonWord(str: string): string {
  *
  * @param obj
  * @returns a string representation of the object
+ *
+ * @example
+ * ```ts
+ * objToString({ a: 1, b: { c: 2 } }) // '{"a":1,"b":{"c":2}}'
+ * ```
+ * @params str the string to convert
+ * @returns the converted string
  */
 export function objToString(obj: any): string {
   if (obj == null || typeof obj !== 'object') return '' + obj;
