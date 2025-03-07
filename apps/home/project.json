@@ -38,7 +38,10 @@
         "ssr": {
           "entry": "apps/home/server.ts"
         },
-        "plugins": ["apps/home/builders/custom-esbuild.ts"]
+        "plugins": ["apps/home/builders/custom-esbuild.ts"],
+        "loader": {
+          ".wgsl": "text"
+        }
       },
       "configurations": {
         "production": {

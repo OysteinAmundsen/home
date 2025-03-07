@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { DestroyRef, inject, Injectable, linkedSignal, OnDestroy, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { concatMap, delay, Observable, of, retryWhen, Subscriber, take, throwError } from 'rxjs';
+import { objToString } from '../utils/object';
 
 export type Geolocation = { latitude: number; longitude: number };
 
@@ -51,10 +52,10 @@ export class GeoLocationService implements OnDestroy {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         } as Geolocation;
-        if (JSON.stringify(pos) !== JSON.stringify(this.currentLocation())) {
+        if (objToString(pos) !== objToString(this.currentLocation())) {
           // Current position differs from stored position
           // Cache the location for later
-          this.window.localStorage.setItem('location', JSON.stringify(pos));
+          this.window.localStorage.setItem('location', objToString(pos));
           // Return current position
           observer.next(pos);
         }

@@ -14,6 +14,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, debounceTime } from 'rxjs';
+import { objToString } from '../utils/object';
 
 /**
  * A directive that listens to changes in the size of an element.
@@ -25,6 +26,11 @@ import { BehaviorSubject, debounceTime } from 'rxjs';
  * @example
  * ```html
  * <div appResize="auto" (resized)="onResize($event)"></div>
+ * ```
+ *
+ * ```ts
+ * onResize($event: DOMRect) {
+ * }
  * ```
  */
 @Directive({
@@ -60,7 +66,7 @@ export class ResizeDirective implements AfterViewInit, OnDestroy {
   onRectChange = effect(() => {
     const rect = this.rect();
     if (!rect) return;
-    const rectStr = JSON.stringify(rect);
+    const rectStr = objToString(rect);
     if (rectStr != this._oldRect) {
       this._oldRect = rectStr;
       this.resized.emit(rect);

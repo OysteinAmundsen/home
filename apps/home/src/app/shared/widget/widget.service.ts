@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, ElementRef, inject, Injectable, Injector, NgModuleFactory, resource, signal } from '@angular/core';
 import { Route } from '@angular/router';
@@ -14,6 +15,7 @@ export type Widget = {
 @Injectable({ providedIn: 'root' })
 export class WidgetService {
   private http = inject(HttpClient);
+  private document = inject(DOCUMENT);
   private injector = inject(Injector);
 
   // The routes for the widgets
@@ -74,7 +76,7 @@ export class WidgetService {
    */
   isDescendantOfDashboard(elementRef: ElementRef<HTMLElement>) {
     const element = elementRef.nativeElement;
-    return document.querySelector('app-dashboard')?.contains(element);
+    return this.document.querySelector('app-dashboard')?.contains(element);
   }
 
   /**

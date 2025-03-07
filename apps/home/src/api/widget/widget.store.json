@@ -1,5 +1,6 @@
 [
   { "id": 1, "name": "Weather", "componentName": "weather" },
   { "id": 2, "name": "Starfield", "componentName": "starfield" },
-  { "id": 3, "name": "Something else", "componentName": "widget3" }
+  { "id": 3, "name": "WebGPU", "componentName": "webgpu" },
+  { "id": 4, "name": "Something else", "componentName": "widget3" }
 ]

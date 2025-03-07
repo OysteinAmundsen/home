@@ -10,7 +10,7 @@
  * getHue('rgba(255, 255, 255, 1)'); // => 0
  * getHue('hsl(255, 255%, 255%)'); // => 255
  * getHue('hsla(255deg, 255%, 255%, 100%)'); // => 255
- * getHue('#FFFFFF');            // => 0
+ * getHue('#FFFFFF'); // => 0
  * ```
  */
 export function getHue(color: string): number {
@@ -24,9 +24,9 @@ export function getHue(color: string): number {
  *
  * @example
  * ```ts
- * addHue('rgb(204 238 255)', 10);    // => 'rgb(204 229 255)'
+ * addHue('rgb(204 238 255)', 10); // => 'rgb(204 229 255)'
  * addHue('hsl(200, 100%, 90%)', 10); // => 'hsl(210, 100%, 90%)'
- * addHue('#cceeff', 10);             // => '#cce5ff'
+ * addHue('#cceeff', 10); // => '#cce5ff'
  * ```
  */
 export function addHue(color: string, degrees: number): string {
@@ -39,11 +39,11 @@ export function addHue(color: string, degrees: number): string {
  *
  * @example
  * ```ts
- * getSaturation('rgb(255, 255, 255)');             // => 255
- * getSaturation('rgba(255, 255, 255, 1)');         // => 255
- * getSaturation('hsl(255, 255%, 255%)');           // => 255
+ * getSaturation('rgb(255, 255, 255)'); // => 255
+ * getSaturation('rgba(255, 255, 255, 1)'); // => 255
+ * getSaturation('hsl(255, 255%, 255%)'); // => 255
  * getSaturation('hsla(255deg, 255%, 255%, 100%)'); // => 255
- * getSaturation('#FFFFFF');                        // => 255
+ * getSaturation('#FFFFFF'); // => 255
  * ```
  */
 export function getSaturation(color: string): number {
@@ -57,9 +57,9 @@ export function getSaturation(color: string): number {
  *
  * @example
  * ```ts
- * setSaturation('rgb(204 238 255)', 50);    // => 'rgb(204 238 255)'
+ * setSaturation('rgb(204 238 255)', 50); // => 'rgb(204 238 255)'
  * setSaturation('hsl(200, 100%, 90%)', 50); // => 'hsl(200, 50%, 90%)'
- * setSaturation('#cceeff', 50);             // => '#cceeff'
+ * setSaturation('#cceeff', 50); // => '#cceeff'
  * ```
  */
 export function setSaturation(color: string, percent: number): string {
@@ -72,11 +72,11 @@ export function setSaturation(color: string, percent: number): string {
  *
  * @example
  * ```ts
- * getLightness('rgb(255, 255, 255)');             // => 255
- * getLightness('rgba(255, 255, 255, 1)');         // => 255
- * getLightness('hsl(255, 255%, 255%)');           // => 255
+ * getLightness('rgb(255, 255, 255)'); // => 255
+ * getLightness('rgba(255, 255, 255, 1)'); // => 255
+ * getLightness('hsl(255, 255%, 255%)'); // => 255
  * getLightness('hsla(255deg, 255%, 255%, 100%)'); // => 255
- * getLightness('#FFFFFF');                        // => 255
+ * getLightness('#FFFFFF'); // => 255
  * ```
  */
 export function getLightness(color: string): number {
@@ -89,11 +89,11 @@ export function getLightness(color: string): number {
  *
  * @example
  * ```ts
- * getAlpha('rgb(255, 255, 255)');             // => 255
- * getAlpha('rgba(255, 255, 255, 1)');         // => 255
- * getAlpha('hsl(255, 255%, 255%)');           // => 255
+ * getAlpha('rgb(255, 255, 255)'); // => 255
+ * getAlpha('rgba(255, 255, 255, 1)'); // => 255
+ * getAlpha('hsl(255, 255%, 255%)'); // => 255
  * getAlpha('hsla(255deg, 255%, 255%, 100%)'); // => 255
- * getAlpha('#FFFFFF');                        // => 255
+ * getAlpha('#FFFFFF'); // => 255
  * ```
  */
 export function getAlpha(color: string): number {
@@ -106,11 +106,11 @@ export function getAlpha(color: string): number {
  *
  * @example
  * ```ts
- * setAlpha('rgb(255, 255, 255)', 0.5);             // => 'rgba(255, 255, 255, 0.5)'
- * setAlpha('rgba(255, 255, 255, 1)', 0.5);         // => 'rgba(255, 255, 255, 0.5)'
- * setAlpha('hsl(255, 255%, 255%)', 0.5);           // => 'hsla(255, 255%, 255%, 0.5)'
+ * setAlpha('rgb(255, 255, 255)', 0.5); // => 'rgba(255, 255, 255, 0.5)'
+ * setAlpha('rgba(255, 255, 255, 1)', 0.5); // => 'rgba(255, 255, 255, 0.5)'
+ * setAlpha('hsl(255, 255%, 255%)', 0.5); // => 'hsla(255, 255%, 255%, 0.5)'
  * setAlpha('hsla(255deg, 255%, 255%, 100%)', 0.5); // => 'hsla(255deg, 255%, 255%, 0.5)'
- * setAlpha('#FFFFFF', 0.5);                        // => '#FFFFFF80'
+ * setAlpha('#FFFFFF', 0.5); // => '#FFFFFF80'
  * ```
  */
 export function setAlpha(color: string, alpha: number): string {
@@ -124,9 +124,9 @@ export function setAlpha(color: string, alpha: number): string {
  *
  * @example
  * ```ts
- * lighten('rgb(204, 238, 255)', 10);    // => 'rgb(229, 243, 255)'
- * lighten('hsl(200, 100%, 90%)', 10);   // => 'hsl(200, 100%, 100%)'
- * lighten('#cceeff', 10);               // => '#e0f4ff'
+ * lighten('rgb(204, 238, 255)', 10); // => 'rgb(229, 243, 255)'
+ * lighten('hsl(200, 100%, 90%)', 10); // => 'hsl(200, 100%, 100%)'
+ * lighten('#cceeff', 10); // => '#e0f4ff'
  * ```
  */
 export function lighten(color: string, percent: number): string {
@@ -139,9 +139,9 @@ export function lighten(color: string, percent: number): string {
  *
  * @example
  * ```ts
- * darken('rgb(204, 238, 255)', 10);    // => 'rgb(179, 233, 255)'
- * darken('hsl(200, 100%, 90%)', 10);   // => 'hsl(200, 100%, 80%)'
- * darken('#cceeff', 10);               // => '#b3d9ff'
+ * darken('rgb(204, 238, 255)', 10); // => 'rgb(179, 233, 255)'
+ * darken('hsl(200, 100%, 90%)', 10); // => 'hsl(200, 100%, 80%)'
+ * darken('#cceeff', 10); // => '#b3d9ff'
  * ```
  */
 export function darken(color: string, percent: number): string {
@@ -171,7 +171,7 @@ function luminance(r: number, g: number, b: number): number {
  * ```ts
  * toHex('rgb(255, 255, 255)'); // => '#FFFFFF'
  * toHex('hsl(255, 255, 255)'); // => '#FFFFFF'
- * toHex('#FFFFFF');            // => '#FFFFFF'
+ * toHex('#FFFFFF'); // => '#FFFFFF'
  * ```
  */
 export const toHex = (color: string) => {
@@ -232,7 +232,7 @@ export function alphaToHex(a: number) {
  * ```ts
  * toRgb('rgb(255, 255, 255)'); // => 'rgb(255, 255, 255)'
  * toRgb('hsl(255, 255, 255)'); // => 'rgb(255, 255, 255)'
- * toRgb('#FFFFFF');            // => 'rgb(255, 255, 255)'
+ * toRgb('#FFFFFF'); // => 'rgb(255, 255, 255)'
  * ```
  */
 export function toRgb(color: string) {
@@ -330,7 +330,7 @@ function hslToRgb(h: number, s: number, l: number, a?: number): string {
  * ```ts
  * toHslString('rgb(255, 255, 255)'); // => hsl(0, 0%, 100%)
  * toHslString('hsl(255, 255, 255)'); // => hsl(255, 255, 255)
- * toHslString('#FFFFFF');            // => hsl(0, 0%, 100%)
+ * toHslString('#FFFFFF'); // => hsl(0, 0%, 100%)
  * ```
  */
 export function toHslString(color: string) {
@@ -353,7 +353,7 @@ export function toHslString(color: string) {
  * ```ts
  * toHsl('rgb(255, 255, 255)'); // => [0, 0, 100]
  * toHsl('hsl(255, 255, 255)'); // => [255, 255, 255]
- * toHsl('#FFFFFF');            // => [0, 0, 100]
+ * toHsl('#FFFFFF'); // => [0, 0, 100]
  * ```
  */
 export function toHsl(color: string): number[] {
