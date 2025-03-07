@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, effect, inject, linkedSignal, OnDestroy, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { GeoLocationService } from '../../shared/geoLocation/geoLocation.service';
-import { IconPipe } from '../../shared/icons/icon.pipe';
-import { cache, Cache } from '../../shared/rxjs/cache';
-import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
-import { WidgetComponent } from '../../shared/widget/widget.component';
+import { GeoLocationService } from '../../../shared/geoLocation/geoLocation.service';
+import { IconPipe } from '../../../shared/icons/icon.pipe';
+import { cache, Cache } from '../../../shared/rxjs/cache';
+import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
+import { WidgetComponent } from '../../../shared/widget/widget.component';
 
 /**
  * A widget integrating with the yr.no weather API
@@ -41,9 +41,8 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
     :host {
       container-type: size;
       display: block;
-      height: 100%;
-      width: 100%;
       min-height: 20rem;
+      min-width: 11.5rem;
     }
     header {
       display: none;

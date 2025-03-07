@@ -4,8 +4,8 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
 
 /**
  * A "cacth-all" widget to display if a requested widget is not found
- * 
- * In order to find a widget, a widget must be registerred in the 
+ *
+ * In order to find a widget, a widget must be registerred in the
  * `widget.routes.ts` file.
  */
 @Component({
@@ -23,12 +23,6 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
   `,
   styles: `
     :host {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      width: 100%;
       ::ng-deep .widget-content {
         place-content: center;
         place-items: center;

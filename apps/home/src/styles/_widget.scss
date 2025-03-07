@@ -11,6 +11,8 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
+  align-items: center;
+  justify-content: center;
   view-transition-class: widget;
   .widget-wrapper {
     flex: 1;
@@ -34,6 +36,7 @@
       view-transition-class: widget-header;
       h2 {
         view-transition-class: widget-header-text;
+        margin: 0;
       }
     }
 
