@@ -6,7 +6,7 @@
   height: 100%;
   position: relative;
   z-index: 0;
-  overflow: hidden;
+  overflow: auto;
 
   &.offline {
     --vignette-color: light-dark(rgb(214, 145, 145), rgb(78, 32, 32));
@@ -16,7 +16,7 @@
   &::before {
     content: '';
     position: absolute;
-    inset: -5%;
+    inset: 0;
     background-image: url('/api/background');
     background-repeat: no-repeat;
     background-size: cover;

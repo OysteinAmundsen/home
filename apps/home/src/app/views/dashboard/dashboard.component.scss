@@ -9,16 +9,21 @@ nav {
   gap: 0.25rem;
 }
 
-section {
+.widget-area {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  align-items: normal;
+  height: auto;
+  flex: 1;
   view-transition-name: widget-container;
-  ::ng-deep app-widget-loader {
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: min-content;
-    min-width: 11rem;
-    max-height: 25rem;
-  }
+}
+
+footer {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--divider-color);
+  margin-top: auto;
 }

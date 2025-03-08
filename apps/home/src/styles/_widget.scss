@@ -1,11 +1,19 @@
+// When widget is displayed in a dashboard, it is wrapped by this loader component.
 .widget-loader {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
   view-transition-class: widget-loader;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: min-content;
+  min-height: 19rem;
+  align-self: auto;
+  min-width: 11rem;
+  max-height: 25rem;
 }
 
+// The widget component itself
 .widget {
   display: flex;
   flex-direction: column;

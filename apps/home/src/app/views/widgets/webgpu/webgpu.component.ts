@@ -60,59 +60,60 @@ export default class WebGpuComponent extends AbstractWidgetComponent {
     // and try to initialize the context
     if (isPlatformBrowser(this.platformId)) {
       try {
+        // Platform validation
         const ctx = this.canvasEl()?.getContext('webgpu');
-        if (ctx && 'gpu' in navigator) {
-          const adapter = await navigator.gpu?.requestAdapter();
-          const device = await adapter?.requestDevice();
-          if (!device) throw new Error('No GPU device found');
+        if (!ctx || !('gpu' in navigator)) throw new Error('WebGPU not supported in this browser');
+        const adapter = await navigator.gpu?.requestAdapter();
+        if (!adapter) throw new Error('No GPU adapter found');
+        const device = await adapter?.requestDevice();
+        if (!device) throw new Error('No GPU device found');
+        device.lost.then(() => console.error('GPU device lost'));
 
-          const format = navigator.gpu.getPreferredCanvasFormat();
-          ctx.configure({ device, format });
+        // Configure the context
+        const format = navigator.gpu.getPreferredCanvasFormat();
+        ctx.configure({ device, format, alphaMode: 'opaque' });
 
-          const module: GPUShaderModule = device.createShaderModule({
-            label: 'our hardcoded red triangle shaders',
-            code: triangleShader,
-          });
-          const pipeline: GPURenderPipeline = device.createRenderPipeline({
-            label: 'our hardcoded red triangle pipeline',
-            layout: 'auto',
-            vertex: {
-              entryPoint: 'vertex_shader',
-              module,
+        const module: GPUShaderModule = device.createShaderModule({
+          label: 'our hardcoded red triangle shaders',
+          code: triangleShader,
+        });
+        const pipeline: GPURenderPipeline = device.createRenderPipeline({
+          label: 'our hardcoded red triangle pipeline',
+          layout: 'auto',
+          vertex: {
+            entryPoint: 'vertex_shader',
+            module,
+          },
+          fragment: {
+            entryPoint: 'fragment_shader',
+            module,
+            targets: [{ format }],
+          },
+        });
+        // Get the current texture from the canvas context
+        const view = ctx.getCurrentTexture().createView();
+        const renderPassDescriptor: GPURenderPassDescriptor = {
+          label: 'our basic canvas renderPass',
+          colorAttachments: [
+            {
+              view,
+              clearValue: [0.3, 0.3, 0.3, 1],
+              loadOp: 'clear',
+              storeOp: 'store',
             },
-            fragment: {
-              entryPoint: 'fragment_shader',
-              module,
-              targets: [{ format }],
-            },
-          });
-          // Get the current texture from the canvas context
-          const view = ctx.getCurrentTexture().createView();
-          const renderPassDescriptor: GPURenderPassDescriptor = {
-            label: 'our basic canvas renderPass',
-            colorAttachments: [
-              {
-                view,
-                clearValue: [0.3, 0.3, 0.3, 1],
-                loadOp: 'clear',
-                storeOp: 'store',
-              },
-            ],
-          };
-          // make a command encoder to start encoding commands
-          const encoder = device.createCommandEncoder({ label: 'our encoder' });
+          ],
+        };
+        // make a command encoder to start encoding commands
+        const encoder = device.createCommandEncoder({ label: 'our encoder' });
 
-          // make a render pass encoder to encode render specific commands
-          const pass = encoder.beginRenderPass(renderPassDescriptor);
-          pass.setPipeline(pipeline);
-          pass.draw(3); // call our vertex shader 3 times
-          pass.end();
+        // make a render pass encoder to encode render specific commands
+        const pass = encoder.beginRenderPass(renderPassDescriptor);
+        pass.setPipeline(pipeline);
+        pass.draw(3); // call our vertex shader 3 times
+        pass.end();
 
-          const commandBuffer = encoder.finish();
-          device.queue.submit([commandBuffer]);
-        } else {
-          console.error('WebGPU not supported');
-        }
+        const commandBuffer = encoder.finish();
+        device.queue.submit([commandBuffer]);
       } catch (error) {
         console.error(error);
       }

@@ -8,7 +8,7 @@
   @defer {}
 </nav>
 
-<section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()">
+<section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()" class="widget-area">
   @for (widget of widgets(); track widget.id) {
     <app-widget-loader [data]="widget"> </app-widget-loader>
   } @empty {
@@ -19,3 +19,12 @@
     }
   }
 </section>
+
+<footer>
+  <p>
+    This is my sandbox, my playground. In this app, I can try out all things web related. It is a place where I can
+    experiment with new technologies and ideas. I can create widgets that visualize data, or I can create games that
+    entertain me. I can even create tools that help me with my daily tasks. I can add all these programs as widgets in
+    this dashboard.
+  </p>
+</footer>
