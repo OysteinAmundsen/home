@@ -1,8 +1,8 @@
 import { DOCUMENT } from '@angular/common';
 import { effect, inject, Injectable, linkedSignal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { CookieService } from '../utils/cookie';
-import { doSafeTransition } from '../utils/transitions';
+import { CookieService } from '../../utils/cookie';
+import { doSafeTransition } from '../../utils/transitions';
 
 export type Theme = 'light' | 'dark';
 

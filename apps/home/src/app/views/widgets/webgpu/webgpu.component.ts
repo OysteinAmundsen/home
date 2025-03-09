@@ -1,6 +1,6 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { ResizeDirective } from '../../../shared/size/resize.directive';
+import { ResizeDirective } from '../../../shared/browser/resize/resize.directive';
 import { Debouncer } from '../../../shared/utils/function';
 import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
 import { WidgetComponent } from '../../../shared/widget/widget.component';

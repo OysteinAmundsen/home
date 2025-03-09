@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, effect, inject, linkedSignal, OnDestroy, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { GeoLocationService } from '../../../shared/geoLocation/geoLocation.service';
+import { GeoLocationService } from '../../../shared/browser/geoLocation/geoLocation.service';
 import { IconPipe } from '../../../shared/icons/icon.pipe';
 import { cache, Cache } from '../../../shared/rxjs/cache';
 import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
@@ -109,7 +109,7 @@ export default class WeatherComponent extends AbstractWidgetComponent implements
       // Fetch weather data for location
       return await firstValueFrom(
         cache(() => this.http.get<any>(`${request.url}`), request.url, {
-          expirationTime: this.cacheExpirationTime(),
+          expirationTime: this.cacheExpirationTime() - 2 * 60 * 1000,
         }),
       );
     },

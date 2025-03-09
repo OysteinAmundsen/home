@@ -2,7 +2,8 @@ import { DOCUMENT } from '@angular/common';
 import { DestroyRef, inject, Injectable, linkedSignal, OnDestroy, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { concatMap, delay, Observable, of, retryWhen, Subscriber, take, throwError } from 'rxjs';
-import { objToString } from '../utils/object';
+import { objToString } from '../../utils/object';
+import { StorageService } from '../storage/storage.service';
 
 export type Geolocation = { latitude: number; longitude: number };
 
@@ -16,7 +17,7 @@ export type Geolocation = { latitude: number; longitude: number };
 export class GeoLocationService implements OnDestroy {
   private readonly destroyRef$ = inject(DestroyRef);
   private readonly document = inject(DOCUMENT);
-  private window = globalThis.window || this.document.defaultView;
+  private readonly storage = inject(StorageService);
 
   /* Watch ID for geolocation */
   private watchID: number | undefined;
@@ -55,7 +56,7 @@ export class GeoLocationService implements OnDestroy {
         if (objToString(pos) !== objToString(this.currentLocation())) {
           // Current position differs from stored position
           // Cache the location for later
-          this.window.localStorage.setItem('location', objToString(pos));
+          this.storage.set('location', pos);
           // Return current position
           observer.next(pos);
         }
@@ -97,9 +98,9 @@ export class GeoLocationService implements OnDestroy {
 
   currentLocation = linkedSignal(() => {
     if (typeof window === 'undefined') return undefined;
-    const storedPosition = this.window.localStorage.getItem('location');
+    const storedPosition = this.storage.get('location');
     if (storedPosition) {
-      return JSON.parse(storedPosition) as Geolocation;
+      return storedPosition as Geolocation;
     }
     return undefined;
   });

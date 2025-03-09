@@ -13,9 +13,9 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AppSettingsService } from '../../../app.settings';
-import { ResizeDirective } from '../../../shared/size/resize.directive';
-import { ThemeService } from '../../../shared/theme/theme.service';
-import { VisibilityService } from '../../../shared/visibility/visibility.service';
+import { ThemeService } from '../../../shared/browser/theme/theme.service';
+import { VisibilityService } from '../../../shared/browser/visibility/visibility.service';
+import { ResizeDirective } from '../../../shared/browser/resize/resize.directive';
 import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
 import { WidgetComponent } from '../../../shared/widget/widget.component';
 import { Star } from './star';

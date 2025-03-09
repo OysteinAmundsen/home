@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { GetRegistrationOptionsResponse } from '../../../api/auth/authenticator.model';
+import { StorageService } from '../browser/storage/storage.service';
 
 const bufferToBase64 = (buffer: ArrayBuffer) => btoa(String.fromCharCode(...new Uint8Array(buffer)));
 const base64ToBuffer = (base64: string) => Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
@@ -17,9 +18,10 @@ const CREDENTIALS_KEY = 'credentials';
 export class AuthenticationService {
   private readonly http = inject(HttpClient);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly storage = inject(StorageService);
 
   /** The credential raw id stored in localStorage */
-  credentials = linkedSignal(() => (isPlatformBrowser(this.platformId) ? localStorage.getItem(CREDENTIALS_KEY) : ''));
+  credentials = linkedSignal(() => (isPlatformBrowser(this.platformId) ? this.storage.get(CREDENTIALS_KEY) : ''));
 
   /** Returns true if there exists credentials in localStorage */
   isRegistered = computed(() => !!this.credentials());
@@ -32,7 +34,7 @@ export class AuthenticationService {
    * @param rawId The raw ID of the credential
    */
   private setCredentials(rawId: string) {
-    localStorage.setItem(CREDENTIALS_KEY, rawId);
+    this.storage.set(CREDENTIALS_KEY, rawId);
     this.credentials.set(rawId);
   }
 
@@ -44,7 +46,7 @@ export class AuthenticationService {
    * removing credentials a lot of times will fill up your passkey storage.
    */
   removeCredentials() {
-    localStorage.removeItem(CREDENTIALS_KEY);
+    this.storage.remove(CREDENTIALS_KEY);
     this.credentials.set('');
   }
 
@@ -172,7 +174,7 @@ export class AuthenticationService {
    * @returns The retrieved public key credential or null if failed
    */
   private async getCredentials(options: PublicKeyCredentialRequestOptions): Promise<PublicKeyCredential | null> {
-    const credentialId = localStorage.getItem(CREDENTIALS_KEY) || '';
+    const credentialId = (this.storage.get(CREDENTIALS_KEY) || '') as string;
     try {
       return (await navigator.credentials.get({
         publicKey: {

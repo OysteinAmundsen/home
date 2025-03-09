@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, debounceTime } from 'rxjs';
-import { objToString } from '../utils/object';
+import { objToString } from '../../utils/object';
 
 /**
  * A directive that listens to changes in the size of an element.
