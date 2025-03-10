@@ -16,6 +16,9 @@ import { VisibilityService } from './browser/visibility/visibility.service';
       display: flex;
       place-items: center;
       height: 100%;
+      time {
+        text-align: center;
+      }
     }
   `,
 })

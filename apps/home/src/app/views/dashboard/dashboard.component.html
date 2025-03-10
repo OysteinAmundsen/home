@@ -4,8 +4,6 @@
   <button type="button" (click)="filter(3)">WebGPU</button>
   <button type="button" (click)="filter(4)">Widget 3</button>
   <button type="button" (click)="filter(undefined)">All</button>
-  <div class="spacer"></div>
-  @defer {}
 </nav>
 
 <section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()" class="widget-area">

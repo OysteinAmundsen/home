@@ -7,6 +7,14 @@
 nav {
   display: flex;
   gap: 0.25rem;
+  flex-wrap: wrap;
+  @media screen and (max-width: 420px) {
+    flex-direction: column;
+    button {
+      width: 100%;
+      flex: 1;
+    }
+  }
 }
 
 .widget-area {

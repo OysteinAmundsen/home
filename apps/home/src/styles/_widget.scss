@@ -4,13 +4,23 @@
   flex-direction: column;
   width: 100%;
   view-transition-class: widget-loader;
-  flex-grow: 1;
   flex-shrink: 1;
   flex-basis: min-content;
   min-height: 19rem;
   align-self: auto;
   min-width: 11rem;
   max-height: 25rem;
+  &:has(~ .widget-loader),
+  + .widget-loader {
+    // Only grow if there is another widget-loader next to it
+    @media (max-width: 1240px) {
+      flex-grow: 1;
+    }
+  }
+  // Or when the screen is narrow enough
+  @media (max-width: 640px) {
+    flex-grow: 1;
+  }
 }
 
 // The widget component itself
