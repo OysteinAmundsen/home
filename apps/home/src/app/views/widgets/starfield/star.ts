@@ -1,5 +1,5 @@
 import { computed, linkedSignal, Signal, signal } from '@angular/core';
-import { strToHSL } from '../../../shared/utils/color';
+import { Color, Format } from '../../../shared/utils/color';
 
 type Point = {
   x: number;
@@ -31,7 +31,7 @@ export class Star {
 
   // Colors
   private currentColor = signal('#fff');
-  private hslColor = linkedSignal(() => strToHSL(this.currentColor()));
+  private hslColor = linkedSignal(() => Color.destructure(this.currentColor(), Format.HSL));
   private _lastColor = '';
   private color = computed(() => {
     // Triggers
@@ -115,7 +115,7 @@ export class Star {
       y: this.random(-y, y),
     });
     const { width } = this.rect();
-    const [h, s, l] = strToHSL(this.currentColor());
+    const [h, s, l] = Color.destructure(this.currentColor(), Format.HSL);
     const variation = 100;
     this.hslColor.set([this.random(h - variation, h + variation), this.random(s - variation, s + variation), l]);
 

@@ -1,99 +1,83 @@
-import {
-  addHue,
-  darken,
-  getAlpha,
-  getHue,
-  getLightness,
-  getSaturation,
-  lighten,
-  setAlpha,
-  setSaturation,
-  strToHEX,
-  strToHSL,
-  strToRGB,
-  toHexStr,
-  toHslStr,
-  toRgbStr,
-} from './color';
+import { Color, Format } from './color';
 
 describe('Color Utilities', () => {
   const colorHex = '#ff5733';
   const colorHexa = '#ff5733FF';
   const colorRgb = 'rgb(255, 87, 51)';
   const colorRgba = 'rgba(255, 87, 51, 1)';
-  const colorHsl = 'hsl(10.59deg, 100%, 60%)';
-  const colorHsla = 'hsl(10.59deg, 100%, 60%, 1)';
+  const colorHsl = 'hsl(10.59, 100%, 60%)';
+  const colorHsla = 'hsl(10.59, 100%, 60%, 1)';
 
   test('getHue', () => {
-    expect(getHue(colorHsl)).toBe(10.59);
+    expect(Color.getHue(colorHsl)).toBe(10.59);
   });
 
   test('addHue', () => {
-    expect(addHue(colorHsl, 10)).toBe('hsl(20.59, 100%, 60%)');
+    expect(Color.addHue(colorHsl, 10)).toBe('hsl(20.59, 100%, 60%)');
   });
 
   test('getSaturation', () => {
-    expect(getSaturation(colorHsl)).toBe(100);
+    expect(Color.getSaturation(colorHsl)).toBe(100);
   });
 
   test('setSaturation', () => {
-    expect(setSaturation(colorHsl, 50)).toBe('hsl(10.59, 50%, 60%)');
+    expect(Color.setSaturation(colorHsl, 50)).toBe('hsl(10.59, 50%, 60%)');
   });
 
   test('getLightness', () => {
-    expect(getLightness(colorHsl)).toBe(60);
+    expect(Color.getLightness(colorHsl)).toBe(60);
   });
 
   test('getAlpha', () => {
-    expect(getAlpha(colorHsl)).toBe(255);
+    expect(Color.getAlpha(colorHsl)).toBe(255);
   });
 
   test('setAlpha', () => {
-    expect(setAlpha(colorHsl, 0.5)).toBe('hsla(10.59, 100%, 60%, 50%)');
+    expect(Color.setAlpha(colorHsl, 0.5)).toBe('hsla(10.59, 100%, 60%, 50%)');
   });
 
   test('lighten', () => {
-    expect(lighten(colorHsl, 10)).toBe('hsl(10.59, 100%, 70%)');
+    expect(Color.lighten(colorHsl, 10)).toBe('hsl(10.59, 100%, 70%)');
   });
 
   test('darken', () => {
-    expect(darken(colorHsl, 10)).toBe('hsl(10.59, 100%, 50%)');
+    expect(Color.darken(colorHsl, 10)).toBe('hsl(10.59, 100%, 50%)');
   });
 
   test('toHex', () => {
-    expect(strToHEX(colorHex)).toEqual(['ff', '57', '33']);
-    expect(strToHEX(colorHexa)).toEqual(['ff', '57', '33', 'ff']);
-    expect(strToHEX(colorRgb)).toEqual(['ff', '57', '33']);
-    expect(strToHEX(colorRgba)).toEqual(['ff', '57', '33', 'ff']);
-    expect(strToHEX(colorHsl)).toEqual(['ff', '57', '33']);
-    expect(strToHEX(colorHsla)).toEqual(['ff', '57', '33', 'ff']);
-    expect(toHexStr(colorHex)).toBe(colorHex);
-    expect(toHexStr(colorRgb)).toBe(colorHex);
-    expect(toHexStr(colorHsl)).toBe(colorHex);
+    expect(Color.destructure(colorHex, Format.HEX)).toEqual(['ff', '57', '33']);
+    expect(Color.destructure(colorHexa, Format.HEX)).toEqual(['ff', '57', '33', 'ff']);
+    expect(Color.destructure(colorRgb, Format.HEX)).toEqual(['ff', '57', '33']);
+    expect(Color.destructure(colorRgba, Format.HEX)).toEqual(['ff', '57', '33', 'ff']);
+    expect(Color.destructure(colorHsl, Format.HEX)).toEqual(['ff', '57', '33']);
+    expect(Color.destructure(colorHsla, Format.HEX)).toEqual(['ff', '57', '33', 'ff']);
+    expect(Color.convert(colorHex, Format.HEX)).toBe(colorHex);
+    expect(Color.convert(colorRgb, Format.HEX)).toBe(colorHex);
+    expect(Color.convert(colorHsl, Format.HEX)).toBe(colorHex);
   });
 
   test('toRgb', () => {
-    expect(strToRGB(colorHex)).toEqual([255, 87, 51]);
-    expect(strToRGB(colorHexa)).toEqual([255, 87, 51, 1]);
-    expect(strToRGB(colorRgb)).toEqual([255, 87, 51]);
-    expect(strToRGB(colorRgba)).toEqual([255, 87, 51, 1]);
-    expect(strToRGB(colorHsl)).toEqual([255, 87, 51]);
-    expect(strToRGB(colorHsla)).toEqual([255, 87, 51, 1]);
-    expect(toRgbStr(colorHex)).toBe(colorRgb);
-    expect(toRgbStr(colorRgb)).toBe(colorRgb);
-    expect(toRgbStr(colorHsl)).toBe(colorRgb);
+    expect(Color.destructure(colorHex, Format.RGB)).toEqual([255, 87, 51]);
+    expect(Color.destructure(colorHexa, Format.RGB)).toEqual([255, 87, 51, 1]);
+    expect(Color.destructure(colorRgb, Format.RGB)).toEqual([255, 87, 51]);
+    expect(Color.destructure(colorRgba, Format.RGB)).toEqual([255, 87, 51, 1]);
+    expect(Color.destructure(colorHsl, Format.RGB)).toEqual([255, 87, 51]);
+    expect(Color.destructure(colorHsla, Format.RGB)).toEqual([255, 87, 51, 1]);
+    expect(Color.convert(colorHex, Format.RGB)).toBe(colorRgb);
+    expect(Color.convert(colorRgb, Format.RGB)).toBe(colorRgb);
+    expect(Color.convert(colorHsl, Format.RGB)).toBe(colorRgb);
   });
 
   test('toHsl', () => {
-    expect(strToHSL(colorHex)).toEqual([10.59, 100, 60]);
-    expect(strToHSL(colorHexa)).toEqual([10.59, 100, 60, 1]);
-    expect(strToHSL(colorRgb)).toEqual([10.59, 100, 60]);
-    expect(strToHSL(colorRgba)).toEqual([10.59, 100, 60, 1]);
-    expect(strToHSL(colorHsl)).toEqual([10.59, 100, 60]);
-    expect(strToHSL(colorHsla)).toEqual([10.59, 100, 60, 1]);
-    expect(strToHSL('hsl(10.59deg, 100%, 60%, 100%)')).toEqual([10.59, 100, 60, 1]);
-    expect(toHslStr(colorHex)).toEqual(colorHsl);
-    expect(toHslStr(colorRgb)).toEqual(colorHsl);
-    expect(toHslStr(colorHsl)).toEqual(colorHsl);
+    expect(Color.destructure(colorHex, Format.HSL)).toEqual([10.59, 100, 60]);
+    expect(Color.destructure(colorHexa, Format.HSL)).toEqual([10.59, 100, 60, 1]);
+    expect(Color.destructure(colorRgb, Format.HSL)).toEqual([10.59, 100, 60]);
+    expect(Color.destructure(colorRgba, Format.HSL)).toEqual([10.59, 100, 60, 1]);
+    expect(Color.destructure(colorHsl, Format.HSL)).toEqual([10.59, 100, 60]);
+    expect(Color.destructure(colorHsla, Format.HSL)).toEqual([10.59, 100, 60, 1]);
+    expect(Color.destructure('hsl(10.59deg, 100%, 60%, 100%)', Format.HSL)).toEqual([10.59, 100, 60, 1]);
+    expect(Color.convert(colorHex, Format.HSL)).toEqual(colorHsl);
+    expect(Color.convert(colorRgb, Format.HSL)).toEqual(colorHsl);
+    expect(Color.convert(colorHsl, Format.HSL)).toEqual(colorHsl);
   });
 });

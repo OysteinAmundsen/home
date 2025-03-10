@@ -7,6 +7,17 @@ import { toObservable } from '@angular/core/rxjs-interop';
  *
  * That means that it will report `isBrowserActive() = true` if the document is in focus
  * and the browser tab is active.
+ * The service exposes both a signal and an observable to allow for both reactive and
+ * imperative usage.
+ *
+ * @example
+ * ```ts
+ * // Subscribe to changes
+ * visibilityService.browserActive$.subscribe(isActive => console.log(`SUBCRIPTION: ${isActive}`));
+ *
+ * // Ask for the current state
+ * console.log(`MANUAL CHECK: ${visibilityService.isBrowserActive()}`);
+ * ```
  */
 @Injectable({ providedIn: 'root' })
 export class VisibilityService implements OnDestroy {
@@ -18,8 +29,8 @@ export class VisibilityService implements OnDestroy {
   // Is true if current document is active and in focus
   private isTabActive = signal(this.isDocumentActive());
   /** Readonly flag set to true if the browser tab is active and in focus */
-  public isBrowserActive = computed(() => this.isTabActive());
-  public browserActive$ = toObservable(this.isBrowserActive);
+  isBrowserActive = computed(() => this.isTabActive());
+  browserActive$ = toObservable(this.isBrowserActive);
 
   constructor() {
     this.applyVisibilityChangeHandler();

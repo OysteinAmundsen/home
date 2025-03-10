@@ -1,6 +1,3 @@
-// ------------------------------------------------------
-// #region COLOR UTILITIES
-// ------------------------------------------------------
 // We currently support the following color types
 export type RGB = [number, number, number];
 export type RGBA = [number, number, number, number];
@@ -16,6 +13,97 @@ export type HEXOrHEXA = HEX | HEXA;
 
 export type RGBFloat = [number, number, number, number];
 
+export enum Format {
+  HEX = 'hex',
+  RGB = 'rgb',
+  HSL = 'hsl',
+  FLOAT = 'float',
+}
+
+// #region Public api
+export class Color {
+  // Color manipulation
+  static getHue = getHue;
+  static addHue = addHue;
+  static getSaturation = getSaturation;
+  static setSaturation = setSaturation;
+  static getLightness = getLightness;
+  static getAlpha = getAlpha;
+  static setAlpha = setAlpha;
+  static lighten = lighten;
+  static darken = darken;
+  static contrastRatio = contrastRatio;
+
+  // Color conversion
+  /**
+   * Takes a color string and returns an array of values in the given format
+   *
+   * This currently only supports HEX, RGB, HSL and vec4f FLOAT formats.
+   *
+   * @example
+   * ```ts
+   * destructure('rgb(255, 87, 51)', Format.HEX); // => ['ff', '57', '33']
+   * destructure('rgba(255, 87, 51, 1)', Format.HSL); // => [11, 100, 60, 1]
+   * destructure('hsl(10.59, 100%, 60%)', Format.RGB); // => ['255', '87', '51']
+   * ```
+   *
+   * @param color The color string to destructure
+   * @param to The format to destructure to
+   * @returns The destrucutred color
+   */
+  static destructure(color: string, to: Format.HEX): HEXOrHEXA;
+  static destructure(color: string, to: Format.RGB): RGBOrRGBA;
+  static destructure(color: string, to: Format.HSL): HSLOrHSLA;
+  static destructure(color: string, to: Format.FLOAT): RGBA;
+  static destructure(color: string, to: Format): RGBOrRGBA | HSLOrHSLA | HEXOrHEXA {
+    switch (to) {
+      case Format.HEX:
+        return strToHEX(color) as HEXOrHEXA;
+      case Format.RGB:
+        return strToRGB(color) as RGBOrRGBA;
+      case Format.HSL:
+        return strToHSL(color) as HSLOrHSLA;
+      case Format.FLOAT:
+        return RGBToFloat(...strToRGB(color)) as RGBA;
+      default:
+        throw new Error('Invalid color format');
+    }
+  }
+
+  /**
+   * Converts a color code from one format to another
+   *
+   * This currently only supports HEX, RGB, HSL formats.
+   *
+   * @example
+   * ```ts
+   * convert('rgb(255, 87, 51)', Format.HEX); // => '#FF5733'
+   * convert('hsl(10.59, 100%, 60%)', Format.RGB); // => 'rgb(255, 87, 51)'
+   * convert('#FF5733', Format.HSL); // => 'hsl(10.59, 100%, 60%)'
+   * ```
+   * @param color The color code to convert
+   * @param to The format to convert to
+   * @returns The formatted color string
+   */
+  static convert(color: string, to: Format): string {
+    switch (to) {
+      case Format.HEX:
+        return toHexStr(color);
+      case Format.RGB:
+        return toRgbStr(color);
+      case Format.HSL:
+        return toHslStr(color);
+      case Format.FLOAT:
+        // Not very useful to convert to float as a string, but the `Format` enum
+        // specifies this format, so we have to return something.
+        return JSON.stringify(RGBToFloat(...strToRGB(color)));
+      default:
+        throw new Error('Invalid color format');
+    }
+  }
+}
+
+// #region COLOR UTILITIES
 /**
  * Return the hue of any color value
  *
@@ -30,7 +118,7 @@ export type RGBFloat = [number, number, number, number];
  * @param color the color value to get the hue from
  * @returns the hue value
  */
-export function getHue(color: string): number {
+function getHue(color: string): number {
   const [h, s, l, a] = strToHSL(color);
   return h;
 }
@@ -49,7 +137,7 @@ export function getHue(color: string): number {
  * @param degrees the degrees to add to the hue
  * @returns the new color value
  */
-export function addHue(color: string, degrees: number): string {
+function addHue(color: string, degrees: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h + degrees > 360 ? h + degrees - 360 : h + degrees, s, l, a);
 }
@@ -68,7 +156,7 @@ export function addHue(color: string, degrees: number): string {
  * @param hue the hue to set
  * @returns the new color value
  */
-export function setHue(color: string, hue: number): string {
+function setHue(color: string, hue: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, hue, s, l, a);
 }
@@ -87,7 +175,7 @@ export function setHue(color: string, hue: number): string {
  * @param color the color value to get the saturation from
  * @returns the saturation value
  */
-export function getSaturation(color: string): number {
+function getSaturation(color: string): number {
   const [h, s, l, a] = strToHSL(color);
   return s;
 }
@@ -106,7 +194,7 @@ export function getSaturation(color: string): number {
  * @param percent the percentage to set the saturation to
  * @returns the new color value
  */
-export function setSaturation(color: string, percent: number): string {
+function setSaturation(color: string, percent: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h, percent, l, a);
 }
@@ -125,7 +213,7 @@ export function setSaturation(color: string, percent: number): string {
  * @param color the color value to get the lightness from
  * @returns the lightness value
  */
-export function getLightness(color: string): number {
+function getLightness(color: string): number {
   const [h, s, l, a] = strToHSL(color);
   return l;
 }
@@ -145,7 +233,7 @@ export function getLightness(color: string): number {
  * @param lightness the lightness value to set
  * @returns the new color value
  */
-export function setLightness(color: string, lightness: number): string {
+function setLightness(color: string, lightness: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h, s, lightness, a);
 }
@@ -164,7 +252,7 @@ export function setLightness(color: string, lightness: number): string {
  * @param percent the percentage to lighten the color
  * @returns the new color value
  */
-export function lighten(color: string, percent: number): string {
+function lighten(color: string, percent: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h, s, l + percent > 100 ? 100 : l + percent, a);
 }
@@ -182,7 +270,7 @@ export function lighten(color: string, percent: number): string {
  * @param percent the percentage to darken the color
  * @returns the new color value
  */
-export function darken(color: string, percent: number): string {
+function darken(color: string, percent: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h, s, l - percent < 0 ? 0 : l - percent, a);
 }
@@ -201,7 +289,7 @@ export function darken(color: string, percent: number): string {
  * @param color the color value to get the alpha from
  * @returns the alpha value
  */
-export function getAlpha(color: string): number {
+function getAlpha(color: string): number {
   const [h, s, l, a] = strToHSL(color);
   return a != null ? a : 255;
 }
@@ -221,7 +309,7 @@ export function getAlpha(color: string): number {
  * @param alpha the alpha value to set
  * @returns the new color value
  */
-export function setAlpha(color: string, alpha: number): string {
+function setAlpha(color: string, alpha: number): string {
   const [h, s, l] = strToHSL(color);
   return calculate(color, h, s, l, alpha);
 }
@@ -244,7 +332,7 @@ export function setAlpha(color: string, alpha: number): string {
  * @param col2 the secondary color to compare
  * @returns the contrast ratio between the two colors
  */
-export function contrastRatio(col1: string, col2 = '#000000'): number {
+function contrastRatio(col1: string, col2 = '#000000'): number {
   const [r1, g1, b1, a1 = 1] = strToRGB(col1);
   const [r2, g2, b2, a2 = 1] = strToRGB(col2);
 
@@ -286,7 +374,7 @@ function luminance(r: number, g: number, b: number): number {
  * @param property the css property to get
  * @returns the computed css property
  */
-export function getComputedStyle(element: HTMLElement, property: string): string {
+function getComputedStyle(element: HTMLElement, property: string): string {
   const window = globalThis.window || element.ownerDocument.defaultView;
   return window.getComputedStyle(element).getPropertyValue(property);
 }
@@ -306,22 +394,11 @@ export function getComputedStyle(element: HTMLElement, property: string): string
  * toHexStr('#FFFFFF'); // => '#FFFFFF'
  * ```
  */
-export function toHexStr(color: string): string {
+function toHexStr(color: string): string {
   return `#${strToHEX(color).join('')}`;
 }
 
-export function strToHEX(color: string): HEXOrHEXA {
-  if (color.startsWith('#')) {
-    // Already a hex color. Split it into its parts
-    return color
-      .replace(
-        /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i,
-        (m, r, g, b, a) => '#' + r + g + b + (a ? a : ''),
-      )
-      .substring(1)
-      .match(/.{2}/g)
-      ?.map((n) => n.toLowerCase()) as HEXOrHEXA;
-  }
+function strToHEX(color: string): HEXOrHEXA {
   return RGBtoHEX(...strToRGB(color)) as HEXOrHEXA;
 }
 
@@ -330,11 +407,11 @@ export function strToHEX(color: string): HEXOrHEXA {
  */
 function RGBtoHEX(...color: RGBOrRGBA): HEXOrHEXA;
 function RGBtoHEX(r: number, g: number, b: number, a?: number): HEXOrHEXA {
-  const color = [r, g, b].map((x) => x.toString(16).padStart(2, '0'));
-  if (a != null) color.push(alphaToHex(a));
-  return color as HEXOrHEXA;
+  const [rh, gh, bh] = [r, g, b].map((x) => x.toString(16).padStart(2, '0')) as HEX;
+  if (a != null) return [rh, gh, bh, alphaToHex(a)] as HEXA;
+  return [rh, gh, bh] as HEX;
 }
-function alphaToHex(a: number) {
+function alphaToHex(a: number): string {
   return Math.round(a * 255)
     .toString(16)
     .padStart(2, '0');
@@ -350,7 +427,7 @@ function alphaToHex(a: number) {
  * toRgbStr('#FFFFFF'); // => 'rgb(255, 255, 255)'
  * ```
  */
-export function toRgbStr(color: string): string {
+function toRgbStr(color: string): string {
   const col = strToRGB(color);
   return `rgb${col.length > 3 ? 'a' : ''}(${col.join(', ')})`;
 }
@@ -367,7 +444,7 @@ export function toRgbStr(color: string): string {
  * toRGB('hsla(255, 100%, 100%, 1)'); // => [255, 255, 255, 1]
  * ```
  */
-export function strToRGB(color: string): RGBOrRGBA {
+function strToRGB(color: string): RGBOrRGBA {
   if (color.startsWith('#')) {
     // Hexadecimal color input
     const [r, g, b, a] = color
@@ -412,62 +489,44 @@ export function strToRGB(color: string): RGBOrRGBA {
  * @param color the RGB or RGBA color values to convert
  * @returns
  */
-export function RGBToFloat(...color: RGBOrRGBA): RGBFloat;
-export function RGBToFloat(r: number, g: number, b: number, a?: number): RGBFloat {
+function RGBToFloat(...color: RGBOrRGBA): RGBFloat;
+function RGBToFloat(r: number, g: number, b: number, a?: number): RGBFloat {
   return [r / 255, g / 255, b / 255, a != null ? a : 1];
 }
 
 function HSLToRGB(...color: HSLOrHSLA): RGBOrRGBA;
 function HSLToRGB(h: number, s: number, l: number, a?: number): RGBOrRGBA {
-  if (s === 0) {
-    s = 1;
-  }
-
-  // Must be fractions of 1
   s /= 100;
   l /= 100;
 
   const c = (1 - Math.abs(2 * l - 1)) * s;
   const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
   const m = l - c / 2;
-  let r = 0;
-  let g = 0;
-  let b = 0;
 
+  // prettier-ignore
+  let r = 0, g = 0, b = 0;
+
+  // prettier-ignore
   if (0 <= h && h < 60) {
-    r = c;
-    g = x;
-    b = 0;
+    r = c; g = x; b = 0;
   } else if (60 <= h && h < 120) {
-    r = x;
-    g = c;
-    b = 0;
+    r = x; g = c; b = 0;
   } else if (120 <= h && h < 180) {
-    r = 0;
-    g = c;
-    b = x;
+    r = 0; g = c; b = x;
   } else if (180 <= h && h < 240) {
-    r = 0;
-    g = x;
-    b = c;
+    r = 0; g = x; b = c;
   } else if (240 <= h && h < 300) {
-    r = x;
-    g = 0;
-    b = c;
+    r = x; g = 0; b = c;
   } else if (300 <= h && h < 360) {
-    r = c;
-    g = 0;
-    b = x;
+    r = c; g = 0; b = x;
   }
 
   r = Math.round((r + m) * 255);
   g = Math.round((g + m) * 255);
   b = Math.round((b + m) * 255);
 
-  if (a != null && a > -1) return [r, g, b, a] as RGBA;
-  return [r, g, b] as RGB;
+  return a != null ? ([r, g, b, a] as RGBA) : ([r, g, b] as RGB);
 }
-
 /**
  * Convert any color string to hsl.
  * Accepts alpha values.
@@ -479,7 +538,7 @@ function HSLToRGB(h: number, s: number, l: number, a?: number): RGBOrRGBA {
  * toHslString('#FFFFFF'); // => hsl(0, 0%, 100%)
  * ```
  */
-export function toHslStr(color: string) {
+function toHslStr(color: string) {
   const [h, s, l, a] = strToHSL(color);
   return `hsl${a != null && a > -1 ? 'a' : ''}(${toFixed(h, 2).replace('.00', '')}, ${toFixed(s, 3).replace('.000', '')}%, ${toFixed(l, 3).replace('.000', '')}%${
     a != null && a > -1 ? ', ' + a + '%' : ''
@@ -497,53 +556,43 @@ export function toHslStr(color: string) {
  * toHsl('#FFFFFF'); // => [0, 0, 100]
  * ```
  */
-export function strToHSL(color: string): HSLOrHSLA {
+function strToHSL(color: string): HSLOrHSLA {
   return RGBToHSL(...strToRGB(color));
 }
 
 function RGBToHSL(...color: RGBOrRGBA): HSLOrHSLA;
 function RGBToHSL(r: number, g: number, b: number, a?: number): HSLOrHSLA {
-  // Make r, g, and b fractions of 1
   r /= 255;
   g /= 255;
   b /= 255;
 
-  // Find greatest and smallest channel values
   const cMin = Math.min(r, g, b);
   const cMax = Math.max(r, g, b);
   const delta = cMax - cMin;
+
   let h = 0;
-  let s = 0;
-  let l = 0;
+  if (delta !== 0) {
+    if (cMax === r) {
+      // Red is max
+      h = ((g - b) / delta) % 6;
+    } else if (cMax === g) {
+      // Green is max
+      h = (b - r) / delta + 2;
+    } else {
+      // Blue is max
+      h = (r - g) / delta + 4;
+    }
+    h = Math.round(h * 60 * 100) / 100;
+    if (h < 0) h += 360;
+  }
 
-  // Calculate hue
-  if (delta === 0) {
-    h = 0;
-  } // No difference
-  else if (cMax === r) {
-    h = ((g - b) / delta) % 6;
-  } // Red is max
-  else if (cMax === g) {
-    h = (b - r) / delta + 2;
-  } // Green is max
-  else {
-    h = (r - g) / delta + 4;
-  } // Blue is max
+  const l = (cMax + cMin) / 2;
+  const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
 
-  h = Math.round(h * 60 * 100) / 100;
+  const hsl: HSLOrHSLA = [h, +(s * 100).toFixed(2), +(l * 100).toFixed(2)];
+  if (a != null && a > -1) hsl.push(a);
 
-  if (h < 0) {
-    h += 360;
-  } // Make negative hues positive behind 360°
-  l = (cMax + cMin) / 2; // Calculate lightness
-  s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1)); // Calculate saturation
-
-  // Multiply l and s by 100
-  s = +(s * 100).toFixed(1);
-  l = +(l * 100).toFixed(1);
-
-  if (a != null && a > -1) return [h, s, l, a] as HSLA;
-  return [h, s, l] as HSL;
+  return hsl;
 }
 
 function toFixed(value: number, digits: number): string {

@@ -9,14 +9,39 @@ export type Theme = 'light' | 'dark';
 /**
  * This site supports a light and dark color scheme.
  *
- * The css will autoselect the color scheme based on the user's preference,
+ * CSS will autoselect the color scheme based on the user's preference,
  * but the user can also manually select the color scheme. This service
- * keeps track of the currently selected color scheme.
+ * keeps track of the currently selected color scheme and exposes the
+ * currently `selectedTheme` as both a signal and a stream to allow for
+ * both reactive and imperative usage.
+ *
+ * The color scheme is stored in a cookie so that it persists across sessions
+ * and allow for SSR to render using the correct color scheme.
+ *
+ * @example
+ * ```ts
+ * // Subscribe to changes
+ * themeService.selectedTheme$.subscribe(theme =>  console.log(`SUBCRIPTION: ${theme}`));
+ *
+ * // Set the theme
+ * themeService.selectedTheme.set('dark');
+ *
+ * // Ask for the current theme
+ * console.log(`MANUAL CHECK: ${themeService.selectedTheme()}`);
+ * ```
+ *
+ * The above will log out the following:
+ * ```
+ * // => SUBCRIPTION: light
+ * // => SUBCRIPTION: dark
+ * // => MANUAL CHECK: dark
+ * ```
+ *
  */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  doc = inject(DOCUMENT);
-  cookieService = inject(CookieService);
+  private readonly doc = inject(DOCUMENT);
+  private readonly cookieService = inject(CookieService);
 
   selectedTheme = linkedSignal<Theme>(() => {
     const cookie = this.cookieService.getCookie('theme');

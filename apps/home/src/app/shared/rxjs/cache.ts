@@ -45,6 +45,18 @@ export class Cache {
  * This will guarantee that the inner observable is only subscribed
  * to once and the result is shared between all subscribers.
  *
+ *
+ * @example
+ * ```ts
+ * myApiCall(): Observable<any> {
+ *   return cache(() => http.get('https://api'), 'api');
+ * }
+ *
+ * // Call the api twice, the second call will no execute the http call but rather
+ * // return the cached result when the first call is done.
+ * myApiCall().subscribe(console.log);
+ * myApiCall().subscribe(console.log);
+ * ```
  * @param callback
  * @param options
  * @returns

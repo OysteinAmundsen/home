@@ -88,7 +88,7 @@ export default class WeatherComponent extends AbstractWidgetComponent implements
 
   /** Computes the url with location query params when location is updated */
   private url = computed(() => {
-    const location = this.loc.currentLocation();
+    const location = this.loc.location();
     if (location == null) return undefined;
     return `/api/weather?lat=${location.latitude}&lon=${location.longitude}`;
   });

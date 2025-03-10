@@ -27,10 +27,11 @@ export function doSafeTransition(callback: () => void): ViewTransition {
     callback();
     return viewTransitionMockReturnObject;
   }
-  const doc = window.document;
+  const doc = document || window.document;
   if ('startViewTransition' in doc) {
     return doc.startViewTransition(callback);
   } else {
+    // View transitions unsupported
     callback();
     return viewTransitionMockReturnObject;
   }

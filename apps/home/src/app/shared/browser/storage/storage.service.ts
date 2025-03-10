@@ -4,6 +4,29 @@ import { deepMerge, objToString } from '../../utils/object';
 
 const STORAGE_KEY = 'storage';
 
+/**
+ * A service that provides a simple key-value store using the browser's localStorage.
+ *
+ * Whereas normal  operations against localStorage would operate on single string values,
+ * this service allows you to store complex objects and values. The internal storage is a
+ * regular JSON object. It will serialize to a string and placed in localStorage upon change,
+ * and it will deserialize from localStorage upon instantiation.
+ *
+ * The service uses a similar api to the regular Storage interface, but it allows for nested
+ * keys and values. So you can store and retrieve values like this:
+ *
+ * ```ts
+ * storage.set('user.name', 'John Doe');
+ * storage.get('user.name'); // 'John Doe'
+ * ```
+ *
+ * Internally this value is represented as `{ user: { name: 'John Doe' } }`.
+ *
+ * When serialized to localStorage, all the values in the internal storage will be
+ * stringified, uri encoded and base64 encoded. This is to prevent issues with special
+ * characters and to make the storage more resilient to tampering.
+ *
+ */
 @Injectable({ providedIn: 'root' })
 export class StorageService {
   private readonly platformId = inject(PLATFORM_ID);

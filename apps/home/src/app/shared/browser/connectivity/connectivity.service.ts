@@ -1,8 +1,24 @@
 import { DOCUMENT } from '@angular/common';
 import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 /**
  * Service to check the connectivity status of the browser.
+ *
+ * This will expose a `isBrowserOffline` flag as a signal and observable
+ * which will be set to true if the browser looses connectivity.
+ *
+ * We expose both a signal and an observable to allow for both reactive and
+ * imperative usage.
+ *
+ * @example
+ * ```ts
+ * // Subscribe to changes
+ * connectivityService.isBrowserOffline$.subscribe(isOffline => console.log(`SUBCRIPTION: ${isOffline}`));
+ *
+ * // Ask for the current state
+ * console.log(`MANUAL CHECK: ${connectivityService.isBrowserOffline()}`);
+ * ```
  */
 @Injectable({ providedIn: 'root' })
 export class ConnectivityService implements OnDestroy {
@@ -13,7 +29,8 @@ export class ConnectivityService implements OnDestroy {
   //Appear online if ssr rendered. This is to avoid the flickering of the offline gradient.
   private isOffline = signal(typeof window === 'undefined' ? false : !navigator.onLine);
   /** Readonly flag set to true if browser looses connectivity */
-  public isBrowserOffline = computed(() => this.isOffline());
+  isBrowserOffline = computed(() => this.isOffline());
+  isBrowserOffline$ = toObservable(this.isBrowserOffline);
 
   constructor() {
     this.applyConnectivityChangeHandler();
