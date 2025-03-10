@@ -1,6 +1,7 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ResizeDirective } from '../../../shared/browser/resize/resize.directive';
+import { RGB, RGBToFloat, strToRGB } from '../../../shared/utils/color';
 import { Debouncer } from '../../../shared/utils/function';
 import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
 import { WidgetComponent } from '../../../shared/widget/widget.component';
@@ -92,12 +93,14 @@ export default class WebGpuComponent extends AbstractWidgetComponent {
         });
         // Get the current texture from the canvas context
         const view = ctx.getCurrentTexture().createView();
+        const style = getComputedStyle(this.document.body).getPropertyValue('background-color');
+        const color = RGBToFloat(...(strToRGB(style) as RGB));
         const renderPassDescriptor: GPURenderPassDescriptor = {
           label: 'our basic canvas renderPass',
           colorAttachments: [
             {
               view,
-              clearValue: [0.3, 0.3, 0.3, 1],
+              clearValue: color,
               loadOp: 'clear',
               storeOp: 'store',
             },
