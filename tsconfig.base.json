@@ -6,7 +6,7 @@
     "declaration": false,
     "moduleResolution": "node",
     "isolatedModules": false,
-    "emitDecoratorMetadata": true, // Needed by NestJS
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",

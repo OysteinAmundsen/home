@@ -108,12 +108,13 @@ export class GeoLocationService implements OnDestroy {
   );
 
   location = linkedSignal(() => {
-    if (typeof window === 'undefined') return undefined;
+    const defaultLocation = { latitude: 0, longitude: 0 };
+    if (typeof window === 'undefined') return defaultLocation;
     const storedPosition = this.storage.get('location');
     if (storedPosition) {
       return storedPosition as Geolocation;
     }
-    return undefined;
+    return defaultLocation;
   });
   location$ = toObservable(this.location);
   error = signal('');

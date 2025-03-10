@@ -25,7 +25,7 @@ This will install dependencies and spin up the dev-server.
 I have heard that some people might have had difficulties in installing dependencies and getting this to run using `npm`. If you do not want to use `bun` for some reason, you might get this to run by
 
 ```bash
-rm -rf bun.lockb
+rm -rf bun.lock
 npm install --force
 sed -i.bak -e 's/bun x/npx/g' -e 's/bun /npm /g' package.json
 ```

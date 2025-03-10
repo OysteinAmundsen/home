@@ -40,7 +40,7 @@ export async function bootstrap() {
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
   const browserDistFolder = resolve(serverDistFolder, '../browser');
   server.get(
-    '**',
+    '*splat',
     express.static(browserDistFolder, {
       maxAge: '1y',
       index: 'index.html',
@@ -49,7 +49,7 @@ export async function bootstrap() {
 
   // SSR middleware: Render out the angular application server-side
   const angularNodeAppEngine = new AngularNodeAppEngine();
-  server.use('**', (req, res, next) => {
+  server.use('*splat', (req, res, next) => {
     angularNodeAppEngine
       .handle(req, {
         server: 'express',

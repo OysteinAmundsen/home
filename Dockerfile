@@ -10,7 +10,7 @@ RUN apt-get update && \
 # install dependencies into temp directory
 # this will cache them and speed up future builds
 FROM base AS builder
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
 # Currently hangs because of https://github.com/nrwl/nx/issues/27494
