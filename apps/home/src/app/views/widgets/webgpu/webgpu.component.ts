@@ -1,11 +1,12 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ResizeDirective } from '../../../shared/browser/resize/resize.directive';
 import { Color, Format } from '../../../shared/utils/color';
 import { Debouncer } from '../../../shared/utils/function';
 import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
 import { WidgetComponent } from '../../../shared/widget/widget.component';
 import triangleShader from './triangle.wgsl';
+import { ThemeService } from '../../../shared/browser/theme/theme.service';
 
 /**
  * A "cacth-all" widget to display if a requested widget is not found
@@ -35,6 +36,7 @@ import triangleShader from './triangle.wgsl';
 export default class WebGpuComponent extends AbstractWidgetComponent {
   private readonly el = inject(ElementRef);
   private readonly document = inject(DOCUMENT);
+  private readonly theme = inject(ThemeService);
   id = signal('webgpu');
 
   canvas = viewChild<ElementRef<HTMLCanvasElement>>('playfield');
@@ -54,6 +56,12 @@ export default class WebGpuComponent extends AbstractWidgetComponent {
       this.render();
     }
   }
+  onThemeChanged = effect(() => {
+    const theme = this.theme.selectedTheme();
+    if (isPlatformBrowser(this.platformId) && theme) {
+      this.render();
+    }
+  });
 
   @Debouncer()
   async render() {
