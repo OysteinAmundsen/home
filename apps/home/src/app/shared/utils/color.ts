@@ -20,90 +20,7 @@ export enum Format {
   FLOAT = 'float',
 }
 
-// #region Public api
-export class Color {
-  // Color manipulation
-  static getHue = getHue;
-  static addHue = addHue;
-  static getSaturation = getSaturation;
-  static setSaturation = setSaturation;
-  static getLightness = getLightness;
-  static getAlpha = getAlpha;
-  static setAlpha = setAlpha;
-  static lighten = lighten;
-  static darken = darken;
-  static contrastRatio = contrastRatio;
-
-  // Color conversion
-  /**
-   * Takes a color string and returns an array of values in the given format
-   *
-   * This currently only supports HEX, RGB, HSL and vec4f FLOAT formats.
-   *
-   * @example
-   * ```ts
-   * destructure('rgb(255, 87, 51)', Format.HEX); // => ['ff', '57', '33']
-   * destructure('rgba(255, 87, 51, 1)', Format.HSL); // => [11, 100, 60, 1]
-   * destructure('hsl(10.59, 100%, 60%)', Format.RGB); // => ['255', '87', '51']
-   * ```
-   *
-   * @param color The color string to destructure
-   * @param to The format to destructure to
-   * @returns The destrucutred color
-   */
-  static destructure(color: string, to: Format.HEX): HEXOrHEXA;
-  static destructure(color: string, to: Format.RGB): RGBOrRGBA;
-  static destructure(color: string, to: Format.HSL): HSLOrHSLA;
-  static destructure(color: string, to: Format.FLOAT): RGBA;
-  static destructure(color: string, to: Format): RGBOrRGBA | HSLOrHSLA | HEXOrHEXA {
-    switch (to) {
-      case Format.HEX:
-        return strToHEX(color) as HEXOrHEXA;
-      case Format.RGB:
-        return strToRGB(color) as RGBOrRGBA;
-      case Format.HSL:
-        return strToHSL(color) as HSLOrHSLA;
-      case Format.FLOAT:
-        return RGBToFloat(...strToRGB(color)) as RGBA;
-      default:
-        throw new Error('Invalid color format');
-    }
-  }
-
-  /**
-   * Converts a color code from one format to another
-   *
-   * This currently only supports HEX, RGB, HSL formats.
-   *
-   * @example
-   * ```ts
-   * convert('rgb(255, 87, 51)', Format.HEX); // => '#FF5733'
-   * convert('hsl(10.59, 100%, 60%)', Format.RGB); // => 'rgb(255, 87, 51)'
-   * convert('#FF5733', Format.HSL); // => 'hsl(10.59, 100%, 60%)'
-   * ```
-   * @param color The color code to convert
-   * @param to The format to convert to
-   * @returns The formatted color string
-   */
-  static convert(color: string, to: Format): string {
-    switch (to) {
-      case Format.HEX:
-        return toHexStr(color);
-      case Format.RGB:
-        return toRgbStr(color);
-      case Format.HSL:
-        return toHslStr(color);
-      case Format.FLOAT:
-        // Not very useful to convert to float as a string, but the `Format` enum
-        // specifies this format, so we have to return something.
-        return JSON.stringify(RGBToFloat(...strToRGB(color)));
-      default:
-        throw new Error('Invalid color format');
-    }
-  }
-}
-
-// #region COLOR UTILITIES
+// #region Color manipulation
 /**
  * Return the hue of any color value
  *
@@ -118,7 +35,7 @@ export class Color {
  * @param color the color value to get the hue from
  * @returns the hue value
  */
-function getHue(color: string): number {
+export function getHue(color: string): number {
   const [h, s, l, a] = strToHSL(color);
   return h;
 }
@@ -137,7 +54,7 @@ function getHue(color: string): number {
  * @param degrees the degrees to add to the hue
  * @returns the new color value
  */
-function addHue(color: string, degrees: number): string {
+export function addHue(color: string, degrees: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h + degrees > 360 ? h + degrees - 360 : h + degrees, s, l, a);
 }
@@ -156,7 +73,7 @@ function addHue(color: string, degrees: number): string {
  * @param hue the hue to set
  * @returns the new color value
  */
-function setHue(color: string, hue: number): string {
+export function setHue(color: string, hue: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, hue, s, l, a);
 }
@@ -175,7 +92,7 @@ function setHue(color: string, hue: number): string {
  * @param color the color value to get the saturation from
  * @returns the saturation value
  */
-function getSaturation(color: string): number {
+export function getSaturation(color: string): number {
   const [h, s, l, a] = strToHSL(color);
   return s;
 }
@@ -194,7 +111,7 @@ function getSaturation(color: string): number {
  * @param percent the percentage to set the saturation to
  * @returns the new color value
  */
-function setSaturation(color: string, percent: number): string {
+export function setSaturation(color: string, percent: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h, percent, l, a);
 }
@@ -213,7 +130,7 @@ function setSaturation(color: string, percent: number): string {
  * @param color the color value to get the lightness from
  * @returns the lightness value
  */
-function getLightness(color: string): number {
+export function getLightness(color: string): number {
   const [h, s, l, a] = strToHSL(color);
   return l;
 }
@@ -233,7 +150,7 @@ function getLightness(color: string): number {
  * @param lightness the lightness value to set
  * @returns the new color value
  */
-function setLightness(color: string, lightness: number): string {
+export function setLightness(color: string, lightness: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h, s, lightness, a);
 }
@@ -252,7 +169,7 @@ function setLightness(color: string, lightness: number): string {
  * @param percent the percentage to lighten the color
  * @returns the new color value
  */
-function lighten(color: string, percent: number): string {
+export function lighten(color: string, percent: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h, s, l + percent > 100 ? 100 : l + percent, a);
 }
@@ -270,7 +187,7 @@ function lighten(color: string, percent: number): string {
  * @param percent the percentage to darken the color
  * @returns the new color value
  */
-function darken(color: string, percent: number): string {
+export function darken(color: string, percent: number): string {
   const [h, s, l, a] = strToHSL(color);
   return calculate(color, h, s, l - percent < 0 ? 0 : l - percent, a);
 }
@@ -289,7 +206,7 @@ function darken(color: string, percent: number): string {
  * @param color the color value to get the alpha from
  * @returns the alpha value
  */
-function getAlpha(color: string): number {
+export function getAlpha(color: string): number {
   const [h, s, l, a] = strToHSL(color);
   return a != null ? a : 255;
 }
@@ -309,7 +226,7 @@ function getAlpha(color: string): number {
  * @param alpha the alpha value to set
  * @returns the new color value
  */
-function setAlpha(color: string, alpha: number): string {
+export function setAlpha(color: string, alpha: number): string {
   const [h, s, l] = strToHSL(color);
   return calculate(color, h, s, l, alpha);
 }
@@ -332,7 +249,7 @@ function setAlpha(color: string, alpha: number): string {
  * @param col2 the secondary color to compare
  * @returns the contrast ratio between the two colors
  */
-function contrastRatio(col1: string, col2 = '#000000'): number {
+export function contrastRatio(col1: string, col2 = '#000000'): number {
   const [r1, g1, b1, a1 = 1] = strToRGB(col1);
   const [r2, g2, b2, a2 = 1] = strToRGB(col2);
 
@@ -374,7 +291,7 @@ function luminance(r: number, g: number, b: number): number {
  * @param property the css property to get
  * @returns the computed css property
  */
-function getComputedStyle(element: HTMLElement, property: string): string {
+export function getComputedStyle(element: HTMLElement, property: string): string {
   const window = globalThis.window || element.ownerDocument.defaultView;
   return window.getComputedStyle(element).getPropertyValue(property);
 }
@@ -384,6 +301,73 @@ function getComputedStyle(element: HTMLElement, property: string): string {
 //
 // Converts between different color formats
 // --------------------------------------------------------------------
+/**
+ * Takes a color string and returns an array of values in the given format
+ *
+ * This currently only supports HEX, RGB, HSL and vec4f FLOAT formats.
+ *
+ * @example
+ * ```ts
+ * destructure('rgb(255, 87, 51)', Format.HEX); // => ['ff', '57', '33']
+ * destructure('rgba(255, 87, 51, 1)', Format.HSL); // => [11, 100, 60, 1]
+ * destructure('hsl(10.59, 100%, 60%)', Format.RGB); // => ['255', '87', '51']
+ * ```
+ *
+ * @param color The color string to destructure
+ * @param to The format to destructure to
+ * @returns The destrucutred color
+ */
+export function destructure(color: string, to: Format.HEX): HEXOrHEXA;
+export function destructure(color: string, to: Format.RGB): RGBOrRGBA;
+export function destructure(color: string, to: Format.HSL): HSLOrHSLA;
+export function destructure(color: string, to: Format.FLOAT): RGBA;
+export function destructure(color: string, to: Format): RGBOrRGBA | HSLOrHSLA | HEXOrHEXA {
+  switch (to) {
+    case Format.HEX:
+      return strToHEX(color) as HEXOrHEXA;
+    case Format.RGB:
+      return strToRGB(color) as RGBOrRGBA;
+    case Format.HSL:
+      return strToHSL(color) as HSLOrHSLA;
+    case Format.FLOAT:
+      return RGBToFloat(...strToRGB(color)) as RGBA;
+    default:
+      throw new Error('Invalid color format');
+  }
+}
+
+/**
+ * Converts a color code from one format to another
+ *
+ * This currently only supports HEX, RGB, HSL formats.
+ *
+ * @example
+ * ```ts
+ * convert('rgb(255, 87, 51)', Format.HEX); // => '#FF5733'
+ * convert('hsl(10.59, 100%, 60%)', Format.RGB); // => 'rgb(255, 87, 51)'
+ * convert('#FF5733', Format.HSL); // => 'hsl(10.59, 100%, 60%)'
+ * ```
+ * @param color The color code to convert
+ * @param to The format to convert to
+ * @returns The formatted color string
+ */
+export function convert(color: string, to: Format): string {
+  switch (to) {
+    case Format.HEX:
+      return toHexStr(color);
+    case Format.RGB:
+      return toRgbStr(color);
+    case Format.HSL:
+      return toHslStr(color);
+    case Format.FLOAT:
+      // Not very useful to convert to float as a string, but the `Format` enum
+      // specifies this format, so we have to return something.
+      return JSON.stringify(RGBToFloat(...strToRGB(color)));
+    default:
+      throw new Error('Invalid color format');
+  }
+}
+
 /**
  * Convert any color string to hex css color string. Accepts alpha values.
  *

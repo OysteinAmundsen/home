@@ -2,7 +2,7 @@ import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ResizeDirective } from '../../../shared/browser/resize/resize.directive';
 import { ThemeService } from '../../../shared/browser/theme/theme.service';
-import { Color, Format } from '../../../shared/utils/color';
+import { destructure, Format, setAlpha } from '../../../shared/utils/color';
 import { Debouncer } from '../../../shared/utils/function';
 import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
 import { WidgetComponent } from '../../../shared/widget/widget.component';
@@ -103,7 +103,7 @@ export default class WebGpuComponent extends AbstractWidgetComponent {
         const view = ctx.getCurrentTexture().createView();
         const style = getComputedStyle(this.document.body).getPropertyValue('background-color');
         const alpha = 0.01;
-        const color = Color.destructure(Color.setAlpha(style, alpha), Format.FLOAT)
+        const color = destructure(setAlpha(style, alpha), Format.FLOAT)
           // Pre-multiply the color with the alpha
           .map((c, i) => (i === 3 ? alpha : c * alpha));
         const renderPassDescriptor: GPURenderPassDescriptor = {

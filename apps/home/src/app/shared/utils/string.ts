@@ -109,6 +109,10 @@ export function slugify(str: string, delimiter = '-'): string {
     .toLowerCase();
 }
 
+export function kebabCase(str: string): string {
+  return slugify(unCamelCase(str).toLowerCase(), '-');
+}
+
 /**
  * Replaces spaces with hyphens, split camelCase text, remove non-word
  * chars, remove accents and convert to lower case.
@@ -152,7 +156,7 @@ export function unhyphenate(str: string): string {
  * @params str the string to convert
  * @returns the converted string
  */
-export function underscore(str: string): string {
+export function snakeCase(str: string): string {
   if (!str || typeof str !== 'string') return str;
   str = unCamelCase(str);
   return slugify(str, '_');
