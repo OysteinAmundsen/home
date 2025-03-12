@@ -1,10 +1,10 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, OnDestroy, signal, viewChild } from '@angular/core';
-import { ResizeDirective } from '../../../shared/browser/resize/resize.directive';
-import { ThemeService } from '../../../shared/browser/theme/theme.service';
-import { premultiplyAlpha, setAlpha } from '../../../shared/utils/color';
-import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
-import { WidgetComponent } from '../../../shared/widget/widget.component';
+import { ResizeDirective } from '@home/shared/browser/resize/resize.directive';
+import { ThemeService } from '@home/shared/browser/theme/theme.service';
+import { premultiplyAlpha, setAlpha } from '@home/shared/utils/color';
+import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
+import { WidgetComponent } from '@home/shared/widget/widget.component';
 import pyramidShader from './pyramid.wgsl';
 
 /**
@@ -17,9 +17,9 @@ import pyramidShader from './pyramid.wgsl';
   selector: 'app-gpu-pyramid',
   imports: [WidgetComponent, ResizeDirective],
   template: `
-    <app-widget [host]="host()">
-      <canvas #playfield [appResize]="'auto'" (resized)="onResize($event)"></canvas>
-    </app-widget>
+    <lib-widget [host]="host()">
+      <canvas #playfield [libResize]="'auto'" (resized)="onResize($event)"></canvas>
+    </lib-widget>
   `,
   styles: `
     :host {
@@ -59,7 +59,9 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
   }
   onThemeChanged = effect(() => {
     const theme = this.theme.selectedTheme();
-    this.render();
+    if (!this.animationFrame) {
+      this.render();
+    }
   });
 
   ctx!: GPUCanvasContext;
@@ -135,7 +137,7 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
       0, 1, 2,
       0, 3, 2,
 
-      // Sides (four triangles)      
+      // Sides (four triangles)
       0, 1, 4,   // Side 0 (bottom left to bottom right to top)
       1, 2, 4,   // Side 1 (bottom right to top right to top)
       2, 3, 4,   // Side 2 (top right to top left to top)

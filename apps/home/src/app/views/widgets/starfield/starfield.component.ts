@@ -13,11 +13,11 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AppSettingsService } from '../../../app.settings';
-import { ThemeService } from '../../../shared/browser/theme/theme.service';
-import { VisibilityService } from '../../../shared/browser/visibility/visibility.service';
-import { ResizeDirective } from '../../../shared/browser/resize/resize.directive';
-import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
-import { WidgetComponent } from '../../../shared/widget/widget.component';
+import { ResizeDirective } from '@home/shared/browser/resize/resize.directive';
+import { ThemeService } from '@home/shared/browser/theme/theme.service';
+import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
+import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
+import { WidgetComponent } from '@home/shared/widget/widget.component';
 import { Star } from './star';
 
 /**
@@ -27,9 +27,9 @@ import { Star } from './star';
   selector: 'app-widget-starfield',
   imports: [WidgetComponent, ResizeDirective],
   template: `
-    <app-widget [host]="host()">
-      <canvas #starfield [appResize]="'auto'" (resized)="onResize($event)"></canvas>
-    </app-widget>
+    <lib-widget [host]="host()">
+      <canvas #starfield [libResize]="'auto'" (resized)="onResize($event)"></canvas>
+    </lib-widget>
   `,
   styles: [
     `

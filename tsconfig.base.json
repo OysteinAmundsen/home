@@ -17,7 +17,9 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@home/builder": ["tools/builder/src/index.ts"]
+      "@home/builder": ["tools/builder/src/index.ts"],
+      "@home/shared": ["libs/shared/src/index.ts"],
+      "@home/shared/*": ["libs/shared/src/lib/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

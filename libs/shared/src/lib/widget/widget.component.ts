@@ -10,7 +10,7 @@ import { WidgetService } from './widget.service';
  * This renders a standard ui wrapper for all widgets when displayed in the dashboard.
  */
 @Component({
-  selector: 'app-widget',
+  selector: 'lib-widget',
   imports: [RouterModule, NgTemplateOutlet],
   template: `
     <ng-template #tpl>

@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { ThemeService } from './theme.service';
 
 @Component({
-  selector: 'app-theme',
+  selector: 'lib-theme',
   template: `
     <button type="button" class="flat text-shadow" (click)="toggleTheme()">
       <span class="material-symbols-outlined">

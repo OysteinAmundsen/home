@@ -12,7 +12,7 @@ import { Widget, WidgetService } from './widget.service';
  * the components that should actually be visible.
  */
 @Component({
-  selector: 'app-widget-loader',
+  selector: 'lib-widget-loader',
   imports: [RouterModule],
   template: `<ng-container #container></ng-container>`,
   host: { class: 'widget-loader' },

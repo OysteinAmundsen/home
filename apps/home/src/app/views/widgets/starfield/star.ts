@@ -1,5 +1,5 @@
 import { computed, linkedSignal, Signal, signal } from '@angular/core';
-import { destructure, Format } from '../../../shared/utils/color';
+import { destructure, Format } from '@home/shared/utils/color';
 
 type Point = {
   x: number;

@@ -3,8 +3,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, ElementRef, inject, Injectable, Injector, NgModuleFactory, resource, signal } from '@angular/core';
 import { Route } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { widgetRoutes } from '../../views/widget.routes';
 import { cache } from '../rxjs/cache';
+import { WIDGET_ROUTES_TOKEN } from './widget-routes.token';
 
 export type Widget = {
   id: number;
@@ -17,9 +17,7 @@ export class WidgetService {
   private http = inject(HttpClient);
   private document = inject(DOCUMENT);
   private injector = inject(Injector);
-
-  // The routes for the widgets
-  private widgetRoutes = widgetRoutes;
+  private widgetRoutes = inject(WIDGET_ROUTES_TOKEN);
 
   /** Filter widgets by id */
   filter = signal<string | undefined>(undefined);
@@ -124,6 +122,6 @@ export class WidgetService {
         console.error(error);
       }
     }
-    return (await import('../../views/widgets/not-found.component')).default;
+    return (await import('./not-found.component')).default;
   }
 }

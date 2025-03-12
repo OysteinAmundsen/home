@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { AbstractWidgetComponent } from '../../shared/widget/abstract-widget.component';
-import { WidgetComponent } from '../../shared/widget/widget.component';
+import { AbstractWidgetComponent } from './abstract-widget.component';
+import { WidgetComponent } from './widget.component';
 
 /**
  * A "cacth-all" widget to display if a requested widget is not found
@@ -9,17 +9,17 @@ import { WidgetComponent } from '../../shared/widget/widget.component';
  * `widget.routes.ts` file.
  */
 @Component({
-  selector: 'app-not-found',
+  selector: 'lib-not-found',
   imports: [WidgetComponent],
   template: `
-    <app-widget [host]="host()">
+    <lib-widget [host]="host()">
       <header>
         <h1>{{ widgetName() }} not found</h1>
       </header>
       <section>
         <p>Sorry, the widget you are looking for does not exist.</p>
       </section>
-    </app-widget>
+    </lib-widget>
   `,
   styles: `
     :host {

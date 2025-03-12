@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, effect, inject, linkedSignal, OnDestroy, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { GeoLocationService } from '../../../shared/browser/geoLocation/geoLocation.service';
-import { IconPipe } from '../../../shared/icons/icon.pipe';
-import { cache, Cache } from '../../../shared/rxjs/cache';
-import { AbstractWidgetComponent } from '../../../shared/widget/abstract-widget.component';
-import { WidgetComponent } from '../../../shared/widget/widget.component';
+import { GeoLocationService } from '@home/shared/browser/geoLocation/geoLocation.service';
+import { IconPipe } from '@home/shared/pipes/icon.pipe';
+import { cache, Cache } from '@home/shared/rxjs/cache';
+import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
+import { WidgetComponent } from '@home/shared/widget/widget.component';
 
 /**
  * A widget integrating with the yr.no weather API
@@ -15,7 +15,7 @@ import { WidgetComponent } from '../../../shared/widget/widget.component';
   selector: 'app-widget-weather',
   imports: [CommonModule, IconPipe, WidgetComponent],
   template: `
-    <app-widget [host]="host()">
+    <lib-widget [host]="host()">
       @if (weather.isLoading()) {
         <section>Loading...</section>
       } @else if (weather.error()) {
@@ -35,7 +35,7 @@ import { WidgetComponent } from '../../../shared/widget/widget.component';
           <time>{{ lastUpdated() | date: 'dd.MM.yyyy HH:mm' }}</time>
         </footer>
       }
-    </app-widget>
+    </lib-widget>
   `,
   styles: `
     :host {

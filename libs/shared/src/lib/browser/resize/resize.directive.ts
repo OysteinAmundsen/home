@@ -34,7 +34,7 @@ import { objToString } from '../../utils/object';
  * ```
  */
 @Directive({
-  selector: '[appResize]',
+  selector: '[libResize]',
 })
 export class ResizeDirective implements AfterViewInit, OnDestroy {
   private readonly platformId = inject(PLATFORM_ID);
@@ -52,7 +52,7 @@ export class ResizeDirective implements AfterViewInit, OnDestroy {
    * whatever you want with the new size.
    */
   config = input('none', {
-    alias: 'appResize',
+    alias: 'libResize',
     transform: (value: string | undefined) => (value != null && value != '' && value === 'auto' ? 'auto' : 'none'),
   });
   resized = output<DOMRect>();
