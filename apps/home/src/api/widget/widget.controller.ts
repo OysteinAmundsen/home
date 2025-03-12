@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { WidgetService } from './widget.service';
 
 /**
@@ -19,17 +19,18 @@ export class WidgetController {
   }
 
   /**
-   * Fetch a single widget by ID.
+   * Fetch all widget tags.
    */
-  @Get(':id')
-  findOne(
-    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
-    id: number,
-  ) {
-    const widget = this.widgetService.getWidgets(id);
-    if (!widget) {
-      throw new HttpException('Widget not found', HttpStatus.NOT_FOUND);
-    }
-    return [widget];
+  @Get('tags')
+  getAllTags() {
+    return this.widgetService.getAvailableTags();
+  }
+
+  /**
+   * Fetch widgets by tag
+   */
+  @Get(':tag')
+  filterByTag(@Param('tag') tag: string) {
+    return this.widgetService.getWidgetsByTag(tag);
   }
 }

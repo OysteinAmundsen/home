@@ -1,8 +1,8 @@
 <nav>
-  <button type="button" (click)="filter(1)">Weather</button>
-  <button type="button" (click)="filter(2)">Starfield</button>
-  <button type="button" (click)="filter(3)">WebGPU</button>
-  <button type="button" (click)="filter(4)">Widget 3</button>
+  @for (tag of tags.value(); track tag) {
+    <button type="button" (click)="filter(tag)">{{ tag | string: 'titleCase' }}</button>
+  }
+  <button type="button" (click)="filter('nothing')">Nothing</button>
   <button type="button" (click)="filter(undefined)">All</button>
 </nav>
 

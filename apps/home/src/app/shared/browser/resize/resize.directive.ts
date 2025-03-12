@@ -69,13 +69,15 @@ export class ResizeDirective implements AfterViewInit, OnDestroy {
     const rectStr = objToString(rect);
     if (rectStr != this._oldRect) {
       this._oldRect = rectStr;
-      this.resized.emit(rect);
 
       if (this.config() === 'auto') {
         // Apply the new size to the host element
         this.host.nativeElement.setAttribute('width', `${rect.width}`);
         this.host.nativeElement.setAttribute('height', `${rect.height}`);
       }
+
+      // Emit event lastly
+      this.resized.emit(rect);
     }
   });
 

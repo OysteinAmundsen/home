@@ -8,17 +8,17 @@ import { Route } from '@angular/router';
 export const widgetRoutes: Route[] = [
   {
     path: 'weather',
-    data: { widget: true },
+    data: { widget: true, tags: ['integration'] },
     loadComponent: () => import('./widgets/weather/weather.component').then((m) => m.default),
   },
   {
     path: 'starfield',
-    data: { widget: true },
+    data: { widget: true, tags: ['graphics'] },
     loadComponent: () => import('./widgets/starfield/starfield.component').then((m) => m.default),
   },
   {
-    path: 'webgpu',
-    data: { widget: true },
-    loadComponent: () => import('./widgets/webgpu/webgpu.component').then((m) => m.default),
+    path: 'pyramid',
+    data: { widget: true, tags: ['graphics'] },
+    loadComponent: () => import('./widgets/pyramid/pyramid.component').then((m) => m.default),
   },
 ];

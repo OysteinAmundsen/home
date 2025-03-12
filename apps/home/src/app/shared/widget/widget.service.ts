@@ -22,7 +22,7 @@ export class WidgetService {
   private widgetRoutes = widgetRoutes;
 
   /** Filter widgets by id */
-  filter = signal<number | undefined>(undefined);
+  filter = signal<string | undefined>(undefined);
 
   /** The url to load widgets from */
   url = computed(() => (this.filter() ? `/api/widgets/${this.filter()}` : '/api/widgets'));
@@ -48,8 +48,16 @@ export class WidgetService {
         }
       });
 
-      return this.widgetsCache.sort((a, b) => a.id - b.id);
+      const result = this.widgetsCache.sort((a, b) => a.id - b.id);
+      if (result.length < 1) {
+        return [{ id: -1, name: '', componentName: this.filter() }];
+      }
+      return result;
     },
+  });
+
+  tags = resource({
+    loader: () => firstValueFrom(this.http.get<string[]>('/api/widgets/tags')),
   });
 
   /** Exposes either the cached or loaded widgets */

@@ -3,6 +3,7 @@ import { afterNextRender, AfterViewInit, Component, DestroyRef, effect, inject, 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
+import { StringPipe } from '../../shared/pipes/string.pipe';
 import { doSafeTransition } from '../../shared/utils/transitions';
 import { WidgetLoaderComponent } from '../../shared/widget/widget-loader.component';
 import { Widget, WidgetService } from '../../shared/widget/widget.service';
@@ -15,7 +16,7 @@ import { dashboardAnimation } from './dashboard.animation';
  */
 @Component({
   selector: 'app-dashboard',
-  imports: [WidgetLoaderComponent],
+  imports: [WidgetLoaderComponent, StringPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   animations: [trigger('widgets', [dashboardAnimation])],
@@ -28,6 +29,7 @@ export class DashboardComponent implements AfterViewInit {
   protected animationDisabled = signal(true);
 
   /** The resource loader for widgets is outsourced to an effect in order to animate this */
+  tags = this.widgetService.tags;
   widgets = signal<Widget[]>([]);
   error = this.widgetService.error;
   isLoading = this.widgetService.isLoading;
@@ -37,7 +39,7 @@ export class DashboardComponent implements AfterViewInit {
   });
 
   /** The resource reactive signal for reloading */
-  filter(id: number | undefined) {
+  filter(id: string | undefined) {
     this.widgetService.filter.set(id);
   }
 

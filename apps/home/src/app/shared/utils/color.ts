@@ -477,6 +477,12 @@ function RGBToFloat(...color: RGBOrRGBA): RGBFloat;
 function RGBToFloat(r: number, g: number, b: number, a?: number): RGBFloat {
   return [r / 255, g / 255, b / 255, a != null ? a : 1];
 }
+/** Utility to premultiply alpha to color floats.  */
+export function premultiplyAlpha(color: string | RGBFloat): RGBFloat {
+  if (typeof color === 'string') color = destructure(color, Format.FLOAT) as RGBFloat;
+  const alpha = color[3];
+  return color.map((c, i) => (i === 3 ? alpha : c * alpha)) as RGBFloat;
+}
 
 function HSLToRGB(...color: HSLOrHSLA): RGBOrRGBA;
 function HSLToRGB(h: number, s: number, l: number, a?: number): RGBOrRGBA {
