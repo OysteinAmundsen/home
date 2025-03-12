@@ -70,10 +70,10 @@ fn fragment_main(@location(0) normal: vec3<f32>, @location(1) fragPos: vec3<f32>
     let lightColor2 = vec3<f32>(0.5, 0.5, 1.0);
 
     // Material properties
-    let objectColor = vec3<f32>(0.5, 0.5, 0.5);
+    let objectColor = vec3<f32>(0.7, 0.7, 0.7);
     let ambientStrength = 0.3;
     let specularStrength = 0.9;
-    let shininess = 32.0;
+    let shininess = 128.0;
 
     // Ambient
     let ambient = ambientStrength * (lightColor1 + lightColor2);

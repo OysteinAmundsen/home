@@ -8,7 +8,7 @@ import { Route } from '@angular/router';
 export const widgetRoutes: Route[] = [
   {
     path: 'weather',
-    data: { widget: true, tags: ['integration'] },
+    data: { widget: true, tags: ['integrations'] },
     loadComponent: () => import('./widgets/weather/weather.component').then((m) => m.default),
   },
   {
