@@ -1,5 +1,5 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
-import { widgetRoutes } from '../../../../libs/widget/widget.routes';
+import { widgetRoutes } from '@home/widgets/widget.routes';
 
 export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Server },

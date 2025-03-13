@@ -1,6 +1,6 @@
 import { titleCase } from '@home/shared/utils/string';
+import { widgetRoutes } from '@home/widgets/widget.routes';
 import { Injectable } from '@nestjs/common';
-import { widgetRoutes } from '../../../../../libs/widget/widget.routes';
 
 @Injectable()
 export class WidgetService {
