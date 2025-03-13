@@ -106,7 +106,7 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
        0.5, -0.5, -0.5,      1.0, -1.0, -1.0, // Point 1: Bottom right (side 1)
        0.5, -0.5,  0.5,      1.0, -1.0,  1.0, // Point 2: Top right (side 2)
       -0.5, -0.5,  0.5,     -1.0, -1.0,  1.0, // Point 3: Top left (side 3)
-       0.0,  0.5,  0.0,      0.0,  1.0,  0.0, // Point 4: Top vertex
+       0.0,  0.5,  0.0,      0.0, -1.0,  0.0, // Point 4: Top vertex
     ]);
     this.vBuffer = this.device.createBuffer({
       label: 'Pyramid vertices',
@@ -122,13 +122,13 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
     const indexData = new Uint16Array([
       // Base (two triangles)
       0, 1, 2,
-      0, 3, 2,
+      0, 2, 3,
 
       // Sides (four triangles)
-      0, 1, 4,   // Side 0 (bottom left to bottom right to top)
-      1, 2, 4,   // Side 1 (bottom right to top right to top)
-      2, 3, 4,   // Side 2 (top right to top left to top)
-      3, 0, 4,   // Side 3 (top left to bottom left to top)
+      0, 4, 1,   // Side 0 (bottom left to bottom right to top)
+      1, 4, 2,   // Side 1 (bottom right to top right to top)
+      2, 4, 3,   // Side 2 (top right to top left to top)
+      3, 4, 0,   // Side 3 (top left to bottom left to top)
     ]);
     this.iBuffer = this.device.createBuffer({
       label: 'Pyramid faces',
@@ -155,8 +155,27 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
           },
         ],
       },
-      fragment: { module, targets: [{ format }] },
-      primitive: { topology: 'triangle-list' },
+      fragment: {
+        module,
+        targets: [
+          {
+            format,
+            blend: {
+              color: {
+                srcFactor: 'src-alpha',
+                dstFactor: 'one-minus-src-alpha',
+                operation: 'add',
+              },
+              alpha: {
+                srcFactor: 'one',
+                dstFactor: 'one-minus-src-alpha',
+                operation: 'add',
+              },
+            },
+          },
+        ],
+      },
+      primitive: { topology: 'triangle-list', cullMode: 'back' },
     });
 
     this.isInitializing = false;
