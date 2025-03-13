@@ -4,6 +4,32 @@ import { deepMerge, objToString } from '../../utils/object';
 
 const STORAGE_KEY = 'storage';
 
+const storage = new Map<string, string>();
+const storageMock = {
+  getItem: (key: string): string | null => {
+    return storage.has(key) ? (storage.get(key) as string) : null;
+  },
+  removeItem: (key: string) => {
+    return storage.delete(key);
+  },
+  setItem: (key: string, value: string) => {
+    return storage.set(key, value);
+  },
+  length: storage.size,
+  clear: () => storage.clear(),
+  key: (idx) => [...storage.keys()][idx],
+} as Storage;
+
+export function getLocalStorage(document: Document): Storage {
+  const window = globalThis.window || document.defaultView;
+  try {
+    return window.self.localStorage;
+  } catch (ex) {
+    // Could not get localStorage. Use memory storage instead.
+    return storageMock;
+  }
+}
+
 /**
  * A service that provides a simple key-value store using the browser's localStorage.
  *
@@ -31,7 +57,7 @@ const STORAGE_KEY = 'storage';
 export class StorageService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly document = inject(DOCUMENT);
-  private window = globalThis.window || this.document.defaultView;
+  private storage: Storage = getLocalStorage(this.document);
 
   // Our storage is a json object of unknown complexity and values
   private values: Record<string, unknown> = {};
@@ -151,9 +177,9 @@ export class StorageService {
     }
   }
 
-  private loadValues(): void {
+  loadValues(): void {
     if (isPlatformBrowser(this.platformId)) {
-      let valueStr = this.window.localStorage.getItem(STORAGE_KEY);
+      let valueStr = this.storage.getItem(STORAGE_KEY);
 
       // Decode the stored values
       if (valueStr && !valueStr.startsWith('{')) {
@@ -170,7 +196,7 @@ export class StorageService {
       let valueStr = objToString(this.values);
       valueStr = encodeURIComponent(valueStr);
       valueStr = btoa(valueStr);
-      this.window.localStorage.setItem(STORAGE_KEY, valueStr);
+      this.storage.setItem(STORAGE_KEY, valueStr);
     }
   }
 

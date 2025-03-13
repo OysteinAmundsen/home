@@ -1,9 +1,9 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
+import { WidgetService } from '@home/shared/widget/widget.service';
 import { AppComponent } from './app.component';
 import { AuthenticationService } from './shared/auth/authentication.service';
-import { WidgetService } from './shared/widget/widget.service';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;

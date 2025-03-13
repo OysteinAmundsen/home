@@ -1,16 +1,9 @@
-import {
-  BuilderContext,
-  BuilderOutput,
-  createBuilder,
-  scheduleTargetAndForget,
-  targetFromTargetString,
-} from '@angular-devkit/architect';
+import { BuilderContext, BuilderOutput, createBuilder, targetFromTargetString } from '@angular-devkit/architect';
 import { Builder } from '@angular-devkit/architect/src/internal';
 import { JsonObject } from '@angular-devkit/core';
 import * as esbuild from 'esbuild';
 import * as fs from 'fs';
 import * as path from 'path';
-import { catchError, defer, Observable, of, switchMap } from 'rxjs';
 import { ApplicationExecutorSchema } from './schema';
 
 export type Manifest = ManifestEntry[];
@@ -29,27 +22,28 @@ const CACHE_BUST = /-[A-Z0-9]{8}\./;
  * But even though this runs the serve target and returns control to the
  * builder, I am unable to get the output files from the serve target.
  */
-const builder$ = createBuilder<ApplicationExecutorSchema, BuilderOutput>(
-  (opt: ApplicationExecutorSchema, ctx: BuilderContext): Observable<BuilderOutput> => {
-    return defer(async () => {
-      const target = targetFromTargetString(opt.buildTarget);
-      const meta = await ctx.getProjectMetadata(target);
-      const tOpts = await ctx.getTargetOptions(target);
-      return { success: true, target, meta, tOpts };
-    }).pipe(
-      switchMap((o) => scheduleTargetAndForget(ctx, o.target)),
-      switchMap((buildResult) => {
-        const output = buildResult.result;
-        ctx.logger.info(`Build target completed successfully. ${JSON.stringify(output)}`);
-        return of({ success: true });
-      }),
-      catchError((error) => {
-        ctx.logger.error('Error running build target.', error);
-        return of({ success: false });
-      }),
-    );
-  },
-);
+// NOTE: Something here broke after upgrading to angular 19.2.0
+// const builder$ = createBuilder<ApplicationExecutorSchema, BuilderOutput>(
+//   (opt: ApplicationExecutorSchema, ctx: BuilderContext) => {
+//     return defer(async () => {
+//       const target = targetFromTargetString(opt.buildTarget);
+//       const meta = await ctx.getProjectMetadata(target);
+//       const tOpts = await ctx.getTargetOptions(target);
+//       return { success: true, target, meta, tOpts };
+//     }).pipe(
+//       switchMap((o) => scheduleTargetAndForget(ctx, o.target)),
+//       switchMap((buildResult) => {
+//         const output = buildResult.result;
+//         ctx.logger.info(`Build target completed successfully. ${JSON.stringify(output)}`);
+//         return of({ success: true });
+//       }),
+//       catchError((error) => {
+//         ctx.logger.error('Error running build target.', error);
+//         return of({ success: false });
+//       }),
+//     );
+//   },
+// );
 
 /**
  * FIXME: Works with `application` target. Not with `serve` target.
