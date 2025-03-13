@@ -1,5 +1,5 @@
 <lib-widget [host]="host()">
   @if (canRender()) {
-    <div echarts [options]="chartOption" [autoResize]="true" class="chart" (chartInit)="onChartInit($event)"></div>
+    <div echarts [options]="chartOption()" [autoResize]="true" class="chart" (chartInit)="onChartInit($event)"></div>
   }
 </lib-widget>

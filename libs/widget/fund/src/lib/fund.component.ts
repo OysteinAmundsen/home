@@ -2,16 +2,19 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, effect, inject, linkedSignal, OnInit, signal } from '@angular/core';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
-import { LineChart } from 'echarts/charts';
-import { GridComponent } from 'echarts/components';
+
 import * as echarts from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+
+import { LineChart } from 'echarts/charts';
+import { GridComponent, LegendComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+
 import { firstValueFrom } from 'rxjs';
 import { FundService } from './fund.service';
 
 if (typeof window !== 'undefined') {
-  echarts.use([LineChart, GridComponent, CanvasRenderer]);
+  echarts.use([LineChart, GridComponent, LegendComponent, CanvasRenderer]);
 }
 
 @Component({
@@ -29,7 +32,14 @@ export default class FundComponent extends AbstractWidgetComponent implements On
   canRender = linkedSignal(() => isPlatformBrowser(this.platformId));
   api = signal<echarts.ECharts | undefined>(undefined);
 
-  chartOption: echarts.EChartsCoreOption = {
+  chartOption = signal<echarts.EChartsCoreOption>({
+    grid: {
+      top: '30',
+      left: '0',
+      right: '0',
+      bottom: '0',
+      containLabel: true,
+    },
     xAxis: {
       type: 'time',
     },
@@ -37,13 +47,11 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       type: 'value',
       name: 'NOK',
     },
-  };
-
-  mergeOptions = signal<echarts.EChartsCoreOption | undefined>(undefined);
+  });
 
   onDataChanged = effect(() => {
     const api = this.api();
-    const options = this.mergeOptions();
+    const options = this.chartOption();
     if (api && options) {
       api.setOption(options);
     }
@@ -54,32 +62,26 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       const data = await firstValueFrom(this.fundService.getFundData());
 
       // For each instrument, fetch price time series
-      const timeSeries = [] as { timeStamp: number; value: number }[][];
       await Promise.allSettled(
         data.map(async (item: any) => {
           const res = await firstValueFrom(this.fundService.getTimeSeries(item.nnx_info.market_data_order_book_id));
           item.timeSeries = res;
-          timeSeries.push(res.pricePoints);
         }),
       );
 
       const options = {
-        xAxis: {
-          type: 'time',
-          data: Array.from(
-            timeSeries
-              .flatMap((point) => point)
-              .map((p) => p.timeStamp)
-              .reduce((acc, cur) => acc.add(cur), new Set()),
-          ),
-        },
+        ...(this.isFullscreen()
+          ? {
+              legend: { data: data.map((item: any) => item.instrument_info.long_name) },
+            }
+          : {}),
         series: data.map((item: any) => ({
           name: item.instrument_info.long_name,
           type: 'line',
           data: item.timeSeries.pricePoints.map((p: any) => [p.timeStamp, p.value]),
         })),
       };
-      this.mergeOptions.set(options);
+      this.chartOption.update((original) => ({ ...original, ...options }));
     } catch (error) {
       console.error('Error fetching fund data', error);
     }
