@@ -59,10 +59,12 @@ export class WidgetService {
   });
 
   /** Exposes either the cached or loaded widgets */
-  widgets = computed<Widget[]>(() =>
+  widgets = computed<Widget[]>(() => {
+    const isLoading = this.widgetsLoader.isLoading();
+    const widgets = this.widgetsLoader.value() as Widget[];
     // Make sure that widgets always returns an array, even when loading new widgets
-    this.widgetsLoader.isLoading() ? this.widgetsCache : (this.widgetsLoader.value() as Widget[]),
-  );
+    return isLoading ? this.widgetsCache : widgets;
+  });
 
   /** Exposes any errors from the loading process */
   error = computed<string | undefined>(
@@ -70,7 +72,7 @@ export class WidgetService {
   );
 
   /** Exposes the loading state */
-  isLoading = computed(() => this.widgetsLoader.isLoading() && this.widgets.length < 1);
+  isLoading = this.widgetsLoader.isLoading;
 
   /**
    * Check if this element is used in the dashboard or not.

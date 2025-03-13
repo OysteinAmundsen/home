@@ -11,39 +11,23 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { AppSettingsService } from '../../../app.settings';
+import { AppSettingsService } from '@home/shared/app.settings';
 import { ResizeDirective } from '@home/shared/browser/resize/resize.directive';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
 import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Star } from './star';
 
 /**
  * A widget that displays a starfield animation
  */
 @Component({
-  selector: 'app-widget-starfield',
+  selector: 'lib-widget-starfield',
   imports: [WidgetComponent, ResizeDirective],
-  template: `
-    <lib-widget [host]="host()">
-      <canvas #starfield [libResize]="'auto'" (resized)="onResize($event)"></canvas>
-    </lib-widget>
-  `,
-  styles: [
-    `
-      canvas {
-        display: block;
-        min-width: 300px;
-        width: 100%;
-        height: 100%;
-        transition:
-          opacity 0.3s,
-          filter 0.3s;
-      }
-    `,
-  ],
+  templateUrl: './starfield.component.html',
+  styleUrl: './starfield.component.scss',
 })
 export default class StarFieldComponent extends AbstractWidgetComponent implements AfterViewInit, OnDestroy {
   private readonly el = inject(ElementRef);

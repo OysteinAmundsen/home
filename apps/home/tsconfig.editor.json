@@ -1,9 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "include": [
-    "src/**/*.ts",
-    "../../libs/shared/src/lib/widget/not-found.component.ts"
-  ],
+  "include": ["src/**/*.ts", "../../libs/widget/widget.routes.ts"],
   "compilerOptions": {},
   "exclude": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts"]
 }

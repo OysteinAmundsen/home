@@ -16,10 +16,15 @@
     "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
+    "types": ["node", "@webgpu/types"],
     "paths": {
       "@home/builder": ["tools/builder/src/index.ts"],
       "@home/shared": ["libs/shared/src/index.ts"],
-      "@home/shared/*": ["libs/shared/src/lib/*"]
+      "@home/shared/*": ["libs/shared/src/lib/*"],
+      "@home/widgets/pyramid": ["libs/widget/pyramid/src/index.ts"],
+      "@home/widgets/starfield": ["libs/widget/starfield/src/index.ts"],
+      "@home/widgets/weather": ["libs/widget/weather/src/index.ts"],
+      "@home/widgets/*": ["libs/widget/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

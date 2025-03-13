@@ -4,8 +4,8 @@ import { provideClientHydration, withEventReplay, withIncrementalHydration } fro
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withViewTransitions } from '@angular/router';
 import { WIDGET_ROUTES_TOKEN } from '@home/shared/widget/widget-routes.token';
+import { widgetRoutes } from '@home/widgets/widget.routes';
 import { appRoutes } from './app.routes';
-import { widgetRoutes } from './views/widget.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [

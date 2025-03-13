@@ -1,82 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, effect, inject, linkedSignal, OnDestroy, resource, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { GeoLocationService } from '@home/shared/browser/geoLocation/geoLocation.service';
 import { IconPipe } from '@home/shared/pipes/icon.pipe';
 import { cache, Cache } from '@home/shared/rxjs/cache';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
+import { firstValueFrom } from 'rxjs';
 
 /**
  * A widget integrating with the yr.no weather API
  */
 @Component({
-  selector: 'app-widget-weather',
+  selector: 'lib-widget-weather',
   imports: [CommonModule, IconPipe, WidgetComponent],
-  template: `
-    <lib-widget [host]="host()">
-      @if (weather.isLoading()) {
-        <section>Loading...</section>
-      } @else if (weather.error()) {
-        <section>{{ weather.error() }}</section>
-      } @else if (weather.value()) {
-        <section [attr.style]="'view-transition-name: ' + widgetId() + '-content-list'">
-          @for (time of todaysWeather(); track time.time) {
-            <div class="time">
-              <time>{{ time.time | date: 'HH:mm' }}</time>
-              <span [outerHTML]="time.data.next_1_hours.summary.symbol_code | icon"> </span>
-              <span class="temp">{{ time.data.instant.details.air_temperature | number: '1.1' }}°C</span>
-            </div>
-          }
-        </section>
-        <footer [attr.style]="'view-transition-name: ' + widgetId() + '-footer'">
-          <span class="material-symbols-outlined">update</span>
-          <time>{{ lastUpdated() | date: 'dd.MM.yyyy HH:mm' }}</time>
-        </footer>
-      }
-    </lib-widget>
-  `,
-  styles: `
-    :host {
-      container-type: size;
-      display: block;
-      min-height: 20rem;
-      min-width: 11.5rem;
-    }
-    header {
-      display: none;
-      @container (min-height: 23rem) {
-        display: block;
-      }
-    }
-    section {
-      place-items: center;
-      // view-transition-name: widget-weather-content-list;
-      .time {
-        display: flex;
-        gap: 0.5rem;
-        ::ng-deep .material-symbols-outlined {
-          color: var(--color-text-highlight);
-        }
-        .temp {
-          width: 3rem;
-          text-align: right;
-        }
-      }
-    }
-    footer {
-      padding-top: 0.5rem;
-      display: flex;
-      place-items: center;
-      place-content: center;
-      gap: 0.5rem;
-      time {
-        color: var(--color-text-highlight);
-        font-style: italic;
-      }
-    }
-  `,
+  templateUrl: './weather.component.html',
+  styleUrl: './weather.component.scss',
 })
 export default class WeatherComponent extends AbstractWidgetComponent implements OnDestroy {
   private readonly http = inject(HttpClient);

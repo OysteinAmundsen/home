@@ -5,7 +5,7 @@ import { ThemeService } from '@home/shared/browser/theme/theme.service';
 import { premultiplyAlpha, setAlpha } from '@home/shared/utils/color';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
-import pyramidShader from './pyramid.wgsl';
+import pyramidShader from './shaders/pyramid.wgsl';
 
 /**
  * A "cacth-all" widget to display if a requested widget is not found
@@ -14,23 +14,10 @@ import pyramidShader from './pyramid.wgsl';
  * `widget.routes.ts` file.
  */
 @Component({
-  selector: 'app-gpu-pyramid',
+  selector: 'lib-gpu-pyramid',
   imports: [WidgetComponent, ResizeDirective],
-  template: `
-    <lib-widget [host]="host()">
-      <canvas #playfield [libResize]="'auto'" (resized)="onResize($event)"></canvas>
-    </lib-widget>
-  `,
-  styles: `
-    :host {
-      canvas {
-        display: block;
-        min-width: 300px;
-        width: 100%;
-        height: 100%;
-      }
-    }
-  `,
+  templateUrl: './pyramid.component.html',
+  styleUrl: './pyramid.component.scss',
 })
 export default class PyramidComponent extends AbstractWidgetComponent implements OnDestroy {
   private readonly el = inject(ElementRef);

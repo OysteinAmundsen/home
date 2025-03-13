@@ -7,8 +7,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "isolatedModules": true,
-    "esModuleInterop": true,
-    "types": ["node", "@webgpu/types"]
+    "esModuleInterop": true
   },
 
   "angularCompilerOptions": {
