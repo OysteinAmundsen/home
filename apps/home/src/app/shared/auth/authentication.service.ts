@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { GetRegistrationOptionsResponse } from '../../../api/auth/authenticator.model';
-import { StorageService } from '../browser/storage/storage.service';
+import { StorageService } from '@home/shared/browser/storage/storage.service';
 
 const bufferToBase64 = (buffer: ArrayBuffer) => btoa(String.fromCharCode(...new Uint8Array(buffer)));
 const base64ToBuffer = (base64: string) => Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
@@ -141,21 +141,25 @@ export class AuthenticationService {
    * @param credential The credential to use for authentication
    * @returns The result of the authentication
    */
-  private async doAuthentication(credential: Credential) {
+  private async doAuthentication(credential: PublicKeyCredential) {
     try {
       return await firstValueFrom(
         this.http.post(
           `/api/auth/authenticate`,
           {
             credential: {
-              rawId: bufferToBase64((credential as any).rawId),
+              rawId: bufferToBase64(credential.rawId),
               response: {
-                authenticatorData: bufferToBase64((credential as any).response.authenticatorData),
-                signature: bufferToBase64((credential as any).response.signature),
-                userHandle: bufferToBase64((credential as any).response.userHandle),
-                clientDataJSON: bufferToBase64((credential as any).response.clientDataJSON),
-                id: (credential as any).id,
-                type: (credential as any).type,
+                authenticatorData: bufferToBase64(
+                  (credential.response as AuthenticatorAssertionResponse).authenticatorData,
+                ),
+                signature: bufferToBase64((credential.response as AuthenticatorAssertionResponse).signature),
+                userHandle: bufferToBase64(
+                  (credential.response as AuthenticatorAssertionResponse).userHandle as ArrayBuffer,
+                ),
+                clientDataJSON: bufferToBase64((credential.response as AuthenticatorAssertionResponse).clientDataJSON),
+                id: credential.id,
+                type: credential.type,
               },
             },
           },

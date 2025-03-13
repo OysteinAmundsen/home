@@ -1,0 +1,38 @@
+:host {
+  container-type: size;
+  display: block;
+  min-height: 20rem;
+  min-width: 11.5rem;
+}
+header {
+  display: none;
+  @container (min-height: 23rem) {
+    display: block;
+  }
+}
+section {
+  place-items: center;
+  // view-transition-name: widget-weather-content-list;
+  .time {
+    display: flex;
+    gap: 0.5rem;
+    ::ng-deep .material-symbols-outlined {
+      color: var(--color-text-highlight);
+    }
+    .temp {
+      width: 3rem;
+      text-align: right;
+    }
+  }
+}
+footer {
+  padding-top: 0.5rem;
+  display: flex;
+  place-items: center;
+  place-content: center;
+  gap: 0.5rem;
+  time {
+    color: var(--color-text-highlight);
+    font-style: italic;
+  }
+}

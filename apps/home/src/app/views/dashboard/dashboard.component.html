@@ -8,7 +8,7 @@
 
 <section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()" class="widget-area">
   @for (widget of widgets(); track widget.id) {
-    <app-widget-loader [data]="widget"> </app-widget-loader>
+    <lib-widget-loader [data]="widget"> </lib-widget-loader>
   } @empty {
     @if (isLoading()) {
       <span class="loading">Loading...</span>

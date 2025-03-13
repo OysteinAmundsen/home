@@ -3,8 +3,8 @@ import { Component, computed, ElementRef, inject, linkedSignal, Signal, viewChil
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { map, merge } from 'rxjs';
-import { titleCase } from '../utils/string';
-import { doSafeTransition } from '../utils/transitions';
+import { titleCase } from '@home/shared/utils/string';
+import { doSafeTransition } from '@home/shared/utils/transitions';
 import { AuthenticationService } from './authentication.service';
 
 @Component({

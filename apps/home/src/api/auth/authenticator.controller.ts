@@ -25,7 +25,7 @@ export class AuthenticatorController {
     status: HttpStatus.OK,
     description: 'Registration options retreived.',
   })
-  async getRegistrationOptions(@Session() session: Record<string, any>) {
+  async getRegistrationOptions(@Session() session: Record<string, unknown>) {
     return await this.authService.getRegistrationOptions(session);
   }
 
@@ -43,7 +43,7 @@ export class AuthenticatorController {
     description: 'Failed to register.',
   })
   async register(
-    @Session() session: Record<string, any>,
+    @Session() session: Record<string, unknown>,
     @Headers() headers: Record<string, string>,
     @Body() body: RegisterRequestBody,
   ) {
@@ -65,7 +65,7 @@ export class AuthenticatorController {
     status: HttpStatus.OK,
     description: 'Authentication options retreived.',
   })
-  async getAuthenticationOptions(@Session() session: Record<string, any>) {
+  async getAuthenticationOptions(@Session() session: Record<string, unknown>) {
     return await this.authService.getAuthenticationOptions(session);
   }
 
@@ -82,7 +82,7 @@ export class AuthenticatorController {
     description: 'Failed to authenticate.',
   })
   async authenticate(
-    @Session() session: Record<string, any>,
+    @Session() session: Record<string, unknown>,
     @Headers() headers: Record<string, string>,
     @Body() body: any,
   ) {

@@ -90,7 +90,7 @@ export class AuthenticatorService {
    *
    * @returns
    */
-  async getAuthenticationOptions(session: Record<string, any>) {
+  async getAuthenticationOptions(session: Record<string, unknown>) {
     const authnOptions = await this.fido.assertionOptions();
     const authOptions = Object.assign(authnOptions, {
       challenge: Buffer.from(authnOptions.challenge),

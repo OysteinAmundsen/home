@@ -56,19 +56,10 @@
     }
   },
   "plugins": [
-    // {
-    //   "plugin": "@nx/cypress/plugin",
-    //   "options": {
-    //     "targetName": "e2e",
-    //     "openTargetName": "open-cypress",
-    //     "componentTestingTargetName": "component-test",
-    //     "ciTargetName": "e2e-ci"
-    //   }
-    // },
     {
       "plugin": "@nx/eslint/plugin",
       "options": {
-        "targetName": "lint"
+        "targetName": "eslint:lint"
       }
     }
   ],
@@ -78,6 +69,13 @@
       "linter": "eslint",
       "style": "scss",
       "unitTestRunner": "jest"
+    },
+    "@nx/angular:library": {
+      "linter": "eslint",
+      "unitTestRunner": "jest"
+    },
+    "@nx/angular:component": {
+      "style": "scss"
     }
   },
   "nxCloudId": "678928b429932a38067f1fdd",

@@ -6,6 +6,7 @@ import { googleFontsCache } from 'workbox-recipes';
 import { registerRoute, setDefaultHandler } from 'workbox-routing';
 import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const self: ServiceWorkerGlobalScope | any;
 const prefix = 'home';
 const version = 'v1';

@@ -13,7 +13,7 @@ export const proxyRoutes: Record<string, Options> = {
     target: 'https://picsum.photos',
     changeOrigin: true,
     followRedirects: true,
-    pathRewrite: (path: string, req: any) => {
+    pathRewrite: () => {
       const now = new Date();
       const seed = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
       return `/seed/${seed}/1920/1080?grayscale&blur=8`;

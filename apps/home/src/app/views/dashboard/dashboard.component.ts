@@ -2,11 +2,11 @@ import { trigger } from '@angular/animations';
 import { afterNextRender, AfterViewInit, Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router } from '@angular/router';
+import { StringPipe } from '@home/shared/pipes/string.pipe';
+import { doSafeTransition } from '@home/shared/utils/transitions';
+import { WidgetLoaderComponent } from '@home/shared/widget/widget-loader.component';
+import { Widget, WidgetService } from '@home/shared/widget/widget.service';
 import { filter } from 'rxjs';
-import { StringPipe } from '../../shared/pipes/string.pipe';
-import { doSafeTransition } from '../../shared/utils/transitions';
-import { WidgetLoaderComponent } from '../../shared/widget/widget-loader.component';
-import { Widget, WidgetService } from '../../shared/widget/widget.service';
 import { dashboardAnimation } from './dashboard.animation';
 
 /**

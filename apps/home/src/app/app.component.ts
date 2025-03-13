@@ -2,12 +2,12 @@ import { trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, computed, ElementRef, HostListener, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AppSettingsService } from './app.settings';
+import { AppSettingsService } from '@home/shared/app.settings';
+import { ConnectivityService } from '@home/shared/browser/connectivity/connectivity.service';
+import { ThemeComponent } from '@home/shared/browser/theme/theme.component';
+import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
 import { AuthenticationService } from './shared/auth/authentication.service';
 import { LoginComponent } from './shared/auth/login.component';
-import { ConnectivityService } from './shared/browser/connectivity/connectivity.service';
-import { ThemeComponent } from './shared/browser/theme/theme.component';
-import { VisibilityService } from './shared/browser/visibility/visibility.service';
 import { TimeComponent } from './shared/time.component';
 import { dashboardAnimation } from './views/dashboard/dashboard.animation';
 

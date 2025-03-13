@@ -1,0 +1,21 @@
+<lib-widget [host]="host()">
+  @if (weather.isLoading()) {
+    <section>Loading...</section>
+  } @else if (weather.error()) {
+    <section>{{ weather.error() }}</section>
+  } @else if (weather.value()) {
+    <section [attr.style]="'view-transition-name: ' + widgetId() + '-content-list'">
+      @for (time of todaysWeather(); track time.time) {
+        <div class="time">
+          <time>{{ time.time | date: 'HH:mm' }}</time>
+          <span [outerHTML]="time.data.next_1_hours.summary.symbol_code | icon"> </span>
+          <span class="temp">{{ time.data.instant.details.air_temperature | number: '1.1' }}°C</span>
+        </div>
+      }
+    </section>
+    <footer [attr.style]="'view-transition-name: ' + widgetId() + '-footer'">
+      <span class="material-symbols-outlined">update</span>
+      <time>{{ lastUpdated() | date: 'dd.MM.yyyy HH:mm' }}</time>
+    </footer>
+  }
+</lib-widget>
