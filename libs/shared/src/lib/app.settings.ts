@@ -18,4 +18,11 @@ export class AppSettingsService {
    * debugging reasons.
    */
   pauseOnInactive = signal(true);
+
+  /**
+   * Relevant instrument_id's from nordnet catalogue.
+   *
+   * These are the funds I'm interested in following.
+   */
+  watchInstruments = signal<number[]>([16802428, 16801174, 16801692, 18282786]);
 }

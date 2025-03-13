@@ -1,1 +1,3 @@
-<lib-widget [host]="host()"> Fond </lib-widget>
+<lib-widget [host]="host()">
+  <canvas #graph [libResize]="'auto'" (resized)="onResize($event)"></canvas>
+</lib-widget>
