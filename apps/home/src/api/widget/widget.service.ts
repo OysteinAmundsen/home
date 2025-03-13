@@ -18,13 +18,13 @@ export class WidgetService {
   getAvailableTags(): string[] {
     return Array.from(
       this.widgetStore.reduce((acc, curr) => {
-        curr.tags.forEach((tag: string) => acc.add(tag));
+        curr.tags.forEach((tag: string) => acc.add(tag.toLowerCase()));
         return acc;
       }, new Set<string>()),
     );
   }
 
   getWidgetsByTag(tag: string) {
-    return this.widgetStore.filter((w) => w.tags.includes(tag));
+    return this.widgetStore.filter((w) => w.tags.map((t: string) => t.toLowerCase()).includes(tag.toLowerCase()));
   }
 }

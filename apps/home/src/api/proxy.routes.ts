@@ -18,25 +18,22 @@ export const proxyRoutes: Record<string, Options> = {
       const seed = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
       return `/seed/${seed}/1920/1080?grayscale&blur=8`;
     },
-    // on: {
-    //   // This api returns a 302 redirect to the actual image
-    //   // We do not want to allow our client to follow a redirect,
-    //   // it is much cleaner if this is handled by the server
-    //   proxyRes: async (proxyRes, req, res) => {
-    //     if (res.statusCode === 302 && res.headers.location) {
-    //       try {
-    //         const redirectUrl = proxyRes.headers.location;
-    //         const response = await fetch(redirectUrl);
-    //         const content = await response.arrayBuffer();
-    //         res.writeHead(200, 'OK', {'content-type'});
-    //         res.end(content);
-    //       } catch (error) {
-    //         res.writeHead(500);
-    //         res.end('Error fetching redirected content');
-    //       }
-    //     }
-    //   },
-    // },
     logger: console,
+  },
+  '/api/fund': {
+    target: 'https://www.nordnet.no',
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/fund': '/api/2',
+    },
+    logger: console,
+    on: {
+      proxyReq: (proxyReq, req) => {
+        proxyReq.setHeader('client-id', 'NEXT');
+      },
+      error: (error, req, res) => {
+        res.end('Something went wrong. And we are reporting a custom error message.');
+      },
+    },
   },
 };

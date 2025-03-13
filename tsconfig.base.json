@@ -21,10 +21,11 @@
       "@home/builder": ["tools/builder/src/index.ts"],
       "@home/shared": ["libs/shared/src/index.ts"],
       "@home/shared/*": ["libs/shared/src/lib/*"],
+      "@home/widgets/*": ["libs/widget/*"],
       "@home/widgets/pyramid": ["libs/widget/pyramid/src/index.ts"],
       "@home/widgets/starfield": ["libs/widget/starfield/src/index.ts"],
       "@home/widgets/weather": ["libs/widget/weather/src/index.ts"],
-      "@home/widgets/*": ["libs/widget/*"]
+      "@home/widgets/fund": ["libs/widget/fund/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
