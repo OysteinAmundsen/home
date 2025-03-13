@@ -1,3 +1,3 @@
-import PyramidComponent from './lib/pyramid/pyramid.component';
+import PyramidComponent from './lib/pyramid.component';
 
 export default PyramidComponent;

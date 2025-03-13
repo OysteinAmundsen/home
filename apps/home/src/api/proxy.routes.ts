@@ -1,12 +1,11 @@
+import { NextFunction, Request, Response } from 'express';
 import { Options } from 'http-proxy-middleware';
 
 export const proxyRoutes: Record<string, Options> = {
   '/api/weather': {
     target: 'https://api.met.no',
     changeOrigin: true,
-    pathRewrite: {
-      '^/api/weather': '/weatherapi/locationforecast/2.0/compact',
-    },
+    pathRewrite: (path, req) => '/weatherapi/locationforecast/2.0/compact' + path.replace(/^\/api\/weather/, ''),
     logger: console,
   },
   '/api/background': {
@@ -18,25 +17,32 @@ export const proxyRoutes: Record<string, Options> = {
       const seed = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
       return `/seed/${seed}/1920/1080?grayscale&blur=8`;
     },
-    // on: {
-    //   // This api returns a 302 redirect to the actual image
-    //   // We do not want to allow our client to follow a redirect,
-    //   // it is much cleaner if this is handled by the server
-    //   proxyRes: async (proxyRes, req, res) => {
-    //     if (res.statusCode === 302 && res.headers.location) {
-    //       try {
-    //         const redirectUrl = proxyRes.headers.location;
-    //         const response = await fetch(redirectUrl);
-    //         const content = await response.arrayBuffer();
-    //         res.writeHead(200, 'OK', {'content-type'});
-    //         res.end(content);
-    //       } catch (error) {
-    //         res.writeHead(500);
-    //         res.end('Error fetching redirected content');
-    //       }
-    //     }
-    //   },
-    // },
+    logger: console,
+  },
+  '/api/fund/instrument_search': {
+    target: 'https://public.nordnet.no',
+    changeOrigin: true,
+    followRedirects: true,
+    pathRewrite: (path, req) => '/api/2/instrument_search' + path.replace(/^\/api\/fund\/instrument_search/, ''),
+    headers: {
+      'client-id': 'NEXT',
+    },
+    logger: console,
+  },
+  '/api/fund/market-data': {
+    target: 'https://api.prod.nntech.io',
+    changeOrigin: true,
+    followRedirects: true,
+    pathRewrite: (path, req) => '/market-data' + path.replace(/^\/api\/fund\/market-data/, ''),
+    headers: {
+      'x-locale': 'ng-NO',
+    },
     logger: console,
   },
 };
+
+// Middleware to log all incoming requests
+export function logRequests(req: Request, res: Response, next: NextFunction) {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+}

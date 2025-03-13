@@ -19,9 +19,9 @@ import { WidgetService } from './widget.service';
 
     @if (route().length > 0) {
       <header [attr.style]="'view-transition-name: ' + widgetId() + '-header'" class="widget-header">
-        <h2 [attr.style]="'view-transition-name: ' + widgetId() + '-header-text'">{{ data()?.name }}</h2>
+        <h2 [attr.style]="'view-transition-name: ' + widgetId() + '-header-text'">{{ data().name }}</h2>
         @if (!isFullscreen()) {
-          <a [routerLink]="route()" [title]="'Open ' + data()?.name + ' in fullscreen mode'">
+          <a [routerLink]="route()" [title]="'Open ' + data().name + ' in fullscreen mode'">
             <span
               class="material-symbols-outlined"
               [attr.style]="'view-transition-name: ' + widgetId() + '-header-icon'"

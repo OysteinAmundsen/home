@@ -13,12 +13,17 @@ export const widgetRoutes: Route[] = [
   },
   {
     path: 'starfield',
-    data: { widget: true, tags: ['graphics'] },
+    data: { widget: true, tags: ['graphics', 'canvas2D'] },
     loadComponent: () => import('@home/widgets/starfield').then((m) => m.default),
   },
   {
     path: 'pyramid',
-    data: { widget: true, tags: ['graphics'] },
+    data: { widget: true, tags: ['graphics', 'webGPU'] },
     loadComponent: () => import('@home/widgets/pyramid').then((m) => m.default),
+  },
+  {
+    path: 'fund',
+    data: { widget: true, tags: ['integrations', 'finance'] },
+    loadComponent: () => import('@home/widgets/fund').then((m) => m.default),
   },
 ];

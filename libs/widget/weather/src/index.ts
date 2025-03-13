@@ -1,2 +1,2 @@
-import WeatherComponent from './lib/weather/weather.component';
+import WeatherComponent from './lib/weather.component';
 export default WeatherComponent;

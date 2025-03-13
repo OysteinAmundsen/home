@@ -12,7 +12,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ApiModule } from './src/api/api.module';
-import { proxyRoutes } from './src/api/proxy.routes';
+import { logRequests, proxyRoutes } from './src/api/proxy.routes';
 
 export async function bootstrap() {
   // Create the NestJS application
@@ -33,8 +33,13 @@ export async function bootstrap() {
     }),
   );
 
+  // Use the logRequests middleware
+  server.use(logRequests);
+
   // Setup reverse proxy routes
-  Object.entries(proxyRoutes).forEach(([path, config]) => server.get(path, createProxyMiddleware(config)));
+  Object.entries(proxyRoutes).forEach(([path, config]) => {
+    server.use(path, createProxyMiddleware(config));
+  });
 
   // Serve static files from the browser distribution folder
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
@@ -60,15 +65,7 @@ export async function bootstrap() {
       .then((response) => {
         // If the Angular app returned a response, write it to the Express response
         if (response) {
-          const n = writeResponseToNodeResponse(response, res);
-          console.log(
-            '[SSR]',
-            req.method,
-            req.url,
-            // req.headers.cookie,
-            response.status,
-          );
-          return n;
+          return writeResponseToNodeResponse(response, res);
         }
         // If not, this is not an Angular route, so continue to the next middleware
         return next();
