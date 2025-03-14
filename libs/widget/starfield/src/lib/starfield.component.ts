@@ -127,7 +127,9 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
         ctx.translate(-centerX, -centerY);
       }
     }
-    this.animationFrame = requestAnimationFrame(() => this.animate());
+    if (isPlatformBrowser(this.platformId)) {
+      this.animationFrame = requestAnimationFrame(() => this.animate());
+    }
   }
 
   pause() {

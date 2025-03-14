@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, ElementRef, inject, linkedSignal, Signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { map, merge } from 'rxjs';
 import { titleCase } from '@home/shared/utils/string';
 import { doSafeTransition } from '@home/shared/utils/transitions';
+import { map, merge } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 
 @Component({
@@ -49,7 +49,7 @@ import { AuthenticationService } from './authentication.service';
           <input type="text" formControlName="displayName" [attr.placeholder]="displayName()" />
         </div>
         <footer>
-          <button type="submit" [disabled]="isInvalid()">Register</button>
+          <button type="submit" class="primary" [disabled]="isInvalid()">Register</button>
           <button type="button" class="flat" (click)="closeDialog()">Cancel</button>
         </footer>
       </form>
