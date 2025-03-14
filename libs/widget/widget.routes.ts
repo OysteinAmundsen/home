@@ -26,4 +26,9 @@ export const widgetRoutes: Route[] = [
     data: { widget: true, tags: ['graphics', 'webGPU'] },
     loadComponent: () => import('@home/widgets/pyramid').then((m) => m.default),
   },
+  {
+    path: 'space-invaders',
+    data: { widget: true, tags: ['game'] },
+    loadComponent: () => import('@home/widgets/space-invaders').then((m) => m.default),
+  },
 ];

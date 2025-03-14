@@ -1,0 +1,5 @@
+<lib-widget [host]="host()">
+  <div class="game-container">
+    <canvas #gameCanvas [libResize]="'auto'" (resized)="onResize($event)"></canvas>
+  </div>
+</lib-widget>
