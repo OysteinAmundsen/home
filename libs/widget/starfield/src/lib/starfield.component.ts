@@ -15,6 +15,7 @@ import { AppSettingsService } from '@home/shared/app.settings';
 import { ResizeDirective } from '@home/shared/browser/resize/resize.directive';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
 import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
+import { getComputedStyle } from '@home/shared/utils/color';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -81,7 +82,7 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
 
     this.theme.selectedTheme$
       .pipe(takeUntilDestroyed(this.destroyRef$), debounceTime(200), distinctUntilChanged())
-      .subscribe(() => this.color.set(this.computedColor()));
+      .subscribe(() => this.color.set(getComputedStyle(this.el.nativeElement, '--color-text')));
 
     // Initialize
     if (this.settings.pauseOnInactive()) {
@@ -102,16 +103,6 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
     for (const star of this.stars()) {
       star.canvasChanged();
     }
-  }
-
-  private computedColor() {
-    const tmp = this.doc.createElement('div');
-    tmp.style.cssText = 'color: var(--color-text)';
-    this.doc.body.appendChild(tmp);
-    const window = globalThis.window || this.doc.defaultView;
-    const currentColor = window.getComputedStyle(tmp).color;
-    this.doc.body.removeChild(tmp);
-    return currentColor;
   }
 
   // Animation loop

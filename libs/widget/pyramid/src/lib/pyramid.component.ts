@@ -1,7 +1,20 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Component, computed, effect, ElementRef, inject, OnDestroy, signal, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  OnDestroy,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AppSettingsService } from '@home/shared/app.settings';
 import { ResizeDirective } from '@home/shared/browser/resize/resize.directive';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
+import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
 import { premultiplyAlpha, setAlpha } from '@home/shared/utils/color';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
@@ -19,10 +32,12 @@ import pyramidShader from './shaders/pyramid.wgsl';
   templateUrl: './pyramid.component.html',
   styleUrl: './pyramid.component.scss',
 })
-export default class PyramidComponent extends AbstractWidgetComponent implements OnDestroy {
-  private readonly el = inject(ElementRef);
+export default class PyramidComponent extends AbstractWidgetComponent implements AfterViewInit, OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly theme = inject(ThemeService);
+  private readonly visibility = inject(VisibilityService);
+  private readonly settings = inject(AppSettingsService);
+
   id = signal('pyramid');
 
   canvas = viewChild<ElementRef<HTMLCanvasElement>>('playfield');
@@ -42,12 +57,12 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
 
   onResize(size: DOMRect) {
     this.rect.set(size);
-    this.render();
+    this.animate();
   }
   onThemeChanged = effect(() => {
     const theme = this.theme.selectedTheme();
     if (!this.animationFrame) {
-      this.render();
+      this.animate();
     }
   });
 
@@ -60,6 +75,21 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
   isInitialized = false;
   isInitializing = false;
   animationFrame: number | undefined;
+
+  ngAfterViewInit(): void {
+    // Initialize
+    if (this.settings.pauseOnInactive()) {
+      this.visibility.browserActive$.pipe(takeUntilDestroyed(this.destroyRef$)).subscribe((active) => {
+        if (active) {
+          this.animate();
+        } else {
+          this.pause();
+        }
+      });
+    } else {
+      this.animate();
+    }
+  }
 
   /**
    * Configure the rendering context
@@ -184,7 +214,7 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
     return true;
   }
 
-  async render(time = 1) {
+  async animate(time = 1) {
     time *= 0.001;
 
     // Die if we are not running in the browser or we are still initializing
@@ -247,10 +277,14 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
       this.device.queue.submit([commandBuffer]);
 
       // request the next frame
-      this.animationFrame = requestAnimationFrame(this.render.bind(this));
+      this.animationFrame = requestAnimationFrame(this.animate.bind(this));
     } catch (error) {
       console.error(error);
     }
+  }
+
+  pause() {
+    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
   }
 
   createProjectionMatrix() {

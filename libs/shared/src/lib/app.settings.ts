@@ -9,15 +9,15 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class AppSettingsService {
   /** Got tired of the background animation, so this is a switch to turn it off */
-  animateBackground = signal(false);
+  animateBackground = signal(true);
 
   /**
-   * Toggle to pause the background animation when the window is inactive
+   * Toggle to pause the animations when the window is inactive
    *
    * This is useful for performance reasons, but also useful to turn off for
    * debugging reasons.
    */
-  pauseOnInactive = signal(true);
+  pauseOnInactive = signal(false);
 
   /**
    * Relevant instrument_id's from nordnet catalogue.
