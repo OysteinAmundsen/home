@@ -1,4 +1,4 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Component, effect, inject, linkedSignal, OnInit, signal } from '@angular/core';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
@@ -7,14 +7,17 @@ import * as echarts from 'echarts/core';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 
 import { LineChart } from 'echarts/charts';
-import { GridComponent, LegendComponent } from 'echarts/components';
+import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 
+import { ThemeService } from '@home/shared/browser/theme/theme.service';
+import { getComputedStyle, setAlpha } from '@home/shared/utils/color';
+import { deepMerge } from '@home/shared/utils/object';
 import { firstValueFrom } from 'rxjs';
 import { FundService } from './fund.service';
 
 if (typeof window !== 'undefined') {
-  echarts.use([LineChart, GridComponent, LegendComponent, CanvasRenderer]);
+  echarts.use([LineChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
 }
 
 @Component({
@@ -26,19 +29,30 @@ if (typeof window !== 'undefined') {
 })
 export default class FundComponent extends AbstractWidgetComponent implements OnInit {
   private readonly fundService = inject(FundService);
+  private readonly theme = inject(ThemeService);
+  private readonly document = inject(DOCUMENT);
 
   override id = signal('fund');
-  instruments = signal<any[]>([]);
-  canRender = linkedSignal(() => isPlatformBrowser(this.platformId));
-  api = signal<echarts.ECharts | undefined>(undefined);
 
+  // Got in trouble when rendering through SSR, so skip it when not in browser
+  canRender = linkedSignal(() => isPlatformBrowser(this.platformId));
+
+  // The chart API
+  api = signal<echarts.ECharts | undefined>(undefined);
+  // The chart options
   chartOption = signal<echarts.EChartsCoreOption>({
     grid: {
-      top: '30',
-      left: '0',
-      right: '0',
-      bottom: '0',
+      top: 30,
+      left: 0,
+      right: 0,
+      bottom: 0,
       containLabel: true,
+    },
+    legend: {
+      bottom: 0,
+      textStyle: {
+        color: 'var(--color-text)',
+      },
     },
     xAxis: {
       type: 'time',
@@ -47,18 +61,45 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       type: 'value',
       name: 'NOK',
     },
+    tooltip: {
+      trigger: 'axis',
+    },
   });
-
-  onDataChanged = effect(() => {
-    const api = this.api();
-    const options = this.chartOption();
-    if (api && options) {
-      api.setOption(options);
-    }
+  // Update chart when options change
+  onDataChanged = effect(() => this.api()?.setOption(this.chartOption()));
+  // Set dark mode in chart options when theme changes
+  onThemeChanged = effect(() => {
+    const theme = this.theme.selectedTheme();
+    const s = getComputedStyle(this.document.body, '--animation-duration', 'duration');
+    const duration = parseFloat(s) * (/\ds$/.test(s) ? 1000 : 1);
+    setTimeout(() => {
+      this.chartOption.update((original) => {
+        const legendColor = getComputedStyle(this.document.body, 'color');
+        const axisColor = legendColor ? setAlpha(legendColor, 0.5) : legendColor;
+        const splitColor = legendColor ? setAlpha(legendColor, 0.1) : legendColor;
+        const newOptions = deepMerge(original, {
+          darkMode: theme === 'dark',
+          legend: { textStyle: { color: legendColor } },
+          xAxis: {
+            axisLabel: { color: axisColor },
+          },
+          yAxis: {
+            axisLabel: { color: axisColor },
+            axisLine: { lineStyle: { color: axisColor } },
+            splitLine: { lineStyle: { color: splitColor } },
+          },
+          tooltip: {
+            show: this.isFullscreen(),
+          },
+        });
+        return { ...newOptions };
+      });
+    }, duration);
   });
 
   async ngOnInit() {
     try {
+      // Load instrument data
       const data = await firstValueFrom(this.fundService.getFundData());
 
       // For each instrument, fetch price time series
@@ -69,19 +110,26 @@ export default class FundComponent extends AbstractWidgetComponent implements On
         }),
       );
 
-      const options = {
-        ...(this.isFullscreen()
-          ? {
-              legend: { data: data.map((item: any) => item.instrument_info.long_name) },
-            }
-          : {}),
-        series: data.map((item: any) => ({
-          name: item.instrument_info.long_name,
-          type: 'line',
-          data: item.timeSeries.pricePoints.map((p: any) => [p.timeStamp, p.value]),
-        })),
-      };
-      this.chartOption.update((original) => ({ ...original, ...options }));
+      // Map data to chart options
+      this.chartOption.update((original) => {
+        const newOptions = deepMerge(original, {
+          grid: {
+            bottom: this.isFullscreen() ? 40 : 0,
+          },
+          legend: {
+            data: data.map((item: any) => item.instrument_info.long_name),
+            show: this.isFullscreen(),
+          },
+          series: data.map((item: any) => ({
+            name: item.instrument_info.long_name,
+            type: 'line',
+            smooth: true,
+            data: item.timeSeries.pricePoints.map((p: any) => [p.timeStamp, p.value]),
+          })),
+        });
+        // Must return a new object to trigger change detection
+        return { ...newOptions };
+      });
     } catch (error) {
       console.error('Error fetching fund data', error);
     }

@@ -283,6 +283,8 @@ function luminance(r: number, g: number, b: number): number {
  *
  * Useful for retreiving calculated css variables.
  *
+ * NOTE: Do not use this in SSR environments. It heavily relies on the DOM.
+ *
  * @example
  * ```ts
  * getComputedStyle(document.body, 'background-color'); // => 'rgb(255, 255, 255)'
@@ -291,9 +293,26 @@ function luminance(r: number, g: number, b: number): number {
  * @param property the css property to get
  * @returns the computed css property
  */
-export function getComputedStyle(element: HTMLElement, property: string): string {
-  const window = globalThis.window || element.ownerDocument.defaultView;
-  return window.getComputedStyle(element).getPropertyValue(property);
+export function getComputedStyle(element: HTMLElement, property: string, type = 'color'): string {
+  try {
+    const document = element.ownerDocument;
+    const window = document.defaultView;
+    if (!window) throw new Error('Window not found');
+
+    if (property.startsWith('--') && type === 'color') {
+      // Get computed color from css variable
+      const tmp = document.createElement('div');
+      tmp.style.setProperty(type, `var(${property})`);
+      document.body.appendChild(tmp);
+      const style = window.getComputedStyle(tmp).getPropertyValue(type);
+      document.body.removeChild(tmp);
+      return style;
+    }
+    return window.getComputedStyle(element).getPropertyValue(property);
+  } catch (error) {
+    console.error('Error getting computed style', error);
+    return '';
+  }
 }
 
 // --------------------------------------------------------------------

@@ -1,8 +1,21 @@
-.chart {
-  display: block;
-  min-width: 300px;
-  width: 100%;
-  height: 100%;
-  max-width: 100vw;
-  max-height: 100vh;
+:host {
+  &.fullscreen {
+    ::ng-deep .widget-content {
+      display: grid;
+      grid-template:
+        'fund-chart' 1fr
+        'fund-content' 1fr / 1fr;
+    }
+  }
+  .chart {
+    grid-area: fund-chart;
+    display: block;
+    min-width: 300px;
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
+  }
+  section {
+    grid-area: fund-content;
+  }
 }

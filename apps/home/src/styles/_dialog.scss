@@ -17,7 +17,6 @@
 }
 
 dialog {
-  --animation-time: 0.25s;
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   background-color: var(--color-background);
@@ -28,10 +27,10 @@ dialog {
   inset: 0;
 
   &[open] {
-    animation: fly-in var(--animation-time) ease-in-out;
+    animation: fly-in var(--animation-duration) ease-in-out;
   }
   &:not([open]) {
-    animation: fly-out var(--animation-time) ease-in-out;
+    animation: fly-out var(--animation-duration) ease-in-out;
   }
 
   &::backdrop {
@@ -41,7 +40,7 @@ dialog {
       var(--vignette-color, var(--color-background)) 100%
     );
     backdrop-filter: blur(2px);
-    transition: opacity var(--animation-time) ease-in-out;
+    transition: opacity var(--animation-duration) ease-in-out;
     opacity: 1;
 
     @starting-style {

@@ -92,9 +92,9 @@
     @layer widget {
       transition-behavior: allow-discrete;
       transition:
-        opacity 0.25s ease-in,
-        scale 0.25s ease-in,
-        display 0.25s ease-in;
+        opacity var(--animation-duration) ease-in,
+        scale var(--animation-duration) ease-in,
+        display var(--animation-duration) ease-in;
 
       // Enter animation
       @starting-style {
@@ -114,12 +114,12 @@
         font-size: inherit;
         font-weight: normal;
         margin: 0;
-        transition: opacity 0.25s ease-in;
+        transition: opacity var(--animation-duration) ease-in;
         opacity: 0.6;
       }
       a {
         opacity: 0;
-        transition: opacity 0.25s ease-in;
+        transition: opacity var(--animation-duration) ease-in;
       }
     }
     &:hover > header {

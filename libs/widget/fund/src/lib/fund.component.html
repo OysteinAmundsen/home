@@ -2,4 +2,7 @@
   @if (canRender()) {
     <div echarts [options]="chartOption()" [autoResize]="true" class="chart" (chartInit)="onChartInit($event)"></div>
   }
+  @if (isFullscreen()) {
+    <section>Can has fullscreen content?</section>
+  }
 </lib-widget>
