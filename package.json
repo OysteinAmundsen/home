@@ -47,6 +47,7 @@
     "base64url": "^3.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "date-fns": "^4.1.0",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "fido2-lib": "^3.5.3",

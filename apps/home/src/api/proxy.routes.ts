@@ -1,12 +1,12 @@
-import { NextFunction, Request, Response } from 'express';
 import { Options } from 'http-proxy-middleware';
+import { requestLogger } from './logger';
 
 export const proxyRoutes: Record<string, Options> = {
   '/api/weather': {
     target: 'https://api.met.no',
     changeOrigin: true,
     pathRewrite: (path, req) => '/weatherapi/locationforecast/2.0/compact' + path.replace(/^\/api\/weather/, ''),
-    logger: console,
+    plugins: [requestLogger],
   },
   '/api/background': {
     target: 'https://picsum.photos',
@@ -17,7 +17,7 @@ export const proxyRoutes: Record<string, Options> = {
       const seed = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
       return `/seed/${seed}/1920/1080?grayscale&blur=8`;
     },
-    logger: console,
+    plugins: [requestLogger],
   },
   '/api/fund/instrument_search': {
     target: 'https://public.nordnet.no',
@@ -27,7 +27,7 @@ export const proxyRoutes: Record<string, Options> = {
     headers: {
       'client-id': 'NEXT',
     },
-    logger: console,
+    plugins: [requestLogger],
   },
   '/api/fund/market-data': {
     target: 'https://api.prod.nntech.io',
@@ -37,12 +37,6 @@ export const proxyRoutes: Record<string, Options> = {
     headers: {
       'x-locale': 'ng-NO',
     },
-    logger: console,
+    plugins: [requestLogger],
   },
 };
-
-// Middleware to log all incoming requests
-export function logRequests(req: Request, res: Response, next: NextFunction) {
-  console.log(`Incoming request: ${req.method} ${req.url}`);
-  next();
-}

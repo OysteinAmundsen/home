@@ -6,13 +6,14 @@ import {
 } from '@angular/ssr/node';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ApiModule } from './src/api/api.module';
-import { logRequests, proxyRoutes } from './src/api/proxy.routes';
+import { logger } from './src/api/logger';
+import { proxyRoutes } from './src/api/proxy.routes';
 
 export async function bootstrap() {
   // Create the NestJS application
@@ -33,8 +34,11 @@ export async function bootstrap() {
     }),
   );
 
-  // Use the logRequests middleware
-  server.use(logRequests);
+  // Middleware to log all incoming requests
+  server.use((req: Request, res: Response, next: NextFunction) => {
+    logger('Expr', `${req.method}`, `${req.url}`);
+    next();
+  });
 
   // Setup reverse proxy routes
   Object.entries(proxyRoutes).forEach(([path, config]) => {
