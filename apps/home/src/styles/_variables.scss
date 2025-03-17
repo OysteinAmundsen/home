@@ -10,7 +10,7 @@
   --color-background-button: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 24%));
   --color-border: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 30%));
   --color-border-focused: light-dark(hsl(0, 0%, 29%), hsl(0, 0%, 63%));
-  --color-shadow: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 4%));
+  --color-shadow: light-dark(hsla(0, 0%, 20%, 55%), hsl(0, 0%, 4%));
 
   // Theme colors
   --color-primary: light-dark(hsl(200, 100%, 50%), hsl(210, 100%, 30%));
@@ -49,7 +49,7 @@ html {
     // Special overrides for light mode
     --text-shadow:
       0 0 0px rgba(0, 0, 0, 1),
-      0 0 1px rgba(0, 0, 0, 1),
+      0 0 1px rgb(255 255 255),
       0 0 2px rgb(255 255 255),
       0 0 2px rgb(255 255 255),
       0 0 16px rgb(255 255 255),

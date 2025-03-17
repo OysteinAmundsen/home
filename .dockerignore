@@ -15,5 +15,5 @@ helm-charts
 .angular
 .nx
 tmp
-dist
+# dist # Because of build issues, we are including the locally built dist folder in the repository
 coverage*

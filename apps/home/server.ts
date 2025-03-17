@@ -34,15 +34,15 @@ export async function bootstrap() {
     }),
   );
 
-  // Middleware to log all incoming requests
-  server.use((req: Request, res: Response, next: NextFunction) => {
-    logger('Expr', `${req.method}`, `${req.url}`);
-    next();
-  });
-
   // Setup reverse proxy routes
   Object.entries(proxyRoutes).forEach(([path, config]) => {
     server.use(path, createProxyMiddleware(config));
+  });
+
+  // Middleware to log all incoming requests (except proxy requests which has its own logger)
+  server.use((req: Request, res: Response, next: NextFunction) => {
+    logger('Expr', `${req.method}`, `${req.url}`);
+    next();
   });
 
   // Serve static files from the browser distribution folder

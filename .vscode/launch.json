@@ -15,6 +15,13 @@
         "${workspaceFolder}/node_modules/**/*.*",
         "node_modules/**/*.js"
       ]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach NestJS WS",
+      "port": 9229,
+      "restart": true
     }
   ]
 }
