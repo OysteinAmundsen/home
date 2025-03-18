@@ -19,6 +19,4 @@ import { PopoverComponent } from './popover.component';
 })
 export class PopoverToggleComponent {
   popoverPanel = input<PopoverComponent>();
-
-  isOpen = computed(() => this.popoverPanel()?.isOpen() ?? false);
 }
