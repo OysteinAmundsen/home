@@ -80,6 +80,9 @@
         hsla(from var(--color-background) h s l / 80%) 40%,
         hsla(from var(--color-background) h s l / 95%) 60%
       );
+      > .widget-header {
+        padding-top: 0;
+      }
     }
   }
 

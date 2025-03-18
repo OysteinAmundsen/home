@@ -1,0 +1,20 @@
+<header>App settings</header>
+<form [formGroup]="form">
+  @for (prop of props; track prop.name) {
+    <div class="form-field">
+      <label [for]="prop.name">{{ prop.name | string: 'titleCase' }}</label>
+      <!-- https://github.com/angular/angular/issues/60435 -->
+      @switch (prop.type) {
+        @case ('checkbox') {
+          <input type="checkbox" [name]="prop.name" formControlName="{{ prop.name }}" />
+        }
+        @case ('number') {
+          <input type="number" [name]="prop.name" formControlName="{{ prop.name }}" />
+        }
+        @default {
+          <input [type]="prop.type" [name]="prop.name" formControlName="{{ prop.name }}" />
+        }
+      }
+    </div>
+  }
+</form>

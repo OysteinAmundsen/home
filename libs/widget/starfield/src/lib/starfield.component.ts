@@ -63,6 +63,11 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
   });
 
   animationFrame: number | undefined;
+  isPaused = computed(() => {
+    const isActive = this.visibility.isBrowserActive();
+    const shouldPause = this.settings.pauseOnInactive();
+    return shouldPause && !isActive;
+  });
 
   ngAfterViewInit() {
     if (this.canvas() == null) return;
@@ -85,17 +90,14 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
       .subscribe(() => this.color.set(getComputedStyle(this.el.nativeElement, '--color-text')));
 
     // Initialize
-    if (this.settings.pauseOnInactive()) {
-      this.visibility.browserActive$.pipe(takeUntilDestroyed(this.destroyRef$)).subscribe((active) => {
-        if (active) {
-          this.animate();
-        } else {
-          this.pause();
-        }
-      });
-    } else {
-      this.animate();
-    }
+    this.visibility.browserActive$.pipe(takeUntilDestroyed(this.destroyRef$)).subscribe((active) => {
+      if (active && !this.animationFrame) {
+        this.animate();
+      } else if (this.isPaused()) {
+        this.pause();
+      }
+    });
+    this.animate();
   }
 
   onResize(size: DOMRect) {
@@ -108,6 +110,8 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
   // Animation loop
   animate() {
     // Update canvas size
+    if (this.isPaused()) return;
+
     const width = this.width();
     const height = this.height();
     const stars = this.stars();
@@ -134,7 +138,7 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
 
   pause() {
     // If browser tab is inactive, pause the animation
-    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+    this.cancelAnimationFrame();
 
     // Draw the pause state
     const width = this.width();
@@ -165,7 +169,14 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
     }
   }
 
+  private cancelAnimationFrame() {
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = undefined;
+    }
+  }
+
   ngOnDestroy(): void {
-    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+    this.cancelAnimationFrame();
   }
 }

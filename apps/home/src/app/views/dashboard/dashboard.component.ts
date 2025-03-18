@@ -4,6 +4,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router } from '@angular/router';
 import { StringPipe } from '@home/shared/pipes/string.pipe';
 import { doSafeTransition } from '@home/shared/utils/transitions';
+import { PopoverToggleComponent } from '@home/shared/ux/popover/popover-toggle.component';
+import { PopoverComponent } from '@home/shared/ux/popover/popover.component';
+import { SettingsFormComponent } from '@home/shared/ux/settings/settings-form.component';
 import { WidgetLoaderComponent } from '@home/shared/widget/widget-loader.component';
 import { Widget, WidgetService } from '@home/shared/widget/widget.service';
 import { filter } from 'rxjs';
@@ -16,7 +19,7 @@ import { dashboardAnimation } from './dashboard.animation';
  */
 @Component({
   selector: 'app-dashboard',
-  imports: [WidgetLoaderComponent, StringPipe],
+  imports: [WidgetLoaderComponent, StringPipe, PopoverToggleComponent, PopoverComponent, SettingsFormComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   animations: [trigger('widgets', [dashboardAnimation])],

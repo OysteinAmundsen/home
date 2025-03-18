@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged, map, switchMap, timer } from 'rxjs';
 import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
+import { AppSettingsService } from '@home/shared/app.settings';
 
 /**
  * Renders a date and time component
@@ -24,6 +25,7 @@ import { VisibilityService } from '@home/shared/browser/visibility/visibility.se
 })
 export class TimeComponent {
   private readonly visibility = inject(VisibilityService);
+  private readonly settings = inject(AppSettingsService);
   private isVisible$ = toObservable(this.visibility.isBrowserActive);
   // Timer that emits the current time every second on the second
   // But only if the page is currently active. This saves CPU cycles
@@ -31,7 +33,7 @@ export class TimeComponent {
   private now$ = this.isVisible$.pipe(
     distinctUntilChanged(),
     switchMap((isRunning) =>
-      isRunning
+      isRunning || this.settings.pauseOnInactive() === false
         ? timer(1000 - new Date().getMilliseconds(), 1000).pipe(
             switchMap(() => timer(0, 1000)),
             map(() => new Date()),

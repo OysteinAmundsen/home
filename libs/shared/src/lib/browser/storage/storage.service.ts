@@ -99,7 +99,7 @@ export class StorageService {
    * @param key A '.' separated path to the value
    * @returns The value
    */
-  get(key: string): unknown | null {
+  get(key: string, defaultValue?: unknown): unknown | null {
     if (!key || typeof key !== 'string') {
       console.error('Invalid key provided for "get".');
       return null;
@@ -109,7 +109,7 @@ export class StorageService {
     const obj = this.findKey(key, this.values);
 
     if (!obj || !(k in obj)) {
-      return null;
+      return defaultValue ?? null;
     }
     return obj[k];
   }

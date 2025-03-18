@@ -1,5 +1,5 @@
 form {
-  .form-field {
+  .form-field:not(:has(input[type='checkbox'])) {
     display: grid;
     input {
       flex: 1;
@@ -13,6 +13,12 @@ form {
       .hint {
         margin-bottom: 0.5rem;
       }
+    }
+  }
+  .form-field:has(input[type='checkbox']) {
+    display: flex;
+    label {
+      flex: 1;
     }
   }
 }

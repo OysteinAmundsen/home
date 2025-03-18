@@ -4,7 +4,13 @@
   }
   <button type="button" (click)="filter('nothing')">Nothing</button>
   <button type="button" (click)="filter(undefined)">All</button>
+  <div class="spacer"></div>
+  <lib-popover-toggle [popoverPanel]="popoverPanel"></lib-popover-toggle>
 </nav>
+
+<lib-popover #popoverPanel>
+  <lib-settings-form></lib-settings-form>
+</lib-popover>
 
 <section [@widgets]="{ value: widgets() }" [@.disabled]="animationDisabled()" class="widget-area">
   @for (widget of widgets(); track widget.id) {

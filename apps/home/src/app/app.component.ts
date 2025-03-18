@@ -49,6 +49,9 @@ export class AppComponent {
       const offsetY = (mouseY / viewportHeight) * 108 - 4;
       this.el.nativeElement.style.setProperty('--background-position-x', `${offsetX}%`);
       this.el.nativeElement.style.setProperty('--background-position-y', `${offsetY}%`);
+    } else {
+      this.el.nativeElement.style.removeProperty('--background-position-x');
+      this.el.nativeElement.style.removeProperty('--background-position-y');
     }
   }
 }

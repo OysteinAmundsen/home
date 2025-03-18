@@ -15,6 +15,7 @@ import { getComputedStyle, setAlpha } from '@home/shared/utils/color';
 import { deepMerge } from '@home/shared/utils/object';
 import { firstValueFrom } from 'rxjs';
 import { FundService } from './fund.service';
+import { AppSettingsService } from '@home/shared/app.settings';
 
 if (typeof window !== 'undefined') {
   echarts.use([LineChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
@@ -27,9 +28,10 @@ if (typeof window !== 'undefined') {
   styleUrl: './fund.component.scss',
   providers: [{ provide: FundService }, provideEchartsCore({ echarts })],
 })
-export default class FundComponent extends AbstractWidgetComponent implements OnInit {
+export default class FundComponent extends AbstractWidgetComponent {
   private readonly fundService = inject(FundService);
   private readonly theme = inject(ThemeService);
+  private readonly settings = inject(AppSettingsService);
   private readonly document = inject(DOCUMENT);
 
   override id = signal('fund');
@@ -96,11 +98,12 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       });
     }, duration);
   });
+  onInstrumentChanged = effect(() => this.loadData(this.settings.watchInstruments()));
 
-  async ngOnInit() {
+  async loadData(instruments = this.settings.watchInstruments()) {
     try {
       // Load instrument data
-      const data = await firstValueFrom(this.fundService.getFundData());
+      const data = await firstValueFrom(this.fundService.getFundData(instruments));
 
       // For each instrument, fetch price time series
       await Promise.allSettled(

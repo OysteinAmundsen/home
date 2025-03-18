@@ -66,6 +66,12 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
     }
   });
 
+  isPaused = computed(() => {
+    const isActive = this.visibility.isBrowserActive();
+    const shouldPause = this.settings.pauseOnInactive();
+    return shouldPause && !isActive;
+  });
+
   ctx!: GPUCanvasContext;
   device!: GPUDevice;
   pipeline!: GPURenderPipeline;
@@ -78,17 +84,14 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
 
   ngAfterViewInit(): void {
     // Initialize
-    if (this.settings.pauseOnInactive()) {
-      this.visibility.browserActive$.pipe(takeUntilDestroyed(this.destroyRef$)).subscribe((active) => {
-        if (active) {
-          this.animate();
-        } else {
-          this.pause();
-        }
-      });
-    } else {
-      this.animate();
-    }
+    this.visibility.browserActive$.pipe(takeUntilDestroyed(this.destroyRef$)).subscribe((active) => {
+      if (active && !this.animationFrame) {
+        this.animate();
+      } else if (this.isPaused()) {
+        this.pause();
+      }
+    });
+    // this.animate();
   }
 
   /**
@@ -220,6 +223,7 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
     // Die if we are not running in the browser or we are still initializing
     if (!isPlatformBrowser(this.platformId)) return;
     if (this.isInitializing) return;
+    if (this.isPaused()) return;
 
     // Configure the context first time we render
     if (!this.isInitialized) {
@@ -284,7 +288,10 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
   }
 
   pause() {
-    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = undefined;
+    }
   }
 
   createProjectionMatrix() {
