@@ -6,13 +6,13 @@
       <!-- https://github.com/angular/angular/issues/60435 -->
       @switch (prop.type) {
         @case ('checkbox') {
-          <input type="checkbox" [name]="prop.name" formControlName="{{ prop.name }}" />
+          <input type="checkbox" [id]="prop.name" formControlName="{{ prop.name }}" />
         }
         @case ('number') {
-          <input type="number" [name]="prop.name" formControlName="{{ prop.name }}" />
+          <input type="number" [id]="prop.name" formControlName="{{ prop.name }}" />
         }
         @default {
-          <input [type]="prop.type" [name]="prop.name" formControlName="{{ prop.name }}" />
+          <input [type]="prop.type" [id]="prop.name" formControlName="{{ prop.name }}" />
         }
       }
     </div>
