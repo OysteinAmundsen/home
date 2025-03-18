@@ -1,5 +1,6 @@
 import { computed, linkedSignal, Signal, signal } from '@angular/core';
 import { destructure, Format } from '@home/shared/utils/color';
+import { random } from '@home/shared/utils/numbers';
 
 type Point = {
   x: number;
@@ -111,18 +112,18 @@ export class Star {
     const { x, y } = this.center();
     // this.startPos.set({ x: -x + 100, y: -y + 100 });
     this.startPos.set({
-      x: this.random(-x, x),
-      y: this.random(-y, y),
+      x: random(-x, x),
+      y: random(-y, y),
     });
     const { width } = this.rect();
     const [h, s, l] = destructure(this.currentColor(), Format.HSL);
     const variation = 100;
-    this.hslColor.set([this.random(h - variation, h + variation), this.random(s - variation, s + variation), l]);
+    this.hslColor.set([random(h - variation, h + variation), random(s - variation, s + variation), l]);
 
-    this.size = this.random(1, this.large ? 6 : 2);
-    this.speed = this.random(1, 5);
-    this.angle = this.random(0, width) * 2 * Math.PI;
-    this.z.set(Math.abs(this.random(width / ((this.size + this.speed) * 3), width)));
+    this.size = random(1, this.large ? 6 : 2);
+    this.speed = random(1, 5);
+    this.angle = random(0, width) * 2 * Math.PI;
+    this.z.set(Math.abs(random(width / ((this.size + this.speed) * 3), width)));
     if (this.remap(this.z(), 0, width, this.size, 0) < 0) {
       this.z.set(width);
     }
@@ -170,10 +171,6 @@ export class Star {
     }
     ctx.stroke();
     ctx.closePath();
-  }
-
-  private random(min: number, max: number): number {
-    return Math.random() * (max - min + 1) + min;
   }
 
   private remap(value: number, istart: number, istop: number, ostart: number, ostop: number): number {

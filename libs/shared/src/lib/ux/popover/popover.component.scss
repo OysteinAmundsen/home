@@ -27,17 +27,18 @@
     opacity: 0.3;
 
     &:popover-open {
+      transform: rotateX(0) rotateY(0) rotateZ(0);
+      scale: 1;
+      opacity: 1;
+
+      border: 2px solid var(--color-border-focused);
+
       // Will animate from these on open
       @starting-style {
         transform: rotateX($xStart) rotateY($yStart) rotateZ($zStart);
         scale: 0.2;
         opacity: 0.3;
       }
-      transform: rotateX(0) rotateY(0) rotateZ(0);
-      scale: 1;
-      opacity: 1;
-
-      border: 2px solid var(--color-border-focused);
     }
   }
 }
