@@ -31,3 +31,14 @@ sed -i.bak -e 's/bun x/npx/g' -e 's/bun /npm /g' package.json
 ```
 
 This will remove the bun lockfile, install dependencies using npm and lastly replace all usage of `bun` in `package.json` with the `npm` equivalent.
+
+### Whisper widget prerequisites (Windows)
+
+```cmd
+winget install --id Python.Python.3.11
+python -m pip install --upgrade pip
+pip install faster-whisper
+python -c "from faster_whisper import WhisperModel; WhisperModel('NbAiLab/nb-whisper-small', device='cpu', compute_type='int8')"
+```
+
+This installs python and loads up the whisper ai model. After this, `bun start` will be able to handle audio inputs from the client and transcribe it. Currently only transcribing in norwegian, and it will try to translate any audio.

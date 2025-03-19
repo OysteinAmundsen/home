@@ -1,8 +1,8 @@
 export default {
-  displayName: 'widget/fund',
+  displayName: 'widgets/fund',
   preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../../coverage/libs/widget/fund',
+  coverageDirectory: '../../../coverage/libs/widgets/fund',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

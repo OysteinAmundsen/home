@@ -1,7 +1,7 @@
-# widget/fund
+# widgets/whisper
 
 This library was generated with [Nx](https://nx.dev).
 
 ## Running unit tests
 
-Run `nx test widget/fund` to execute the unit tests.
+Run `nx test widgets/whisper` to execute the unit tests.

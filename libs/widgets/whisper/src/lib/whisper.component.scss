@@ -1,0 +1,30 @@
+:host {
+  container-type: inline-size;
+  min-width: 280px;
+  ::ng-deep .widget-content {
+    overflow: auto;
+    object-fit: contain;
+  }
+  form {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    @container (max-width: 320px) {
+      flex-direction: column;
+    }
+  }
+  .group {
+    position: relative;
+    flex: 1;
+    button {
+      width: 100%;
+    }
+  }
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    max-height: 2.4rem;
+    pointer-events: none;
+  }
+}

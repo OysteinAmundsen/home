@@ -26,4 +26,9 @@ export const widgetRoutes: Route[] = [
     data: { widget: true, tags: ['graphics', 'webGPU'] },
     loadComponent: () => import('@home/widgets/pyramid').then((m) => m.default),
   },
+  {
+    path: 'whisper',
+    data: { widget: true, tags: ['ai'] },
+    loadComponent: () => import('@home/widgets/whisper').then((m) => m.default),
+  },
 ];

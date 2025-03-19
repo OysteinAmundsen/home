@@ -17,9 +17,10 @@
     "clean": "bun run reset && rm -rf ./node_modules/ bun.lock && bun install",
     "update": "nx migrate latest && nx migrate --run-migrations --if-exists && git commit -am 'chore: update dependencies' && bun x npm-check-updates -u && bun install",
     "analyze:home": "rm -rf dist/apps/home && nx build home --stats-json --named-chunks && npx -y @angular-experts/hawkeye dist/apps/home/stats.json",
-    "docker:build": "bun run build && podman build --tag home .",
+    "docker:build": "podman build --tag home .",
     "docker:start": "podman run -d -p 4200:4200 --name home home",
-    "docker:stop": "podman container stop home && podman container rm home"
+    "docker:stop": "podman container stop home && podman container rm home",
+    "docker:inspect": "podman exec -it home /bin/bash"
   },
   "private": true,
   "dependencies": {
@@ -60,6 +61,7 @@
     "jsonwebtoken": "^9.0.2",
     "kafkajs": "^2.2.4",
     "mqtt": "^5.10.4",
+    "multer": "^1.4.5-lts.1",
     "nats": "^2.29.2",
     "ngx-echarts": "^19.0.0",
     "rxjs": "~7.8.2",
@@ -96,8 +98,9 @@
     "@swc/helpers": "~0.5.15",
     "@types/express": "5.0.0",
     "@types/express-session": "^1.18.1",
-    "@types/jsonwebtoken": "^9.0.9",
     "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/multer": "^1.4.12",
     "@types/node": "22.13.10",
     "@typescript-eslint/utils": "^8.26.0",
     "@webgpu/types": "^0.1.56",
