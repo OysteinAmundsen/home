@@ -7,7 +7,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-    "types": ["node", "@webgpu/types", "Multer"]
+    "types": ["node", "@webgpu/types", "express", "Multer"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

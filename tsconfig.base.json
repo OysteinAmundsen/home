@@ -16,6 +16,7 @@
     "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
+    "types": ["node", "@webgpu/types", "express", "Multer"],
     "paths": {
       "@home/builder": ["tools/builder/src/index.ts"],
       "@home/shared": ["libs/shared/src/index.ts"],
