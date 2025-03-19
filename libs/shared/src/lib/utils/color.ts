@@ -480,6 +480,12 @@ function strToRGB(color: string): RGBOrRGBA {
         return +n.replace('%', '').replace('deg', '').trim();
       });
     return HSLToRGB(h, s, l, a);
+  } else if (color.startsWith('color(srgb')) {
+    // sRGB color input
+    return color
+      .substring(color.indexOf('(srgb') + 6, color.indexOf(')'))
+      .split(' ')
+      .map((n) => +n * 100) as RGBOrRGBA;
   }
   throw new Error('Invalid color string');
 }
