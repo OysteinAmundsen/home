@@ -1,21 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, computed, effect, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { getComputedStyle } from '@home/shared/utils/color';
+import { doSafeTransition } from '@home/shared/utils/transitions';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
 import { firstValueFrom } from 'rxjs';
-import { doSafeTransition } from '@home/shared/utils/transitions';
 
 @Component({
-  selector: 'lib-widget-whisper',
+  selector: 'lib-whisper',
   imports: [CommonModule, WidgetComponent, ReactiveFormsModule],
   templateUrl: './whisper.component.html',
   styleUrl: './whisper.component.scss',
 })
-export default class WidgetWhisperComponent extends AbstractWidgetComponent {
+export default class WhisperComponent extends AbstractWidgetComponent {
   private readonly http = inject(HttpClient);
 
   id = signal('whisper');
