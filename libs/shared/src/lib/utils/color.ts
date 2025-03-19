@@ -485,7 +485,7 @@ function strToRGB(color: string): RGBOrRGBA {
     return color
       .substring(color.indexOf('(srgb') + 6, color.indexOf(')'))
       .split(' ')
-      .map((n) => +n * 100) as RGBOrRGBA;
+      .map((n) => +n * 255) as RGBOrRGBA;
   }
   throw new Error('Invalid color string');
 }
