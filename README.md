@@ -6,6 +6,11 @@ The app features:
 
 - BFF [NestJS powered api](./apps/home/server.ts)
 - Workbox service-worker built into the dev process (_not [working](https://stackoverflow.com/questions/79374706/how-to-inject-workbox-manifest-in-angular-on-both-build-and-serve-targets) yet_).
+- Widget dashboard system where each widget is a self enclosed library with a dashboard view and a fullscreen view.
+- Integrations to third parties like met.no for weather data and nordnet.no for financial instrument data.
+- Experimentation with canvas and webGPU
+- Experimentation with local AI models
+- Experimentation with browser api's and best practices on permission handling
 
 This is my feature playground. Nothing useful here, just me playing around.
 
