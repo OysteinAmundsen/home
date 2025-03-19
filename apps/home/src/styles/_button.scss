@@ -5,13 +5,17 @@ button,
 .button,
 a.button {
   --outline-color: var(--color-border-focused);
+  display: block;
   color: var(--color-text-button);
   background-color: var(--color-background-button);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   padding: 0.5rem 1rem;
   outline-color: var(--outline-color);
+  font-family: inherit;
+  font-size: inherit;
   cursor: pointer;
+  text-align: center;
   transition:
     scale 0.1s ease-in-out,
     outline 0.1s ease-in-out,
@@ -69,4 +73,16 @@ a.button {
     border-color: transparent;
     color: var(--color-text-disabled);
   }
+}
+
+/**
+ * File upload buttons
+ */
+label.button + input[type='file'] {
+  padding: 0;
+  visibility: hidden;
+  height: 0;
+  width: 0;
+  line-height: 0;
+  position: absolute;
 }

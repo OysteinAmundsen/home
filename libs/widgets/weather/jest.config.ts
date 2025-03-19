@@ -1,8 +1,8 @@
 export default {
-  displayName: 'pyramid',
+  displayName: 'weather',
   preset: '../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts', 'jest-canvas-mock'],
-  coverageDirectory: '../../../coverage/libs/widget/pyramid',
+  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  coverageDirectory: '../../../coverage/libs/widgets/weather',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

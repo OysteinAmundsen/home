@@ -161,7 +161,7 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
         }
       }
 
-      ctx.font = '16px Arial';
+      ctx.font = '16px Roboto';
       ctx.fillStyle = color;
       ctx.textAlign = 'center';
       ctx.fillText('Interstellar travel paused', 0, 0);

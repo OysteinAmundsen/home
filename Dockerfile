@@ -5,7 +5,12 @@ WORKDIR /usr/src/app
 RUN apt-get update && \
     apt-get install -y \
       git \
-      unzip
+      unzip \
+      # tools needed for whisper ai
+      python3 \
+      python3-pip \
+      ffmpeg && \
+    ln -s /usr/bin/python3 /usr/bin/python
 
 # install dependencies into temp directory
 # this will cache them and speed up future builds
@@ -23,11 +28,18 @@ COPY . .
 
 # copy compiled code into final image
 FROM base AS release
+
+# Install whisper
+RUN python -m pip install --upgrade pip && \
+    pip install Flask faster-whisper && \
+    python -c "from faster_whisper import WhisperModel; WhisperModel('NbAiLab/nb-whisper-small', device='cpu', compute_type='int8')"
+
 # Don't know yet if having node_modules in the final image is needed.
 # If it is, we probably should install a production version
 # of our dependencies in the builder stage and copy them here.
 # COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist/ .
+COPY --from=builder /usr/src/app/apps/whisper/ ./apps/whisper/
 COPY --from=builder /usr/src/app/package.json .
 
 # run the app

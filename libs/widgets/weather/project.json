@@ -1,7 +1,7 @@
 {
-  "name": "widget/pyramid",
+  "name": "widgets/weather",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/widget/pyramid/src",
+  "sourceRoot": "libs/widgets/weather/src",
   "prefix": "lib",
   "projectType": "library",
   "tags": [],
@@ -10,7 +10,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/widget/pyramid/jest.config.ts"
+        "jestConfig": "libs/widgets/weather/jest.config.ts"
       }
     },
     "lint": {

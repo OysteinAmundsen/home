@@ -1,8 +1,8 @@
 export default {
-  displayName: 'starfield',
+  displayName: 'pyramid',
   preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts', 'jest-canvas-mock'],
-  coverageDirectory: '../../../coverage/libs/widget/starfield',
+  coverageDirectory: '../../../coverage/libs/widgets/pyramid',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

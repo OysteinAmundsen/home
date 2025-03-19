@@ -1,8 +1,8 @@
 export default {
-  displayName: 'weather',
+  displayName: 'starfield',
   preset: '../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../../coverage/libs/widget/weather',
+  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts', 'jest-canvas-mock'],
+  coverageDirectory: '../../../coverage/libs/widgets/starfield',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

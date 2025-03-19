@@ -57,3 +57,15 @@ a:visited {
   text-shadow: var(--text-shadow);
   font-weight: bold;
 }
+
+.info-box {
+  display: grid;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin-top: auto;
+  box-shadow:
+    0 0 5rem calc(100vw / 80) var(--color-background) inset,
+    0 0 0.3rem -0.2rem var(--color-background);
+  border-radius: var(--border-radius);
+}
