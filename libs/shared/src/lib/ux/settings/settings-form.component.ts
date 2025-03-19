@@ -56,7 +56,6 @@ export class SettingsFormComponent implements OnInit {
   ngOnInit(): void {
     // Update the settings service with the new values
     this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef$)).subscribe((values) => {
-      console.log(values);
       // eslint-disable-next-line prefer-const
       for (let [key, value] of Object.entries(values)) {
         let originalValue = value;

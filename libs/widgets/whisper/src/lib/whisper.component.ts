@@ -95,7 +95,11 @@ export default class WhisperComponent extends AbstractWidgetComponent {
   private recordingStopped(mediaRecorder: MediaRecorder) {
     this.isRecording.set(false);
     this.upload(new Blob(this.chunks, { type: mediaRecorder.mimeType }));
+    // Cleanup
     this.chunks = [];
+    this.stream?.getTracks().forEach((track) => track.stop());
+    this.mediaRecorder = undefined;
+    this.stream = undefined;
   }
 
   filePicked(event: Event) {

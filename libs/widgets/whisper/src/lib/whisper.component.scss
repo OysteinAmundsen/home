@@ -13,6 +13,12 @@
       flex-direction: column;
     }
   }
+  .upload-button {
+    view-transition-name: upload-button;
+  }
+  .record-button {
+    view-transition-name: record-button;
+  }
   .group {
     position: relative;
     flex: 1;
