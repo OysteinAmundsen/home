@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   linkedSignal,
   OnDestroy,
@@ -44,12 +45,19 @@ export default class WeatherComponent extends AbstractWidgetComponent implements
   locationMethod = this.locationService.locationMethod;
   onLocationMethodChanged = effect(() => {
     const method = this.locationMethod();
-    if (method === 'auto') this.locationSearch.setValue('');
+    const input = this.cityInput();
+    if (method !== 'auto' && input != null && input.nativeElement != null) {
+      setTimeout(() => {
+        input.nativeElement.click();
+        input.nativeElement.focus();
+      });
+    }
   });
 
   locationSearch = new FormControl(this.locationService.locationSearchString$.value);
   possibleLocations = this.locationService.possibleLocations;
   locationPopover = viewChild(PopoverComponent);
+  cityInput = viewChild<ElementRef<HTMLInputElement>>('cityInput');
   onLocationsUpdated = effect(() => {
     const popover = this.locationPopover();
     const locations = this.possibleLocations();

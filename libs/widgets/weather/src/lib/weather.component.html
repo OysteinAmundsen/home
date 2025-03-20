@@ -2,7 +2,7 @@
   <header class="head">
     <div class="search form-group" [libPopoverAnchor]="locationPopover">
       @if (locationMethod() === 'search') {
-        <input class="city" type="text" placeholder="Search city" [formControl]="locationSearch" />
+        <input class="city" #cityInput type="text" placeholder="Search city" [formControl]="locationSearch" />
       } @else {
         <span class="city">My location</span>
       }

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { DestroyRef, effect, inject, Injectable, linkedSignal, OnDestroy, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { cache } from '@home/shared/rxjs/cache';
 import {
   BehaviorSubject,
   catchError,
@@ -53,13 +54,16 @@ export class GeoLocationService implements OnDestroy {
     () => this.storage.get('location.method', 'search') as 'search' | 'auto',
   );
   private onLocationMethodChanged = effect(() => {
-    this.storage.set('location.method', this.locationMethod());
-    this.storage.remove('location.city');
-    this.locationSearchString$.next('');
+    const method = this.locationMethod();
+    this.storage.set('location.method', method);
+    this.possibleLocations.set([]);
+    if (method === 'search') {
+      this.locationSearchString$.next(this.storage.get('location.address', '') as string);
+    }
   });
   private locationMethod$ = toObservable(this.locationMethod);
 
-  locationSearchString$ = new BehaviorSubject<string>((this.storage.get('location.city') as string) || '');
+  locationSearchString$ = new BehaviorSubject<string>(this.storage.get('location.address', '') as string);
   possibleLocations = signal<GeoLocationItem[]>([]);
 
   private selectedLocation$ = new BehaviorSubject<GeoLocationItem | undefined>(undefined);
@@ -97,7 +101,7 @@ export class GeoLocationService implements OnDestroy {
         if (objToString(pos) !== objToString(this.location())) {
           // Current position differs from stored position
           // Cache the location for later
-          this.storage.set('location', pos);
+          this.storage.set('location.position', pos);
           // Return current position
           observer.next(pos);
         }
@@ -173,9 +177,6 @@ export class GeoLocationService implements OnDestroy {
           this.error.set('');
           if (location) {
             this.location.set(location);
-            if (location.city) {
-              this.storage.set('location.city', location.city);
-            }
           }
         },
         error: (error) => {
@@ -190,8 +191,10 @@ export class GeoLocationService implements OnDestroy {
         debounceTime(500),
         takeUntilDestroyed(this.destroyRef$),
         switchMap((str: string | undefined) => {
-          if (this.locationMethod() === 'search' && (!this.location() || this.location()?.city != str)) {
+          const storedCity = this.storage.get('location.address', '');
+          if (this.locationMethod() === 'search') {
             this.location.set(undefined);
+            if ((str?.length ?? 0) < 2) return of([]);
             return this.search(str).pipe(
               catchError((err) => {
                 this.error.set(err.error.message);
@@ -199,18 +202,24 @@ export class GeoLocationService implements OnDestroy {
               }),
             );
           } else {
-            return of((this.location() != null ? [this.location()] : []) as GeoLocationItem[]);
+            return of([]);
           }
         }),
       )
       .subscribe({
         next: (locations) => {
           if (this.locationMethod() !== 'search') return;
-          if (locations.length > 0) {
-            this.possibleLocations.set(locations);
-          }
+          this.possibleLocations.set(locations);
           if (locations.length === 0) {
+            this.storage.remove('location.address');
+            this.storage.remove('location.position');
+          }
+          if (locations.length === 1) {
+            const storedCity = this.storage.get('location.address', '');
             this.selectedLocation$.next(undefined);
+            if (storedCity === locations[0]?.address) {
+              this.selectLocation(locations[0]);
+            }
           }
         },
       });
@@ -226,12 +235,18 @@ export class GeoLocationService implements OnDestroy {
     this.selectedLocation$.next(location);
     this.storage.set('location.position', location);
     this.location.set(location);
+    if (location.address) {
+      this.storage.set('location.address', location.address);
+    }
   }
 
   search(str: string | undefined): Observable<GeoLocationItem[]> {
     this.error.set('');
     if (!str) return of([] as GeoLocationItem[]);
-    return this.http.get<GeoLocationItem[]>(`/api/location/search?s=${str}`);
+    return cache(
+      () => this.http.get<GeoLocationItem[]>(`/api/location/search?s=${str}`),
+      `/api/location/search?s=${str}`,
+    );
   }
 
   /**

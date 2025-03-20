@@ -15,7 +15,7 @@ let id = 0;
       position-anchor: var(--anchor);
       position-area: bottom end;
       position-try-fallbacks: flip-inline, flip-block;
-      position-try-order: most-width;
+      position-try-order: most-block-size;
       z-index: 100;
       left: auto;
       bottom: auto;
