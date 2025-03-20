@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { DestroyRef, effect, inject, Injectable, linkedSignal, OnDestroy, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { cache } from '@home/shared/rxjs/cache';
 import {
   BehaviorSubject,
   catchError,
@@ -16,6 +15,7 @@ import {
   take,
   throwError,
 } from 'rxjs';
+import { cache } from '../../rxjs/cache';
 import { objToString } from '../../utils/object';
 import { StorageService } from '../storage/storage.service';
 import { GeoLocationItem } from './location.model';

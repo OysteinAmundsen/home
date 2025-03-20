@@ -13,7 +13,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { GeoLocationService } from '@home/shared/browser/geoLocation/geoLocation.service';
 import { GeoLocationItem } from '@home/shared/browser/geoLocation/location.model';
