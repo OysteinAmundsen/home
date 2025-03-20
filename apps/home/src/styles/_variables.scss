@@ -26,7 +26,7 @@
     hsl(from var(--base-color) h 0% 97%)
   );
   --color-background: light-dark(
-    hsl(from var(--base-color) h var(--base-saturation) 80%),
+    hsl(from var(--base-color) h var(--base-saturation) 90%),
     hsl(from var(--base-color) h var(--base-saturation) 15%)
   );
   --color-background-button: light-dark(
@@ -48,6 +48,7 @@
 
   // Other variables
   --border-radius: 0.5rem;
+  --border-radius-input: calc(var(--border-radius) / 2);
   --text-shadow: 0 0 3px light-dark(rgba(255, 255, 255, 1), rgba(0, 0, 0, 0.5));
   --shadow1: 0.25rem 0.5rem 0.5rem -0.35rem var(--color-shadow);
   --shadow2: 0rem 1rem 1.3rem -0.1rem var(--color-shadow);

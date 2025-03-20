@@ -114,7 +114,7 @@ export default class WhisperComponent extends AbstractWidgetComponent {
     formData.append('file', blob);
     try {
       const res = await firstValueFrom(
-        this.http.post<{ status: string; transcription: string }>('/api/whisper', formData),
+        this.http.post<{ status: string; transcription: string }>('/api/transcribe', formData),
       );
       this.setTranscription(res.transcription);
     } catch (err) {

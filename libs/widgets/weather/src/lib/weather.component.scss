@@ -1,15 +1,14 @@
 :host {
   container-type: size;
   display: block;
-  min-height: 20rem;
-  min-width: 11.5rem;
+  min-height: 23rem;
+  min-width: 13.5rem;
 }
 header {
-  display: none;
-  @container (min-height: 23rem) {
-    display: block;
-  }
+  margin-top: -1rem;
+  padding-bottom: 1rem;
 }
+
 section {
   place-items: center;
   // view-transition-name: widget-weather-content-list;

@@ -110,7 +110,7 @@
       background: linear-gradient(
         to bottom,
         var(--color-background-button),
-        color-mix(in srgb, var(--color-background-button), transparent 30%),
+        color-mix(in srgb, var(--color-background-button), transparent 50%),
         transparent
       );
       h2 {

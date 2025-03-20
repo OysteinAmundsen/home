@@ -1,16 +1,12 @@
 import { Component, input } from '@angular/core';
+import { PopoverAnchorDirective } from './popover-anchor.directive';
 import { PopoverComponent } from './popover.component';
 
 @Component({
   selector: 'lib-popover-toggle',
+  imports: [PopoverAnchorDirective],
   template: `
-    <button
-      type="button"
-      class="popover-toggle"
-      [attr.popovertarget]="popoverPanel().uniqueId()"
-      [style]="'anchor-name: --' + popoverPanel().uniqueId()"
-      popovertargetaction="toggle"
-    >
+    <button type="button" [libPopoverAnchor]="popoverPanel()">
       <span class="material-symbols-outlined">more_vert</span>
     </button>
   `,

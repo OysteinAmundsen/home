@@ -3,12 +3,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { spawn } from 'node:child_process';
 
 /**
- * The controller for the /api/widgets route.
+ * The controller for the /api/transcribe route.
  *
  * @param server
  */
-@Controller('api/whisper')
-export class WhisperController {
+@Controller('api/transcribe')
+export class TranscribeController {
   /**
    * Fetch all widgets.
    */

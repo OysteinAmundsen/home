@@ -127,10 +127,7 @@ export class StorageService {
     const k = key.split('.').pop() as string;
     const obj = this.findKey(key, this.values);
 
-    if (!obj || !(k in obj)) {
-      console.warn(`Key "${key}" not found in storage. Nothing to remove.`);
-      return;
-    }
+    if (!obj || !(k in obj)) return;
 
     delete obj[k];
     this.storeValues();
