@@ -1,5 +1,5 @@
 <lib-widget [host]="host()">
-  <section class="head">
+  <header class="head">
     <div class="search form-group" [libPopoverAnchor]="locationPopover">
       @if (locationMethod() === 'search') {
         <input class="city" type="text" placeholder="Search city" [formControl]="locationSearch" />
@@ -15,13 +15,13 @@
     <lib-popover #locationPopover>
       <ul class="list">
         @for (item of possibleLocations(); track item) {
-          <li class="list-item" (click)="selectLocation(item)" (keydown.enter)="selectLocation(item)">
+          <li class="list-item" tabindex="0" (click)="selectLocation(item)" (keydown.enter)="selectLocation(item)">
             {{ item?.address }}
           </li>
         }
       </ul>
     </lib-popover>
-  </section>
+  </header>
 
   @if (weather.isLoading()) {
     <section>Loading...</section>
