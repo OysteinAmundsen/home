@@ -53,8 +53,12 @@ export default class WeatherComponent extends AbstractWidgetComponent implements
   onLocationsUpdated = effect(() => {
     const popover = this.locationPopover();
     const locations = this.possibleLocations();
+    const canOpen =
+      locations.filter((l) => l != null && l.address != null).length > 0 &&
+      this.locationMethod() === 'search' &&
+      this.locationService.location() == null;
     if (popover) {
-      if (locations.length > 0 && this.locationMethod() === 'search' && this.locationService.location() == null) {
+      if (canOpen && this.locationService.location() == null) {
         popover.open();
       } else {
         popover.close();

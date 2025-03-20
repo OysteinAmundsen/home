@@ -159,7 +159,6 @@ export class GeoLocationService implements OnDestroy {
       .pipe(
         takeUntilDestroyed(this.destroyRef$),
         switchMap((value) => {
-          this.error.set('');
           switch (value) {
             case 'auto':
               return this.watchLocation$;
@@ -170,6 +169,8 @@ export class GeoLocationService implements OnDestroy {
       )
       .subscribe({
         next: (location: GeoLocationItem | undefined) => {
+          if (this.locationMethod() !== 'auto') return;
+          this.error.set('');
           if (location) {
             this.location.set(location);
             if (location.city) {
@@ -198,15 +199,17 @@ export class GeoLocationService implements OnDestroy {
               }),
             );
           } else {
-            return of([this.location()] as GeoLocationItem[]);
+            return of((this.location() != null ? [this.location()] : []) as GeoLocationItem[]);
           }
         }),
       )
       .subscribe({
         next: (locations) => {
-          this.possibleLocations.set(locations);
+          if (this.locationMethod() !== 'search') return;
+          if (locations.length > 0) {
+            this.possibleLocations.set(locations);
+          }
           if (locations.length === 0) {
-            this.error.set('No locations found');
             this.selectedLocation$.next(undefined);
           }
         },
