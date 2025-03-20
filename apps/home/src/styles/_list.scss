@@ -1,0 +1,10 @@
+.list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.list-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

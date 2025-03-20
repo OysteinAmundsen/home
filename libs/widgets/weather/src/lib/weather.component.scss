@@ -1,14 +1,16 @@
 :host {
   container-type: size;
   display: block;
-  min-height: 20rem;
-  min-width: 11.5rem;
+  min-height: 23rem;
+  min-width: 13.5rem;
 }
+.head {
+  margin-top: -1rem;
+  padding-bottom: 1rem;
+}
+
 header {
   display: none;
-  @container (min-height: 23rem) {
-    display: block;
-  }
 }
 section {
   place-items: center;
@@ -34,5 +36,13 @@ footer {
   time {
     color: var(--color-text-highlight);
     font-style: italic;
+  }
+}
+
+.list-item {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  &:hover {
+    background-color: var(--color-background-button);
   }
 }

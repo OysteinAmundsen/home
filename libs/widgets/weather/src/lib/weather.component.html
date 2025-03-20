@@ -1,4 +1,28 @@
 <lib-widget [host]="host()">
+  <section class="head">
+    <div class="search form-group" [libPopoverAnchor]="locationPopover">
+      @if (locationMethod() === 'search') {
+        <input class="city" type="text" placeholder="Search city" [formControl]="locationSearch" />
+      } @else {
+        <span class="city">My location</span>
+      }
+      <button type="button" (click)="toggleLocationMethod()">
+        <span class="material-symbols-outlined">
+          {{ locationMethod() === 'search' ? 'pin_drop' : 'search' }}
+        </span>
+      </button>
+    </div>
+    <lib-popover #locationPopover>
+      <ul class="list">
+        @for (item of possibleLocations(); track item) {
+          <li class="list-item" (click)="selectLocation(item)" (keydown.enter)="selectLocation(item)">
+            {{ item?.address }}
+          </li>
+        }
+      </ul>
+    </lib-popover>
+  </section>
+
   @if (weather.isLoading()) {
     <section>Loading...</section>
   } @else if (weather.error()) {

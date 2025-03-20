@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, ElementRef, inject, PLATFORM_ID, signal } from '@angular/core';
 
 let id = 0;
 
@@ -13,12 +13,14 @@ let id = 0;
     $zStart: 0;
     :host {
       position-anchor: var(--anchor);
+      position-area: bottom end;
+      position-try-fallbacks: flip-inline, flip-block;
+      position-try-order: most-width;
       z-index: 100;
       left: auto;
       bottom: auto;
       right: anchor(right);
       top: calc(anchor(bottom) + 0.5rem);
-      padding: 1rem;
       transition:
         transform var(--animation-duration) ease-in-out,
         rotate var(--animation-duration) ease-in-out,
@@ -59,5 +61,17 @@ let id = 0;
   },
 })
 export class PopoverComponent {
+  private el = inject(ElementRef);
+  private platformId = inject(PLATFORM_ID);
   uniqueId = signal(`popover-${id++}`);
+
+  open() {
+    (this.el.nativeElement as HTMLElement).showPopover();
+  }
+  close() {
+    const elm = this.el.nativeElement as HTMLElement;
+    if (isPlatformBrowser(this.platformId) && elm.matches(':popover-open')) {
+      elm.hidePopover();
+    }
+  }
 }
