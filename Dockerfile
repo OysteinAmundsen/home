@@ -39,6 +39,7 @@ RUN python -m pip install --upgrade pip && \
 # of our dependencies in the builder stage and copy them here.
 # COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist/ .
+COPY --from=builder /usr/src/app/.env .
 COPY --from=builder /usr/src/app/apps/whisper/ ./apps/whisper/
 COPY --from=builder /usr/src/app/package.json .
 
