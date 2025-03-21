@@ -9,15 +9,15 @@ import { WidgetComponent } from '@home/shared/widget/widget.component';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
-  selector: 'lib-whisper',
+  selector: 'lib-transcribe',
   imports: [CommonModule, WidgetComponent, ReactiveFormsModule],
-  templateUrl: './whisper.component.html',
-  styleUrl: './whisper.component.scss',
+  templateUrl: './transcribe.component.html',
+  styleUrl: './transcribe.component.scss',
 })
-export default class WhisperComponent extends AbstractWidgetComponent {
+export default class TranscribeComponent extends AbstractWidgetComponent {
   private readonly http = inject(HttpClient);
 
-  id = signal('whisper');
+  id = signal('transcribe');
 
   visualizer = viewChild<ElementRef<HTMLCanvasElement>>('visualizer');
   canvasCtx = computed<CanvasRenderingContext2D | undefined>(() => {

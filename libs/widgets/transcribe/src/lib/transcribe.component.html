@@ -1,8 +1,8 @@
 <lib-widget [host]="host()">
   <form>
     <div class="group upload-button">
-      <label for="whisper" class="button">Upload audio</label>
-      <input id="whisper" type="file" (change)="filePicked($event)" accept="audio/*" />
+      <label for="upload" class="button">Upload audio</label>
+      <input id="upload" type="file" (change)="filePicked($event)" accept="audio/*" />
     </div>
     <div class="group record-button">
       <button type="button" (click)="toggleRecord()">

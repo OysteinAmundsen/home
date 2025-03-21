@@ -4,11 +4,11 @@ import { provideLocationMocks } from '@angular/common/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { WidgetService } from '@home/shared/widget/widget.service';
-import { default as WhisperComponent } from './whisper.component';
+import { default as TranscribeComponent } from './transcribe.component';
 
-describe('WidgetWhisperComponent', () => {
-  let component: WhisperComponent;
-  let fixture: ComponentFixture<WhisperComponent>;
+describe('TranscribeComponent', () => {
+  let component: TranscribeComponent;
+  let fixture: ComponentFixture<TranscribeComponent>;
 
   const widgetServiceMock = {
     getRoute: () => ({ path: 'starfield', data: { widget: true } }),
@@ -17,7 +17,7 @@ describe('WidgetWhisperComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WhisperComponent],
+      imports: [TranscribeComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -27,7 +27,7 @@ describe('WidgetWhisperComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(WhisperComponent);
+    fixture = TestBed.createComponent(TranscribeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
