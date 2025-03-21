@@ -33,11 +33,14 @@ export default class TranscribeComponent extends AbstractWidgetComponent {
   isProcessing = signal(false);
 
   // Holds the info message to display to the user
-  info = signal<string | undefined>(undefined);
+  defaultInfo = 'This tool can transcribe your voice to text. Upload audio or click record to speak.';
+  info = signal<string | undefined>(this.defaultInfo);
   setInfo = (msg: string | undefined) => doSafeTransition(() => this.info.set(msg));
   private onInfoChanged = effect(() => {
-    if (this.info()) {
-      setTimeout(() => this.setInfo(undefined), 5000);
+    const isProcessing = this.isProcessing();
+    if (isProcessing) return;
+    if (this.info() != this.defaultInfo) {
+      setTimeout(() => this.setInfo(this.defaultInfo), 5000);
     }
   });
 
@@ -59,47 +62,50 @@ export default class TranscribeComponent extends AbstractWidgetComponent {
     if (!this.mediaRecorder) {
       const recorder = new MediaRecorder(stream);
       recorder.ondataavailable = (e: BlobEvent) => this.chunks.push(e.data);
-      recorder.onstop = () => this.recordingStopped(recorder);
+      recorder.onstop = () => {
+        // Get the audio data as a blob and upload it
+        this.isRecording.set(false);
+        this.upload(new Blob(this.chunks, { type: recorder.mimeType }));
+        // Cleanup
+        this.chunks = [];
+        this.stream?.getTracks().forEach((track) => track.stop());
+        this.mediaRecorder = undefined;
+        this.stream = undefined;
+      };
       this.mediaRecorder = recorder;
     }
     return this.mediaRecorder;
   }
 
   async toggleRecord() {
-    const stream = await this.getStream();
-    const mediaRecorder = this.getRecorder(stream);
-    this.setTranscription(undefined);
-    if (!this.isRecording()) {
-      // Start recording
-      try {
-        mediaRecorder.start();
-        this.isRecording.set(true);
+    try {
+      const stream = await this.getStream();
+      const mediaRecorder = this.getRecorder(stream);
+      this.setTranscription(undefined);
+      if (!this.isRecording()) {
+        // Start recording
+        try {
+          mediaRecorder.start();
+          this.isRecording.set(true);
 
-        // Visualize the audio stream
-        const audioCtx = new AudioContext();
-        const source = audioCtx.createMediaStreamSource(stream);
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 2048;
-        const dataArray = new Uint8Array(analyser.fftSize);
-        source.connect(analyser);
-        this.draw(analyser, dataArray);
-      } catch (err) {
-        this.setInfo(`Cannot record: ${err}`);
+          // Visualize the audio stream
+          const audioCtx = new AudioContext();
+          const source = audioCtx.createMediaStreamSource(stream);
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 2048;
+          const dataArray = new Uint8Array(analyser.fftSize);
+          source.connect(analyser);
+          this.draw(analyser, dataArray);
+        } catch (err) {
+          this.setInfo(`Cannot record: ${err}`);
+        }
+      } else {
+        // Stop recording (fires onstop event)
+        mediaRecorder.stop();
       }
-    } else {
-      // Stop recording
-      mediaRecorder.stop();
+    } catch (err) {
+      this.setInfo(`Cannot record: ${err}`);
     }
-  }
-
-  private recordingStopped(mediaRecorder: MediaRecorder) {
-    this.isRecording.set(false);
-    this.upload(new Blob(this.chunks, { type: mediaRecorder.mimeType }));
-    // Cleanup
-    this.chunks = [];
-    this.stream?.getTracks().forEach((track) => track.stop());
-    this.mediaRecorder = undefined;
-    this.stream = undefined;
   }
 
   filePicked(event: Event) {
@@ -110,13 +116,18 @@ export default class TranscribeComponent extends AbstractWidgetComponent {
 
   async upload(blob: Blob) {
     this.isProcessing.set(true);
+    this.info.set(undefined);
     const formData = new FormData();
     formData.append('file', blob);
     try {
       const res = await firstValueFrom(
         this.http.post<{ status: string; transcription: string }>('/api/transcribe', formData),
       );
-      this.setTranscription(res.transcription);
+      if (res.transcription?.length) {
+        this.setTranscription(res.transcription);
+      } else {
+        this.setInfo('No audible voice data to process');
+      }
     } catch (err) {
       this.setInfo(`Cannot upload: ${err}`);
     }
