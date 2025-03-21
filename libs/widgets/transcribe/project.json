@@ -1,7 +1,7 @@
 {
-  "name": "widgets/whisper",
+  "name": "widgets/transcribe",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/widgets/whisper/src",
+  "sourceRoot": "libs/widgets/transcribe/src",
   "prefix": "lib",
   "projectType": "library",
   "tags": [],
@@ -10,7 +10,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/widgets/whisper/jest.config.ts"
+        "jestConfig": "libs/widgets/transcribe/jest.config.ts"
       }
     },
     "lint": {

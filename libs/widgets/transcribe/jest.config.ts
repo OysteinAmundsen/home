@@ -1,8 +1,8 @@
 export default {
-  displayName: 'widgets/whisper',
+  displayName: 'widgets/transcribe',
   preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../../coverage/libs/widgets/whisper',
+  coverageDirectory: '../../../coverage/libs/widgets/transcribe',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

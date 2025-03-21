@@ -1,5 +1,5 @@
 import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Component, effect, inject, linkedSignal, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, linkedSignal, signal } from '@angular/core';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
 
@@ -10,12 +10,12 @@ import { LineChart } from 'echarts/charts';
 import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 
+import { AppSettingsService } from '@home/shared/app.settings';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
 import { getComputedStyle, setAlpha } from '@home/shared/utils/color';
 import { deepMerge } from '@home/shared/utils/object';
 import { firstValueFrom } from 'rxjs';
 import { FundService } from './fund.service';
-import { AppSettingsService } from '@home/shared/app.settings';
 
 if (typeof window !== 'undefined') {
   echarts.use([LineChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);

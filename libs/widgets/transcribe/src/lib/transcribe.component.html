@@ -1,8 +1,8 @@
 <lib-widget [host]="host()">
   <form>
     <div class="group upload-button">
-      <label for="whisper" class="button">Upload audio</label>
-      <input id="whisper" type="file" (change)="filePicked($event)" accept="audio/*" />
+      <label for="upload" class="button">Upload audio</label>
+      <input id="upload" type="file" (change)="filePicked($event)" accept="audio/*" />
     </div>
     <div class="group record-button">
       <button type="button" (click)="toggleRecord()">
@@ -12,22 +12,14 @@
     </div>
   </form>
 
-  @if (info()) {
-    <div class="info-box">
-      <p>{{ info() }}</p>
-    </div>
-  }
-
-  @if (transcription()) {
-    <div class="info-box">
+  <div class="info-box">
+    @if (isProcessing()) {
+      <p>Processing...</p>
+    } @else if (transcription()) {
       <h2>Result</h2>
       <p>{{ transcription() }}</p>
-    </div>
-  }
-
-  @if (isProcessing()) {
-    <div class="info-box">
-      <p>Processing...</p>
-    </div>
-  }
+    } @else if (info()) {
+      <p>{{ info() }}</p>
+    }
+  </div>
 </lib-widget>
