@@ -13,7 +13,7 @@ export const widgetRoutes: Route[] = [
   },
   {
     path: 'fund',
-    data: { widget: true, tags: ['integrations', 'finance'] },
+    data: { widget: true, tags: ['integrations', 'finance', 'canvas2D'] },
     loadComponent: () => import('@home/widgets/fund').then((m) => m.default),
   },
   {

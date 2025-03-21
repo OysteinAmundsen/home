@@ -87,15 +87,9 @@ export function cache<T>(callback: () => Observable<T>, cacheKey: CacheKey, opti
   // Subscribe to the observable
   const { observable } = cacheEntry;
   observable.subscribe({
-    next(value) {
-      subject.next(value);
-    },
-    error(err) {
-      subject.error(err);
-    },
-    complete() {
-      subject.complete();
-    },
+    next: (value) => subject.next(value),
+    error: (err) => subject.error(err),
+    complete: () => subject.complete(),
   });
   return subject.asObservable();
 }
