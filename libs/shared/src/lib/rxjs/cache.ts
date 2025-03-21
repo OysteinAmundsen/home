@@ -1,5 +1,5 @@
 import { Signal } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
 const CACHE_SIZE = 1;
@@ -62,32 +62,40 @@ export class Cache {
  * @returns
  */
 export function cache<T>(callback: () => Observable<T>, cacheKey: CacheKey, options?: CacheOptions): Observable<T> {
-  return new Observable<T>((observer) => {
-    const now = Date.now();
-    const key = typeof cacheKey === 'function' ? cacheKey() : cacheKey;
-    let cacheEntry = Cache.get(key);
-    if (cacheEntry && cacheEntry.options) {
-      options = { ...options, ...cacheEntry.options };
-    }
+  const now = Date.now();
+  const key = typeof cacheKey === 'function' ? cacheKey() : cacheKey;
+  const subject = new ReplaySubject<T>(CACHE_SIZE);
 
-    if (!cacheEntry || (options?.expirationTime && now - cacheEntry.timestamp > options.expirationTime)) {
-      const observable = callback().pipe(shareReplay(CACHE_SIZE));
-      cacheEntry = { observable, timestamp: now, options };
-      Cache.set(key, cacheEntry);
-    }
+  let cacheEntry = Cache.get(key);
+  if (cacheEntry && cacheEntry.options) {
+    options = { ...options, ...cacheEntry.options };
+  }
 
-    const { observable } = cacheEntry;
+  // Calculate expiration time
+  let expires = Number.POSITIVE_INFINITY;
+  if (cacheEntry != null && options?.expirationTime) {
+    expires = cacheEntry.timestamp + options.expirationTime;
+  }
 
-    observable.subscribe({
-      next(value) {
-        observer.next(value);
-      },
-      error(err) {
-        observer.error(err);
-      },
-      complete() {
-        observer.complete();
-      },
-    });
+  // If the cache entry is missing or expired, create a new one
+  if (!cacheEntry || expires - now < 0) {
+    const observable = callback().pipe(shareReplay(CACHE_SIZE));
+    cacheEntry = { observable, timestamp: now, options };
+    Cache.set(key, cacheEntry);
+  }
+
+  // Subscribe to the observable
+  const { observable } = cacheEntry;
+  observable.subscribe({
+    next(value) {
+      subject.next(value);
+    },
+    error(err) {
+      subject.error(err);
+    },
+    complete() {
+      subject.complete();
+    },
   });
+  return subject.asObservable();
 }
