@@ -39,23 +39,28 @@ export async function bootstrap() {
     server.use(path, createProxyMiddleware(config));
   });
 
-  // Middleware to log all incoming requests (except proxy requests which has its own logger)
   server.use((req: Request, res: Response, next: NextFunction) => {
+    // LOG INCOMING REQUESTS
+    // (except proxy requests which has its own logger)
     logger('Expr', `${req.method}`, `${req.url}`);
-    next();
-  });
 
-  // Middleware to add security headers
-  server.use((req: Request, res: Response, next: NextFunction) => {
+    // ADD SECURITY HEADERS
+    // The 'unsafe-inline' are for the inline scripts in the Angular app
+    // They are included inline by the framework and are responsible for
+    // "jsaction" event replay. We tried to use sha's here to avoid unsafe-inline,
+    // but the sha's are different on every build, so we can't use them.
     const csp = `
       default-src 'self';
-      script-src 'unsafe-inline' 'self';
-      style-src fonts.googleapis.com 'unsafe-inline' 'self';
-      img-src 'self';
-      font-src fonts.gstatic.com 'self';
+      script-src  'self' 'unsafe-inline';
+      style-src   'self' 'unsafe-inline' fonts.googleapis.com;
+      img-src     'self';
+      font-src    'self' fonts.gstatic.com;
+      connect-src 'self' fonts.gstatic.com;
     `.replace(/\n/g, '');
     res.setHeader('Content-Security-Policy', csp);
-    res.setHeader('Permissions-Policy', 'geolocation=(self), microphone=(self)');
+
+    const permissions = ['geolocation=(self)', 'microphone=(self)'];
+    res.setHeader('Permissions-Policy', permissions.join(', '));
     next();
   });
 

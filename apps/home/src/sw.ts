@@ -25,7 +25,7 @@ setCacheNameDetails({
 });
 let manifest = self.__WB_MANIFEST;
 if (manifest == null || !Array.isArray(manifest)) {
-  manifest = [{ url: '/index.html', revision: null }];
+  manifest = [{ url: 'index.csr.html', revision: null }];
 }
 precacheAndRoute(manifest);
 
@@ -45,7 +45,7 @@ registerRoute(
     // Return true to signal that we want to use the handler.
     return true;
   },
-  createHandlerBoundToURL('/index.html'),
+  createHandlerBoundToURL('/index.csr.html'),
 );
 
 // #region Cache and routes

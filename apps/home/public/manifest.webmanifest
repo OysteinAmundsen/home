@@ -20,6 +20,20 @@
   "edge_side_panel": {
     "preferred_width": 400
   },
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "sizes": "1366x1024",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/dashboard_mobile.png",
+      "sizes": "412x915",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
   "icons": [
     {
       "src": "/icons/icon-36.png",
