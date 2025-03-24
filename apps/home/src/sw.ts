@@ -23,16 +23,16 @@ setCacheNameDetails({
   suffix: version,
   precache: 'precache',
 });
-let manifest = self.__WB_MANIFEST;
-if (manifest == null || !Array.isArray(manifest)) {
-  manifest = [{ url: 'index.csr.html', revision: null }];
-}
+const manifest = self.__WB_MANIFEST;
 precacheAndRoute(manifest);
 
 // Set up App Shell-style routing, so that all navigation requests
 // are fulfilled with your index.html shell. Learn more at
 // https://developers.google.com/web/fundamentals/architecture/app-shell
 const fileExtensionRegexp = new RegExp('/[^/?]+\\.[^/]+$');
+// When built through nx serve, the index file is named index.html
+// When built through nx build, the index file is named index.csr.html
+const index = manifest.find((entry: any) => entry.url.includes('index.'));
 registerRoute(
   // Return false to exempt requests from being fulfilled by index.html.
   ({ request, url }) => {
@@ -45,7 +45,7 @@ registerRoute(
     // Return true to signal that we want to use the handler.
     return true;
   },
-  createHandlerBoundToURL('/index.csr.html'),
+  createHandlerBoundToURL(`/${index?.url ?? 'index.html'}`),
 );
 
 // #region Cache and routes
