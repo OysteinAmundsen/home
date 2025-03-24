@@ -45,6 +45,20 @@ export async function bootstrap() {
     next();
   });
 
+  // Middleware to add security headers
+  server.use((req: Request, res: Response, next: NextFunction) => {
+    const csp = `
+      default-src 'self';
+      script-src 'unsafe-inline' 'self';
+      style-src fonts.googleapis.com 'unsafe-inline' 'self';
+      img-src 'self';
+      font-src fonts.gstatic.com 'self';
+    `.replace(/\n/g, '');
+    res.setHeader('Content-Security-Policy', csp);
+    res.setHeader('Permissions-Policy', 'geolocation=(self), microphone=(self)');
+    next();
+  });
+
   // Serve static files from the browser distribution folder
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
   const browserDistFolder = resolve(serverDistFolder, '../browser');
