@@ -11,7 +11,7 @@ bootstrapApplication(AppComponent, appConfig)
  * Load service worker
  * This will also listen for updates and act accordingly
  */
-function loadServiceWorker() {
+async function loadServiceWorker() {
   if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     try {
       const wb = new Workbox('/sw.js', { scope: '/', updateViaCache: 'none' });
@@ -33,18 +33,41 @@ function loadServiceWorker() {
       wb.addEventListener('activated', () => console.log('New service worker activated!'));
 
       // Register the service worker
-      wb.register({ immediate: true })
-        .then((reg) => {
-          if (!reg) throw 'Service worker not registered!';
+      const reg = await wb.register({ immediate: true });
+      if (!reg) throw 'Service worker not registered!';
 
-          // Check for updates every 5 minutes
-          setInterval(() => wb.update(), 1 * 60 * 1000);
-        })
-        .catch((err) => console.log(err));
+      // Check for updates every 5 minutes
+      setInterval(() => wb.update(), 1 * 60 * 1000);
+
+      // Setup notification
+      let subscription = await reg.pushManager.getSubscription();
+      if (!subscription) {
+        const { publicKey } = await fetch('/api/notification/vapid').then((res) => res.json());
+        const convertedKey = urlBase64ToUint8Array(publicKey);
+        subscription = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: convertedKey });
+      }
+      fetch('/api/notification/register', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(subscription),
+      });
     } catch (err) {
       console.log(err);
     }
   } else {
     console.log('Service worker not supported', 'App', true);
   }
+}
+
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
 }

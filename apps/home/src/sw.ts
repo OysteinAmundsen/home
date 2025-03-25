@@ -8,6 +8,15 @@ import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const self: ServiceWorkerGlobalScope | any;
+declare type PushMessageData = {
+  arrayBuffer: () => ArrayBuffer;
+  blob: () => Blob;
+  bytes: () => Uint8Array;
+  json: () => any;
+  text: () => string;
+};
+declare type PushEvent = Event & { data: PushMessageData; waitUntil: (f: Promise<unknown>) => void };
+
 const prefix = 'home';
 const version = 'v1';
 
@@ -25,6 +34,7 @@ setCacheNameDetails({
 });
 const manifest = self.__WB_MANIFEST;
 precacheAndRoute(manifest);
+console.log(manifest);
 
 // Set up App Shell-style routing, so that all navigation requests
 // are fulfilled with your index.html shell. Learn more at
@@ -95,4 +105,18 @@ self.addEventListener('message', (event: MessageEvent) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
+});
+
+// Handle push notifications
+self.addEventListener('push', (event: PushEvent) => {
+  if (!(self.Notification && self.Notification.permission === 'granted')) return;
+
+  const data = event.data?.json() ?? {};
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Title', {
+      body: data.message || 'Message',
+      tag: 'push-notification',
+      icon: 'images/notification.png',
+    }),
+  );
 });
