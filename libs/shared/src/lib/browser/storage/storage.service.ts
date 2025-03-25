@@ -30,6 +30,8 @@ export function getLocalStorage(document: Document): Storage {
   }
 }
 
+const shouldEncode = true;
+
 /**
  * A service that provides a simple key-value store using the browser's localStorage.
  *
@@ -65,28 +67,6 @@ export class StorageService {
   constructor() {
     // Load the storage from localStorage
     this.loadValues();
-  }
-
-  get length(): number {
-    return this.getAllKeys().size;
-  }
-  private getAllKeys(obj: Record<string, unknown> = this.values, parentPath = ''): Set<string> {
-    const keys = new Set<string>();
-
-    Object.keys(obj).forEach((key) => {
-      const fullPath = parentPath ? `${parentPath}.${key}` : key;
-
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
-        // Recursively get keys for nested objects
-        const nestedKeys = this.getAllKeys(obj[key] as Record<string, unknown>, fullPath);
-        nestedKeys.forEach((nestedKey) => keys.add(nestedKey));
-      } else {
-        // Add the full path for non-object values
-        keys.add(fullPath);
-      }
-    });
-
-    return keys;
   }
 
   clear(): void {
@@ -174,7 +154,18 @@ export class StorageService {
     }
   }
 
-  loadValues(): void {
+  flatten() {
+    const keys = this.getAllKeys();
+    const flat = new Map<string, unknown>();
+    keys.forEach((key) => flat.set(key, this.get(key)));
+    return flat;
+  }
+
+  get length(): number {
+    return this.getAllKeys().size;
+  }
+
+  private loadValues(): void {
     if (isPlatformBrowser(this.platformId)) {
       let valueStr = this.storage.getItem(STORAGE_KEY);
 
@@ -195,6 +186,25 @@ export class StorageService {
       valueStr = btoa(valueStr);
       this.storage.setItem(STORAGE_KEY, valueStr);
     }
+  }
+
+  private getAllKeys(obj: Record<string, unknown> = this.values, parentPath = ''): Set<string> {
+    const keys = new Set<string>();
+
+    Object.keys(obj).forEach((key) => {
+      const fullPath = parentPath ? `${parentPath}.${key}` : key;
+
+      if (typeof obj[key] === 'object' && obj[key] !== null) {
+        // Recursively get keys for nested objects
+        const nestedKeys = this.getAllKeys(obj[key] as Record<string, unknown>, fullPath);
+        nestedKeys.forEach((nestedKey) => keys.add(nestedKey));
+      } else {
+        // Add the full path for non-object values
+        keys.add(fullPath);
+      }
+    });
+
+    return keys;
   }
 
   private findKey(key: string, obj = this.values, level = 0): Record<string, unknown> | null {

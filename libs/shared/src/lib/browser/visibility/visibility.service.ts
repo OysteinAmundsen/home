@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { computed, inject, Injectable, OnDestroy, PLATFORM_ID, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 
 /**
@@ -22,6 +22,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 @Injectable({ providedIn: 'root' })
 export class VisibilityService implements OnDestroy {
   private readonly document = inject(DOCUMENT);
+  private readonly platformId = inject(PLATFORM_ID);
   // In SSR environment, the window object does not exist. We need to get a mockup window object from the globalThis object.
   // from angulars DOCUMENT object.
   private window = globalThis.window || this.document.defaultView;
@@ -33,7 +34,9 @@ export class VisibilityService implements OnDestroy {
   browserActive$ = toObservable(this.isBrowserActive);
 
   constructor() {
-    this.applyVisibilityChangeHandler();
+    if (isPlatformBrowser(this.platformId)) {
+      this.applyVisibilityChangeHandler();
+    }
   }
 
   ngOnDestroy(): void {

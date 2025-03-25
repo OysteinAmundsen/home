@@ -6,13 +6,34 @@
 }
 nav {
   display: flex;
+  place-content: space-between;
+  place-items: center;
   gap: 0.25rem;
-  flex-wrap: wrap;
-  @media screen and (max-width: 420px) {
-    flex-direction: column;
-    button {
+  menu {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    @media screen and (max-width: 570px) {
+      button {
+        flex: 1;
+      }
+    }
+    @media screen and (max-width: 420px) {
+      flex-direction: column;
       width: 100%;
-      flex: 1;
+      button {
+        width: 100%;
+      }
+    }
+  }
+  @media screen and (max-width: 470px) {
+    position: relative;
+    lib-popover-toggle {
+      position: absolute;
+      right: 0;
+      top: -7.5rem;
     }
   }
 }

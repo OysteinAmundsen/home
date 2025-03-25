@@ -7,6 +7,7 @@ import {
   concatMap,
   debounceTime,
   delay,
+  filter,
   Observable,
   of,
   retryWhen,
@@ -93,16 +94,12 @@ export class GeoLocationService implements OnDestroy {
     // Watch the location and report changes
     this.watchID = navigator.geolocation.watchPosition(
       (position: GeolocationPosition) => {
-        // Will trigger every time device location changes
         const pos = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         } as GeoLocationItem;
         if (objToString(pos) !== objToString(this.location())) {
-          // Current position differs from stored position
-          // Cache the location for later
           this.storage.set('location.position', pos);
-          // Return current position
           observer.next(pos);
         }
       },
@@ -162,22 +159,13 @@ export class GeoLocationService implements OnDestroy {
     this.locationMethod$
       .pipe(
         takeUntilDestroyed(this.destroyRef$),
-        switchMap((value) => {
-          switch (value) {
-            case 'auto':
-              return this.watchLocation$;
-            default:
-              return this.selectedLocation$;
-          }
-        }),
+        switchMap((value) => (value === 'auto' ? this.watchLocation$ : this.selectedLocation$)),
+        filter(() => this.locationMethod() === 'auto'),
       )
       .subscribe({
         next: (location: GeoLocationItem | undefined) => {
-          if (this.locationMethod() !== 'auto') return;
           this.error.set('');
-          if (location) {
-            this.location.set(location);
-          }
+          if (location) this.selectLocation(location);
         },
         error: (error) => {
           this.error.set(error);
@@ -188,22 +176,19 @@ export class GeoLocationService implements OnDestroy {
     // Manually search for locations
     this.locationSearchString$
       .pipe(
-        debounceTime(500),
         takeUntilDestroyed(this.destroyRef$),
+        debounceTime(500),
+        filter((str: string | undefined) => this.locationMethod() === 'search' && (str?.length ?? 0) >= 2),
         switchMap((str: string | undefined) => {
-          const storedCity = this.storage.get('location.address', '');
-          if (this.locationMethod() === 'search') {
-            this.location.set(undefined);
-            if ((str?.length ?? 0) < 2) return of([]);
-            return this.search(str).pipe(
-              catchError((err) => {
-                this.error.set(err.error.message);
-                return of([] as GeoLocationItem[]);
-              }),
-            );
-          } else {
-            return of([]);
-          }
+          this.location.set(undefined);
+          this.error.set('');
+          const url = `/api/location/search?s=${str}`;
+          return cache(() => this.http.get<GeoLocationItem[]>(url), url).pipe(
+            catchError((err) => {
+              this.error.set(err.error.message);
+              return of([]);
+            }),
+          );
         }),
       )
       .subscribe({
@@ -238,15 +223,6 @@ export class GeoLocationService implements OnDestroy {
     if (location.address) {
       this.storage.set('location.address', location.address);
     }
-  }
-
-  search(str: string | undefined): Observable<GeoLocationItem[]> {
-    this.error.set('');
-    if (!str) return of([] as GeoLocationItem[]);
-    return cache(
-      () => this.http.get<GeoLocationItem[]>(`/api/location/search?s=${str}`),
-      `/api/location/search?s=${str}`,
-    );
   }
 
   /**

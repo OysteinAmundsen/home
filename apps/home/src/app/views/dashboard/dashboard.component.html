@@ -1,10 +1,11 @@
 <nav>
-  @for (tag of tags.value(); track tag) {
-    <button type="button" (click)="filter(tag)">{{ tag | string: 'titleCase' }}</button>
-  }
-  <button type="button" (click)="filter('nothing')">Nothing</button>
-  <button type="button" (click)="filter(undefined)">All</button>
-  <div class="spacer"></div>
+  <menu>
+    @for (tag of tags.value(); track tag) {
+      <button type="button" (click)="filter(tag)">{{ tag | string: 'titleCase' }}</button>
+    }
+    <button type="button" (click)="filter('nothing')">Nothing</button>
+    <button type="button" (click)="filter(undefined)">All</button>
+  </menu>
   <lib-popover-toggle [popoverPanel]="popoverPanel"></lib-popover-toggle>
 </nav>
 
