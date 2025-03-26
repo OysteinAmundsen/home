@@ -38,7 +38,6 @@ setCacheNameDetails({
 });
 const manifest = self.__WB_MANIFEST;
 precacheAndRoute(manifest);
-console.log(manifest);
 
 // Set up App Shell-style routing, so that all navigation requests
 // are fulfilled with your index.html shell. Learn more at

@@ -7,24 +7,21 @@ import { SERVICE_WORKER } from '../service-worker/service-worker';
 export class NotificationService {
   private readonly platformId = inject(PLATFORM_ID);
 
-  async canSubscribe() {
+  private async getRegistration(): Promise<ServiceWorkerRegistration | undefined> {
     // Should not run in SSR
-    if (isPlatformServer(this.platformId)) return false;
+    if (isPlatformServer(this.platformId)) return undefined;
 
     // Setup notification
-    const reg = await navigator.serviceWorker.getRegistration(SERVICE_WORKER);
-    return reg != null;
+    return await navigator.serviceWorker.getRegistration(SERVICE_WORKER);
   }
 
-  async hasSubscription() {
-    // Should not run in SSR
-    if (isPlatformServer(this.platformId)) return false;
+  async canSubscribe(): Promise<boolean> {
+    return (await this.getRegistration()) != null;
+  }
 
-    // Setup notification
-    const reg = await navigator.serviceWorker.getRegistration(SERVICE_WORKER);
-    if (!reg) {
-      return false;
-    }
+  async hasSubscription(): Promise<boolean> {
+    const reg = await this.getRegistration();
+    if (!reg) return false;
 
     // Check if we already have a subscription
     return !!(await reg.pushManager.getSubscription());
@@ -33,46 +30,49 @@ export class NotificationService {
   /**
    * Subscribes to the notification service
    *
-   *
-   * @returns
+   * @returns the subscription object if successful
    */
-  async subscribe() {
+  async subscribe(): Promise<PushSubscription | undefined> {
     // Should not run in SSR
-    if (isPlatformServer(this.platformId)) return;
+    if (isPlatformServer(this.platformId)) return undefined;
 
     // Setup notification
     const reg = await navigator.serviceWorker.getRegistration(SERVICE_WORKER);
-    if (!reg) {
-      throw new Error('Service worker not registered');
-    }
+    if (!reg) throw new Error('Service worker not registered');
 
     // Check if we already have a subscription
     let subscription = await reg.pushManager.getSubscription();
     if (!subscription) {
       const { publicKey } = await fetch('/api/notification/vapid').then((res) => res.json());
       const convertedKey = urlBase64ToUint8Array(publicKey);
-      // This will ask for user permission
+      // This will ask for user permission and create a subscription
       subscription = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: convertedKey });
+      if (subscription) {
+        // User accepted. Save the subscription to the server
+        const res = await fetch('/api/notification/register', {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(subscription),
+        }).then((res) => res.json());
+      }
     }
-    // TODO: Do not send the subscription object if a previous subscription exists, when
-    // we have a backend to store the subscription
-    fetch('/api/notification/register', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(subscription),
-    });
-    return subscription;
+    return subscription || undefined;
   }
 
+  /**
+   * Unsubscribe from the notification service.
+   *
+   * This will also remove the subscription object from the server
+   * as a new one will have to be created when subscribing again.
+   *
+   * @returns true if the unsubscription was successful
+   */
   async unsubscribe(): Promise<boolean> {
     // Should not run in SSR
     if (isPlatformServer(this.platformId)) return false;
 
-    // Setup notification
-    const reg = await navigator.serviceWorker.getRegistration(SERVICE_WORKER);
-    if (!reg) {
-      throw new Error('Service worker not registered');
-    }
+    const reg = await this.getRegistration();
+    if (!reg) throw new Error('Service worker not registered');
 
     // Check if we already have a subscription
     const subscription = await reg.pushManager.getSubscription();
@@ -81,8 +81,8 @@ export class NotificationService {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(subscription),
-      });
-      return subscription.unsubscribe();
+      }).then((res) => res.json());
+      return await subscription.unsubscribe();
     }
     return true;
   }
