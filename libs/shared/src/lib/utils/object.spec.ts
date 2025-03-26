@@ -32,3 +32,16 @@ describe('deepMerge', () => {
     expect(objToString(a)).toEqual('{"a":1,"b":2,"c":{"a":"#REF:$","b":2}}');
   });
 });
+
+describe('objToString', () => {
+  it('should convert object to a string', () => {
+    expect(objToString({})).toEqual('{}');
+    expect(objToString({ a: 1, b: 2 })).toEqual('{"a":1,"b":2}');
+  });
+  it('should truncate circular dependencies', () => {
+    const a: any = { a: 1, b: 2 };
+    const b: any = { a, b: 2 };
+    a.c = b;
+    expect(objToString(a)).toEqual('{"a":1,"b":2,"c":{"a":"#REF:$","b":2}}');
+  });
+});

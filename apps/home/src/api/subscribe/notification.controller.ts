@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { PushSubscription } from 'web-push';
 import { NotificationService } from './notification.service';
 
 /**
@@ -18,16 +19,24 @@ export class NotificationController {
   }
 
   @Post('register')
-  async subscribe(@Body() subscription: any) {
+  async subscribe(@Body() subscription: PushSubscription) {
     await this.notification.addSubscriptionClient(subscription);
     setTimeout(
       () =>
         this.notification.notifyClient(subscription, {
           title: 'Welcome',
           body: 'You are now subscribed to notifications',
+          type: 'notification',
+          tag: 'home-welcome',
         }),
       1000,
     );
+    return { success: true };
+  }
+
+  @Post('unregister')
+  async unsubscribe(@Body() subscription: PushSubscription) {
+    await this.notification.removeSubscriptionClient(subscription);
     return { success: true };
   }
 }

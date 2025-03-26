@@ -69,11 +69,13 @@
     }
     div {
       display: flex;
-      gap: 0.5rem;
       place-items: center;
       @media screen and (max-width: 240px) {
         flex-direction: column;
       }
+    }
+    > div {
+      gap: 0.5rem;
     }
   }
 }

@@ -3,7 +3,7 @@
   "include": [
     "src/**/*.ts",
     "../../libs/widgets/widget.routes.ts",
-    "../../libs/shared/src/lib/browser/geoLocation/location.model.ts"
+    "../../libs/shared/src/lib/browser/geo-location/location.model.ts"
   ],
   "compilerOptions": {},
   "exclude": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts"]

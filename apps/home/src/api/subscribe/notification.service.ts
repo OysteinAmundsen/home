@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PushSubscription, sendNotification, setVapidDetails } from 'web-push';
+import { PushSubscription, sendNotification, SendResult, setVapidDetails } from 'web-push';
+import { NotificationContent } from './notification.model';
 
 @Injectable()
 export class NotificationService {
@@ -30,8 +31,19 @@ export class NotificationService {
     this.clients.push(subscription);
   }
 
-  async notifyClient(subscription: PushSubscription, payload: any) {
+  removeSubscriptionClient(subscription: PushSubscription) {
+    // Remove the subscription from the database
+    this.clients = this.clients.filter((client) => client !== subscription);
+  }
+
+  async notifyClient(subscription: PushSubscription, payload: NotificationContent): Promise<SendResult> {
     // Send the notification to the client
-    const res = await sendNotification(subscription, JSON.stringify(payload), {});
+    return await sendNotification(subscription, JSON.stringify(payload), {
+      vapidDetails: {
+        subject: `${this.VAPID}`,
+        publicKey: `${this.PUBLIC_KEY}`,
+        privateKey: `${this.PRIVATE_KEY}`,
+      },
+    });
   }
 }

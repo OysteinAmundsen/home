@@ -5,17 +5,21 @@ import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from
 import { googleFontsCache } from 'workbox-recipes';
 import { registerRoute, setDefaultHandler } from 'workbox-routing';
 import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
+import { NotificationContent } from './api/subscribe/notification.model';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const self: ServiceWorkerGlobalScope | any;
-declare type PushMessageData = {
-  arrayBuffer: () => ArrayBuffer;
-  blob: () => Blob;
-  bytes: () => Uint8Array;
-  json: () => any;
-  text: () => string;
-};
+
+// Typescript did not understand PushEvent, so we need to declare it
 declare type PushEvent = Event & { data: PushMessageData; waitUntil: (f: Promise<unknown>) => void };
+// and even though arrayBuffer, blob, bytes and text are in the PushMessageData interface, we only want json
+declare type PushMessageData = {
+  // arrayBuffer: () => ArrayBuffer;
+  // blob: () => Blob;
+  // bytes: () => Uint8Array;
+  json: () => NotificationContent;
+  // text: () => string;
+};
 
 const prefix = 'home';
 const version = 'v1';
@@ -114,9 +118,9 @@ self.addEventListener('push', (event: PushEvent) => {
   const data = event.data?.json() ?? {};
   event.waitUntil(
     self.registration.showNotification(data.title || 'Title', {
-      body: data.message || 'Message',
-      tag: 'push-notification',
-      icon: 'images/notification.png',
+      body: data.body || 'Message',
+      tag: data.tag || 'home-notification',
+      icon: `images/${data.type}.png`,
     }),
   );
 });

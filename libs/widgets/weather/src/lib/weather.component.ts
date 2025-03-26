@@ -15,8 +15,8 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { GeoLocationService } from '@home/shared/browser/geoLocation/geoLocation.service';
-import { GeoLocationItem } from '@home/shared/browser/geoLocation/location.model';
+import { GeoLocationService } from '@home/shared/browser/geo-location/geo-location.service';
+import { GeoLocationItem } from '@home/shared/browser/geo-location/location.model';
 import { IconPipe } from '@home/shared/pipes/icon.pipe';
 import { cache, Cache } from '@home/shared/rxjs/cache';
 import { PopoverAnchorDirective } from '@home/shared/ux/popover/popover-anchor.directive';
