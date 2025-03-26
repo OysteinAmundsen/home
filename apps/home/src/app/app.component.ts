@@ -4,6 +4,7 @@ import { Component, computed, ElementRef, HostListener, inject } from '@angular/
 import { RouterModule } from '@angular/router';
 import { AppSettingsService } from '@home/shared/app.settings';
 import { ConnectivityService } from '@home/shared/browser/connectivity/connectivity.service';
+import { NotifyComponent } from '@home/shared/browser/notification/notify.component';
 import { ThemeComponent } from '@home/shared/browser/theme/theme.component';
 import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
 import { AuthenticationService } from './shared/auth/authentication.service';
@@ -12,7 +13,7 @@ import { TimeComponent } from './shared/time.component';
 import { dashboardAnimation } from './views/dashboard/dashboard.animation';
 
 @Component({
-  imports: [RouterModule, CommonModule, TimeComponent, ThemeComponent, LoginComponent],
+  imports: [RouterModule, CommonModule, TimeComponent, ThemeComponent, LoginComponent, NotifyComponent],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

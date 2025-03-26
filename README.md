@@ -14,6 +14,9 @@ The app features:
 
 This is my feature playground. Nothing useful here, just me playing around.
 
+![NX Graph](./docs/nx-graph.png)
+![Screenshot](./apps/home/public/screenshots/dashboard.png)
+
 ## How to build and use
 
 This project is built using [`bun`](https://bun.sh/).

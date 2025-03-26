@@ -50,6 +50,7 @@ const wbInject: Plugin = {
     // Pre-build the worker, so that we get a single module for this
     // as angular would chunk it otherwise
     builder.onStart(async () => {
+      manifest.clear();
       const result = await build({
         entryPoints: [`${appRoot}/src/sw.ts`],
         bundle: true,

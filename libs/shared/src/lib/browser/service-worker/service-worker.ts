@@ -1,0 +1,42 @@
+import { Workbox } from 'workbox-window';
+
+export const SERVICE_WORKER = '/sw.js';
+
+/**
+ * Load service worker
+ * This will also listen for updates and act accordingly
+ */
+export async function loadServiceWorker() {
+  if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+    try {
+      const wb = new Workbox(SERVICE_WORKER, { scope: '/', updateViaCache: 'none' });
+
+      // Log out events in sequence:
+      // [installing -> installed -> redundant -> waiting -> activating -> controlling -> activated]
+      wb.addEventListener('installing', () => console.log('Installing service worker'));
+      wb.addEventListener('installed', () => console.log('Installed!'));
+      wb.addEventListener('redundant', () => console.log('Redundant service worker found'));
+      wb.addEventListener('waiting', () => {
+        console.log('Waiting to activate service worker <- Auto skip');
+        wb.messageSkipWaiting();
+      });
+      wb.addEventListener('activating', () => console.log('Activating service worker'));
+      wb.addEventListener('controlling', () => {
+        console.log('Service worker controlling page <- Reloading');
+        window.location.reload();
+      });
+      wb.addEventListener('activated', () => console.log('New service worker activated!'));
+
+      // Register the service worker
+      const reg = await wb.register({ immediate: true });
+      if (!reg) throw 'Service worker not registered!';
+
+      // Check for updates every 5 minutes
+      setInterval(() => wb.update(), 1 * 60 * 1000);
+    } catch (err) {
+      console.log('WS registration failed: ', err);
+    }
+  } else {
+    console.log('Service worker not supported', 'App', true);
+  }
+}

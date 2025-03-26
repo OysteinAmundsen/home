@@ -1,7 +1,7 @@
 {
   "name": "HOME",
   "short_name": "Home",
-  "description": "My home app",
+  "description": "A dashboard style PWA.\n\n This is a collection of tiny apps that I create to test stuff out. Nothing important here, just my personal playground.",
   "theme_color": "#2e2e33",
   "background_color": "#2e2e33",
   "display": "standalone",

@@ -165,7 +165,7 @@ export class StorageService {
     return this.getAllKeys().size;
   }
 
-  private loadValues(): void {
+  loadValues(): void {
     if (isPlatformBrowser(this.platformId)) {
       let valueStr = this.storage.getItem(STORAGE_KEY);
 
