@@ -1,10 +1,11 @@
-Contains services for accessing browser api's.
+# Contains services for accessing browser api's.
 
-- [`ConnectivityService`](./connectivity/connectivity.service.ts) - detects if we are online or offline and reports back in a stream
-- [`GeoLocationService`](./geo-location/geo-location.service.ts) - monitors the geolocation browser api and reports the current GeoLocation of the device. This requires user permission.
-- [`StorageService`](./storage/storage.service.ts) - An abstraction for localStorage which can handle complex json structures instead of just string values.
+- [`ConnectivityService`](./connectivity/connectivity.service.ts) - Simple service which uses the `offline` and `online` events on the window object to detect our connectivity state and report it back in a stream
+- [`GeoLocationService`](./geo-location/geo-location.service.ts) - monitors the geolocation browser api and reports the current GeoLocation of the device. The service holds one of two `locationMethod`s: `auto` or `search`. Since geolocation requires user permission, we default to `search`. The search method uses a backend service to look up the geolocation based on a string. In our case we use googles geolocation api to convert a street address to a longitude/latitude pair, but when the locationMethod changes to auto, we ask for permission to access the browser api.
+- [`StorageService`](./storage/storage.service.ts) - An abstraction for localStorage which can handle complex json structures instead of just string values. This stores our local settings as a base64 encoded string.
 - [`ThemeService`](./theme/theme.service.ts) - monitors the current color scheme, which is set by default from the system OS but can also be overridden manually by the user. This allows UX to toggle light/dark mode but also allow system to auto-set preference.
-- [`VisibilityService`](./visibility/visibility.service.ts) - monitors if the browser is in focus and active or not
-- [`NotificationService`](./notification/notification.service.ts) - Helper which allows users to subscribe or unsubscribe to push notifications. This requires a service worker to be present
+- [`VisibilityService`](./visibility/visibility.service.ts) - monitors if the browser is in focus and active or not. This uses a combination of `visibilitychange` and `focus`/`blur` window events.
+- [`NotificationService`](./notification/notification.service.ts) - Helper which allows users to subscribe or unsubscribe to push notifications. This requires a service worker to be present. It also requires a [backend to be present](../../../../../apps/home/src/api/subscribe/notification.controller.ts) and capable of storing the subscriptions and pushing out messages. For push notification subscriptions to be accepted by the browser, you must have created vapid public/private keys first. These can be created using https://vapidkeys.com/
 
-Also contains a [directive wrapping the `ResizeObservable` api](./resize/resize.directive.ts) for an element. This can be used to report back what the elements intrinsic size is over time.
+This folder also contains a [directive wrapping the `ResizeObservable` api](./resize/resize.directive.ts) for an element. This can be used to report back what the elements intrinsic size is over time.
+This directive could be made better by holding one global resize observer instance instead of creating a new one for each element.
