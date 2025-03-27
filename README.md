@@ -63,7 +63,7 @@ In [server.ts](./apps/frontend/server.ts) I first setup a NestExpressApplication
 const app = await NestFactory.create<NestExpressApplication>(ApiModule);
 ```
 
-This creates the nest application with my [main module](./apps/backend/src/api/api.module.ts).
+This creates the nest application with my [main module](./apps/backend/src/api.module.ts).
 
 I then get the express instance:
 

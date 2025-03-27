@@ -18,7 +18,6 @@
     "baseUrl": ".",
     "types": ["node", "@webgpu/types", "express", "Multer"],
     "paths": {
-      "@home/backend": ["apps/backend/src/index.ts"],
       "@home/backend*": ["apps/backend/src/*"],
       "@home/builder": ["tools/builder/src/index.ts"],
       "@home/shared": ["libs/shared/src/index.ts"],

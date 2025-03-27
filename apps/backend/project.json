@@ -8,9 +8,12 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "webpack-cli build",
-        "args": ["node-env=production"],
-        "externalDependencies": ["class-transformer", "class-validator"]
+        "command": [
+          {
+            "command": "npx tsc --incremental --project ./apps/api/tsconfig.app.json"
+          }
+        ],
+        "args": ["node-env=production"]
       },
       "configurations": {
         "development": {

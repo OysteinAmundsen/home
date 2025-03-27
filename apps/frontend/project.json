@@ -1,5 +1,5 @@
 {
-  "name": "home",
+  "name": "frontend",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "app",
@@ -9,7 +9,7 @@
     "pwa": {
       "executor": "@home/builder:application",
       "options": {
-        "buildTarget": "home:build",
+        "buildTarget": "frontend:build",
         "serviceWorker": "apps/frontend/src/sw.ts",
         "tsConfig": "apps/frontend/tsconfig.wb.json"
       }
@@ -24,7 +24,19 @@
         "tsConfig": "apps/frontend/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "outputMode": "server",
-        "externalDependencies": ["class-transformer", "class-validator"],
+        "externalDependencies": [
+          "class-transformer",
+          "class-validator",
+          "mysql2",
+          "pg",
+          "pg-query-stream",
+          "tedious",
+          "better-sqlite3",
+          "mysql",
+          "oracledb",
+          "mariadb",
+          "libsql"
+        ],
         "stylePreprocessorOptions": {},
         "assets": [
           {
@@ -72,10 +84,10 @@
       "executor": "@nx/angular:dev-server",
       "configurations": {
         "production": {
-          "buildTarget": "home:build:production"
+          "buildTarget": "frontend:build:production"
         },
         "development": {
-          "buildTarget": "home:build:development"
+          "buildTarget": "frontend:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -83,7 +95,7 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "buildTarget": "home:build"
+        "buildTarget": "frontend:build"
       }
     },
     "lint": {
@@ -99,7 +111,7 @@
     "serve-static": {
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "home:build",
+        "buildTarget": "frontend:build",
         "port": 4200,
         "staticFilePath": "dist/apps/frontend/browser",
         "spa": true
