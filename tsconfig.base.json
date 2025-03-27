@@ -18,6 +18,8 @@
     "baseUrl": ".",
     "types": ["node", "@webgpu/types", "express", "Multer"],
     "paths": {
+      "@home/backend": ["apps/backend/src/index.ts"],
+      "@home/backend*": ["apps/backend/src/*"],
       "@home/builder": ["tools/builder/src/index.ts"],
       "@home/shared": ["libs/shared/src/index.ts"],
       "@home/shared/*": ["libs/shared/src/lib/*"],
@@ -25,8 +27,8 @@
       "@home/widgets/fund": ["libs/widgets/fund/src/index.ts"],
       "@home/widgets/pyramid": ["libs/widgets/pyramid/src/index.ts"],
       "@home/widgets/starfield": ["libs/widgets/starfield/src/index.ts"],
-      "@home/widgets/weather": ["libs/widgets/weather/src/index.ts"],
-      "@home/widgets/transcribe": ["libs/widgets/transcribe/src/index.ts"]
+      "@home/widgets/transcribe": ["libs/widgets/transcribe/src/index.ts"],
+      "@home/widgets/weather": ["libs/widgets/weather/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -4,6 +4,9 @@ import {
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
+import { ApiModule } from '@home/backend/api.module';
+import { logger } from '@home/backend/logger';
+import { proxyRoutes } from '@home/backend/proxy.routes';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import express, { NextFunction, Request, Response } from 'express';
@@ -11,9 +14,6 @@ import session from 'express-session';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ApiModule } from './src/api/api.module';
-import { logger } from './src/api/logger';
-import { proxyRoutes } from './src/api/proxy.routes';
 
 export async function bootstrap() {
   // Create the NestJS application

@@ -15,7 +15,7 @@ The app features:
 This is my feature playground. Nothing useful here, just me playing around.
 
 ![NX Graph](./docs/nx-graph.png)
-![Screenshot](./apps/home/public/screenshots/dashboard.png)
+![Screenshot](./apps/frontend/public/screenshots/dashboard.png)
 
 ## How to build and use
 
@@ -57,13 +57,13 @@ This installs python and loads up the whisper ai model. After this, `bun start` 
 
 Angular now allows the use of a express http server for its server side rendering. By utilizing this, we can extend the capabilities here by also introducing a backend framework like NestJS. This is how I do it:
 
-In [server.ts](./apps/home/server.ts) I first setup a NestExpressApplication
+In [server.ts](./apps/frontend/server.ts) I first setup a NestExpressApplication
 
 ```typescript
 const app = await NestFactory.create<NestExpressApplication>(ApiModule);
 ```
 
-This creates the nest application with my [main module](./apps/home/src/api/api.module.ts).
+This creates the nest application with my [main module](./apps/backend/src/api/api.module.ts).
 
 I then get the express instance:
 
@@ -105,7 +105,7 @@ Angular SSR process is here used as an express middleware, which NestJS has supp
 
 ## Service-worker
 
-This app is a PWA. Which means that it needs a [web manifest](./apps/home/public/manifest.webmanifest) and a [javascript file](./apps/home/src/sw.ts) which is loaded and registered on startup.
+This app is a PWA. Which means that it needs a [web manifest](./apps/frontend/public/manifest.webmanifest) and a [javascript file](./apps/frontend/src/sw.ts) which is loaded and registered on startup.
 
 One of the main things a service-worker does, is it instructs the browser to pre-load and cache all the static resources of your app - like javascript, css and other files (the most important being your `index.html`).
 
@@ -118,24 +118,24 @@ This is no problem when running a production build (`nx build`). All you have to
 
 This repo tries to solve this by using 2 things to do build the service-worker pre-cache:
 
-- [A custom esbuild plugin](./apps/home/builders/custom-esbuild.ts) which runs on `nx serve` and tries to hook into esbuild's `onEnd` hook. But angular uses both esbuild and vite to build, and esbuild only bundles the javascript. So I get the bundles here, but nothing else. I try to loop through what is known and generate a pre-cache regardless, but I cannot get the generated css here.
-- [A custom webpack plugin](./apps/home/builders/webpack.config.js) which runs on `nx build` and properly creates the precache based on files actually outputted to disk.
+- [A custom esbuild plugin](./apps/frontend/builders/custom-esbuild.ts) which runs on `nx serve` and tries to hook into esbuild's `onEnd` hook. But angular uses both esbuild and vite to build, and esbuild only bundles the javascript. So I get the bundles here, but nothing else. I try to loop through what is known and generate a pre-cache regardless, but I cannot get the generated css here.
+- [A custom webpack plugin](./apps/frontend/builders/webpack.config.js) which runs on `nx build` and properly creates the precache based on files actually outputted to disk.
 
-The first is given to esbuild by using the [nx application executor](./apps/home/project.json) for our builds:
+The first is given to esbuild by using the [nx application executor](./apps/frontend/project.json) for our builds:
 
 ```json
   "targets": {
     "build": {
       "executor": "@nx/angular:application",
       "options": {
-        "plugins": ["apps/home/builders/custom-esbuild.ts"],
+        "plugins": ["apps/frontend/builders/custom-esbuild.ts"],
 ```
 
 Which actually means that it runs both on build and on serve, but for `nx build` I overwrite the results with the proper pre-cache. This is done using a separate script:
 
 ```bash
 nx build
-bun x webpack --config ./apps/home/builders/webpack.config.js
+bun x webpack --config ./apps/frontend/builders/webpack.config.js
 ```
 
 So angular builds first, then I run the `workbox-build.injectManifest` after.
@@ -146,7 +146,7 @@ The most important thing here, is that I have an active and working service-work
 
 I wanted to make a dashboard of mini-applications. Each mini-application (widget) should be lazily loaded. For individual routes, this is easy using angular and the `loadChildren` route config. But when the widgets should be displayed in a single view, like a dashboard, it becomes a bit more tricky.
 
-We have a [dashboard view](./apps/home/src/app/views/dashboard/) and we use a [widget-loader](./libs/shared/src/lib/widget/widget-loader.component.ts) to load in our widgets at runtime. So widgets are only loaded when something in the dashboard instructs the widget loader to do so. This means that you can create an endless portfolio of widgets, but they take up no space on the client before the client is instructed to show them.
+We have a [dashboard view](./apps/frontend/src/app/views/dashboard/) and we use a [widget-loader](./libs/shared/src/lib/widget/widget-loader.component.ts) to load in our widgets at runtime. So widgets are only loaded when something in the dashboard instructs the widget loader to do so. This means that you can create an endless portfolio of widgets, but they take up no space on the client before the client is instructed to show them.
 
 Our [widget service](./libs/shared/src/lib/widget/widget.service.ts) uses the [widget-routes](./libs/widgets/widget.routes.ts) as a repository of which widget names are available and how to load them. The dashboard view asks the backend for a dashboard configuration, which is basically an array of widget names to display. When this is received, the dashboard view creates one widget-loader per widget name, and the loader takes care of loading the code, creating the component dynamically and render it in the dashboard viewport. And since the widget repository is also a route configuration, we can use this to create routes to show our widgets in fullscreen.
 

@@ -46,4 +46,4 @@ COPY --from=builder /usr/src/app/package.json .
 # run the app
 USER bun
 EXPOSE 4200/tcp
-ENTRYPOINT [ "bun", "apps/home/server/server.mjs" ]
+ENTRYPOINT [ "bun", "apps/frontend/server/server.mjs" ]
