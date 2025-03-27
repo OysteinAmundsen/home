@@ -24,7 +24,7 @@
         "tsConfig": "apps/frontend/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "outputMode": "server",
-        "externalDependencies": ["class-transformer/storage"],
+        "externalDependencies": ["class-transformer", "class-validator"],
         "stylePreprocessorOptions": {},
         "assets": [
           {

@@ -15,6 +15,7 @@ module.exports = {
       optimization: false,
       outputHashing: 'none',
       generatePackageJson: true,
+      externalDependencies: ['class-transformer', 'class-validator'],
     }),
   ],
 };
