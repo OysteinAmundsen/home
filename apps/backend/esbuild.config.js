@@ -8,7 +8,22 @@ esbuild
     bundle: true,
     platform: 'node',
     outdir: 'dist/apps/backend',
-    external: ['node_modules/*', 'class-transformer/storage'],
+    external: [
+      'node_modules/*',
+      'class-transformer',
+      // I wish I could say here that everything under `@home/widgets/*`
+      // should be external, EXCEPT `@home/widgets/widget.routes`. Like:
+      // ```
+      // '@home/widgets/*',
+      // '!@home/widgets/widget.routes',
+      // ```
+      // but esbuild doesn't seem to support that yet.
+      '@home/widgets/fund',
+      '@home/widgets/pyramid',
+      '@home/widgets/starfield',
+      '@home/widgets/transcribe',
+      '@home/widgets/weather',
+    ],
     sourcemap: !isProduction,
     minify: isProduction,
   })

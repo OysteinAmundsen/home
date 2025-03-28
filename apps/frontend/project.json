@@ -25,6 +25,7 @@
         "inlineStyleLanguage": "scss",
         "outputMode": "server",
         "externalDependencies": [
+          "node_modules/*",
           "class-transformer",
           "class-validator",
           "mysql2",
