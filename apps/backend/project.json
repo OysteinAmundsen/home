@@ -8,16 +8,14 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": [
-          {
-            "command": "npx tsc --incremental --project ./apps/backend/tsconfig.app.json"
-          }
-        ],
-        "args": ["node-env=production"]
+        "command": "node apps/backend/esbuild.config.js"
       },
       "configurations": {
         "development": {
-          "args": ["node-env=development"]
+          "command": "cross-env NODE_ENV=development node apps/backend/esbuild.config.js"
+        },
+        "production": {
+          "command": "cross-env NODE_ENV=production node apps/backend/esbuild.config.js"
         }
       }
     },
