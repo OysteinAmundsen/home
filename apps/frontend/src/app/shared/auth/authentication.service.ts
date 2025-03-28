@@ -1,9 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
-import { GetRegistrationOptionsResponse } from '../../../api/auth/authenticator.model';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { GetRegistrationOptionsResponse } from '@home/backend/app/auth/authenticator.model';
 import { StorageService } from '@home/shared/browser/storage/storage.service';
+import { firstValueFrom } from 'rxjs';
 
 const bufferToBase64 = (buffer: ArrayBuffer) => btoa(String.fromCharCode(...new Uint8Array(buffer)));
 const base64ToBuffer = (base64: string) => Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));

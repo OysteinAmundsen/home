@@ -1,44 +1,57 @@
 {
-  "name": "home",
+  "name": "frontend",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "app",
-  "sourceRoot": "apps/home/src",
+  "sourceRoot": "apps/frontend/src",
   "tags": [],
   "targets": {
     "pwa": {
       "executor": "@home/builder:application",
       "options": {
-        "buildTarget": "home:build",
-        "serviceWorker": "apps/home/src/sw.ts",
-        "tsConfig": "apps/home/tsconfig.wb.json"
+        "buildTarget": "frontend:build",
+        "serviceWorker": "apps/frontend/src/sw.ts",
+        "tsConfig": "apps/frontend/tsconfig.wb.json"
       }
     },
     "build": {
       "executor": "@nx/angular:application",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/home",
-        "index": "apps/home/src/index.html",
-        "browser": "apps/home/src/main.ts",
-        "tsConfig": "apps/home/tsconfig.app.json",
+        "outputPath": "dist/apps/frontend",
+        "index": "apps/frontend/src/index.html",
+        "browser": "apps/frontend/src/main.ts",
+        "tsConfig": "apps/frontend/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "outputMode": "server",
-        "externalDependencies": ["class-transformer/storage"],
+        "externalDependencies": [
+          "node_modules/*",
+          "class-transformer",
+          "class-validator",
+          "mysql2",
+          "pg",
+          "pg-query-stream",
+          "tedious",
+          "better-sqlite3",
+          "mysql",
+          "oracledb",
+          "mariadb",
+          "libsql"
+        ],
         "stylePreprocessorOptions": {},
         "assets": [
           {
             "glob": "**/*",
-            "input": "apps/home/public"
+            "input": "apps/frontend/public"
           }
         ],
-        "styles": ["apps/home/src/styles.scss"],
+        "styles": ["apps/frontend/src/styles.scss"],
         "scripts": [],
-        "server": "apps/home/src/main.server.ts",
+        "server": "apps/frontend/src/main.server.ts",
         "ssr": {
-          "entry": "apps/home/server.ts"
+          "entry": "apps/frontend/server.ts"
         },
-        "plugins": ["apps/home/builders/custom-esbuild.ts"],
+        "plugins": ["apps/frontend/builders/custom-esbuild.ts"],
         "loader": {
           ".wgsl": "text"
         }
@@ -72,10 +85,10 @@
       "executor": "@nx/angular:dev-server",
       "configurations": {
         "production": {
-          "buildTarget": "home:build:production"
+          "buildTarget": "frontend:build:production"
         },
         "development": {
-          "buildTarget": "home:build:development"
+          "buildTarget": "frontend:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -83,7 +96,7 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "buildTarget": "home:build"
+        "buildTarget": "frontend:build"
       }
     },
     "lint": {
@@ -93,15 +106,15 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/home/jest.config.ts"
+        "jestConfig": "apps/frontend/jest.config.ts"
       }
     },
     "serve-static": {
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "home:build",
+        "buildTarget": "frontend:build",
         "port": 4200,
-        "staticFilePath": "dist/apps/home/browser",
+        "staticFilePath": "dist/apps/frontend/browser",
         "spa": true
       }
     }

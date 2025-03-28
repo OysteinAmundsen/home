@@ -52,10 +52,10 @@ class GenerateManifestAndInject {
 
 module.exports = {
   mode: 'production',
-  entry: './apps/home/src/sw.ts',
+  entry: './apps/frontend/src/sw.ts',
   output: {
     filename: 'sw.js',
-    path: path.resolve('./dist/apps/home/browser'),
+    path: path.resolve('./dist/apps/frontend/browser'),
   },
   module: {
     rules: [
@@ -67,7 +67,7 @@ module.exports = {
     ],
   },
   resolve: {
-    modules: ['./apps/home/src', 'node_modules'],
+    modules: ['./apps/frontend/src', 'node_modules'],
     extensions: ['.ts', '.js'],
   },
   plugins: [new GenerateManifestAndInject()],

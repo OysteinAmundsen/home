@@ -26,14 +26,22 @@ export class NotificationService {
     return this.PUBLIC_KEY;
   }
 
-  addSubscriptionClient(subscription: PushSubscription) {
+  async addSubscriptionClient(subscription: PushSubscription) {
     // Save the subscription to the database
-    this.clients.push(subscription);
+    // return await this.subscriptionRepository.save({ subscriptionObject: objToString(subscription) } as Subscription);
+    return Promise.resolve(subscription);
   }
 
-  removeSubscriptionClient(subscription: PushSubscription) {
+  async removeSubscriptionClient(subscription: PushSubscription): Promise<boolean> {
     // Remove the subscription from the database
-    this.clients = this.clients.filter((client) => client !== subscription);
+    // const sub = await this.subscriptionRepository.findOneBy({
+    //   subscriptionObject: objToString(subscription),
+    // } as Subscription);
+    // if (sub) {
+    //   const entity = await this.subscriptionRepository.remove(sub);
+    //   return true;
+    // }
+    return false;
   }
 
   async notifyClient(subscription: PushSubscription, payload: NotificationContent): Promise<SendResult> {

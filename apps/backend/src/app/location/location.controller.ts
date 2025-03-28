@@ -1,7 +1,7 @@
 import { GeoLocationItem } from '@home/shared/browser/geo-location/location.model';
 import { Controller, Get, NotFoundException, Query } from '@nestjs/common';
 import * as dotenv from 'dotenv';
-import { logger } from '../logger';
+import { logger } from '../../logger';
 
 /**
  * The controller for the /api/location route.
