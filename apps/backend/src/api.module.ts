@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AuthenticatorModule } from './api/auth/authenticator.module';
-import { LocationModule } from './api/location/location.module';
-import { NotificationModule } from './api/subscribe/notification.module';
-import { TranscribeModule } from './api/transcribe/transcribe.module';
-import { WidgetModule } from './api/widget/widget.module';
+import { AuthenticatorModule } from './app/auth/authenticator.module';
+import { LocationModule } from './app/location/location.module';
+import { NotificationModule } from './app/subscribe/notification.module';
+import { TranscribeModule } from './app/transcribe/transcribe.module';
+import { WidgetModule } from './app/widget/widget.module';
 
 @Module({
   // Setup backend modules

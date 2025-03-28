@@ -1,7 +1,8 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
-import { GetRegistrationOptionsResponse } from '@home/backend/api/auth/authenticator.model';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { GetRegistrationOptionsResponse } from '@home/backend/app/auth/authenticator.model';
 import { StorageService } from '@home/shared/browser/storage/storage.service';
 import { firstValueFrom } from 'rxjs';
 

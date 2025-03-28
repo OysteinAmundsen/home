@@ -10,7 +10,7 @@
       "options": {
         "command": [
           {
-            "command": "npx tsc --incremental --project ./apps/api/tsconfig.app.json"
+            "command": "npx tsc --incremental --project ./apps/backend/tsconfig.app.json"
           }
         ],
         "args": ["node-env=production"]

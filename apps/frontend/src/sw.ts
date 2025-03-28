@@ -1,4 +1,5 @@
-import { NotificationContent } from '@home/backend/api/subscribe/notification.model';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { NotificationContent } from '@home/backend/app/subscribe/notification.model';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { setCacheNameDetails } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
