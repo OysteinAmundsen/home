@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, forwardRef, Get, Inject, Param } from '@nestjs/common';
 import { WidgetService } from './widget.service';
 
 /**
@@ -8,7 +8,7 @@ import { WidgetService } from './widget.service';
  */
 @Controller('api/widgets')
 export class WidgetController {
-  constructor(private widgetService: WidgetService) {}
+  constructor(@Inject(forwardRef(() => WidgetService)) private widgetService: WidgetService) {}
 
   /**
    * Fetch all widgets.
