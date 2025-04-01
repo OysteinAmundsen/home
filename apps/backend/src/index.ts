@@ -22,7 +22,7 @@ export async function createServer(withDB = true): Promise<{
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: false,
+        secure: true,
         maxAge: 60000,
       },
     }),
