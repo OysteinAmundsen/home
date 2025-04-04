@@ -6,7 +6,6 @@ import session from 'express-session';
 import { ApiModule } from './api.module';
 
 export * from './api.module';
-export * from './proxy.routes';
 
 export async function createServer(withDB = true): Promise<{
   app: NestExpressApplication;

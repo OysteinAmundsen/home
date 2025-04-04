@@ -6,7 +6,6 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import { createServer } from '@home/backend/';
-import { proxyRoutes } from '@home/backend/proxy.routes';
 import { Logger } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import express, { NextFunction, Request, Response } from 'express';
@@ -14,6 +13,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import net from 'node:net';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { proxyRoutes } from './proxy.routes';
 
 async function bootstrap() {
   let app: NestExpressApplication | undefined;
