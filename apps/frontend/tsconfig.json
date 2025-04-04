@@ -6,7 +6,6 @@
     "noPropertyAccessFromIndexSignature": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
     "types": ["node", "@webgpu/types", "express", "Multer"]
   },
   "angularCompilerOptions": {

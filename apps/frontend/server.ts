@@ -9,20 +9,53 @@ import { createServer } from '@home/backend/';
 import { Logger } from '@nestjs/common';
 import express, { NextFunction, Request, Response } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import net from 'node:net';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { proxyRoutes } from './proxy.routes';
 
-export async function bootstrap() {
-  // Create the NestJS application
-  const nest = await createServer();
-  const app = nest.app;
-  const server = nest.server;
+async function bootstrap() {
+  let app: NestExpressApplication | undefined;
+  let server: express.Express;
+
+  // Check if the backend server is already running
+  // If it is, we just start an express server for the Angular SSR
+  // If not, we create the NestJS application and start it
+  // Check if port 3000 is actively listening
+  const backendExists = await new Promise((resolve) => {
+    const tester = net
+      .createServer()
+      .once('error', () => resolve(true))
+      .once('listening', () => tester.close(() => resolve(false)))
+      .listen(3000);
+  });
+  if (backendExists) {
+    Logger.log('Backend already up and running. Starting just Angular SSR.');
+    server = express();
+  } else {
+    // Create the NestJS application (without DB connection)
+    // We cannot use a database in this context.
+    // see https://github.com/OysteinAmundsen/home/issues/33 for more details
+    const nest = await createServer(false);
+    app = nest.app;
+    server = nest.server;
+  }
 
   // Setup reverse proxy routes
   Object.entries(proxyRoutes).forEach(([path, config]) => {
     server.use(path, createProxyMiddleware(config));
   });
+  if (backendExists) {
+    // Setup reverse proxy for the backend api
+    server.use(
+      '/api',
+      createProxyMiddleware({
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        pathRewrite: (path, req) => '/api' + path.replace(/^\/api/, ''),
+      }),
+    );
+  }
 
   server.use((req: Request, res: Response, next: NextFunction) => {
     // ADD SECURITY HEADERS
@@ -78,13 +111,13 @@ export async function bootstrap() {
   });
 
   // Initialize the NestJS application and return the server
-  app.init();
+  if (app != null) app.init();
   return server;
 }
 
 const server = await bootstrap();
 if (isMainModule(import.meta.url)) {
-  const port = process.env['PORT'] || 4200;
+  const port = process.env.PORT || 4200;
   server.listen(port, () => {
     Logger.log(`SSR server listening on http://localhost:${port}`);
   });
