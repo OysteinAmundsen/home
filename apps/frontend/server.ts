@@ -6,6 +6,7 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import { createServer } from '@home/backend/';
+import { Logger } from '@nestjs/common';
 import express, { NextFunction, Request, Response } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { dirname, resolve } from 'node:path';
@@ -85,7 +86,7 @@ const server = await bootstrap();
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4200;
   server.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    Logger.log(`SSR server listening on http://localhost:${port}`);
   });
 }
 

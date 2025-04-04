@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { Logger } from '@nestjs/common';
 import type * as httpProxy from 'http-proxy';
 import { Options } from 'http-proxy-middleware';
 
@@ -26,22 +26,6 @@ enum Color {
   BG_White = 47,
   BG_Crimson = 48,
   BG_Gray = 100,
-}
-
-/**
- * Standard log format for the application
- */
-export function logger(system: string, type: string, message: string) {
-  console.log(
-    [
-      wrap(Color.FG_Green, `[${system}]`.padEnd(6, ' ')),
-      wrap(Color.FG_Green, `${process.pid}  -`),
-      `${format(new Date(), 'dd.MM.yyyy, HH:mm:ss')}`.padEnd(24, ' '),
-      wrap(Color.FG_Green, 'LOG'),
-      wrap(Color.FG_Yellow, `[${type}]`),
-      `${message}`,
-    ].join(' '),
-  );
 }
 
 /**
@@ -83,10 +67,9 @@ export const requestLogger = (proxyServer: httpProxy, options: Options) => {
       target = new URL(options.target as URL);
       target.pathname = proxyRes.req.path;
     }
-    logger(
-      'HPM',
-      `${req.method}`,
+    Logger.log(
       `${proxyPath} ${wrap([Color.FG_White, Color.BG_Blue], ' → ')} ${target.toString()} [${proxyRes.statusCode}]`,
+      `${req.method}`,
     );
   });
 };
