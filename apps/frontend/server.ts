@@ -5,35 +5,18 @@ import {
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
-import { ApiModule } from '@home/backend/api.module';
-import { logger } from '@home/backend/logger';
-import { proxyRoutes } from '@home/backend/proxy.routes';
-import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import { createServer } from '@home/backend/';
 import express, { NextFunction, Request, Response } from 'express';
-import session from 'express-session';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { proxyRoutes } from './proxy.routes';
 
 export async function bootstrap() {
   // Create the NestJS application
-  const app = await NestFactory.create<NestExpressApplication>(ApiModule);
-  // Get the Express instance
-  const server = app.getHttpAdapter().getInstance();
-
-  // Setup session middleware
-  app.use(
-    session({
-      secret: 'Not a real secret',
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        secure: false,
-        maxAge: 60000,
-      },
-    }),
-  );
+  const nest = await createServer();
+  const app = nest.app;
+  const server = nest.server;
 
   // Setup reverse proxy routes
   Object.entries(proxyRoutes).forEach(([path, config]) => {
@@ -41,10 +24,6 @@ export async function bootstrap() {
   });
 
   server.use((req: Request, res: Response, next: NextFunction) => {
-    // LOG INCOMING REQUESTS
-    // (except proxy requests which has its own logger)
-    logger('Expr', `${req.method}`, `${req.url}`);
-
     // ADD SECURITY HEADERS
     // The 'unsafe-inline' are for the inline scripts in the Angular app
     // They are included inline by the framework and are responsible for
