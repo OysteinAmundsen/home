@@ -17,7 +17,8 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "baseUrl": ".",
-    "types": ["node", "@webgpu/types", "express", "Multer"],
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node", "express", "multer"],
     "paths": {
       "@home/backend*": ["apps/backend/src/*"],
       "@home/builder": ["tools/builder/src/index.ts"],

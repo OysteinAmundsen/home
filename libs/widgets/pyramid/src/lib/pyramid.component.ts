@@ -1,3 +1,4 @@
+/// <reference types="@webgpu/types" />
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
   AfterViewInit,

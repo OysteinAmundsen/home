@@ -37,9 +37,8 @@ async function bootstrap() {
     // Create the NestJS application (without DB connection)
     // We cannot use a database in this context.
     // see https://github.com/OysteinAmundsen/home/issues/33 for more details
-    const nest = await createServer(false);
-    app = nest.app;
-    server = nest.server;
+    app = await createServer(false);
+    server = app.getHttpAdapter().getInstance();
   }
 
   // Setup reverse proxy routes
