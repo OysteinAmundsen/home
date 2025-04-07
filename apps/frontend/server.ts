@@ -7,6 +7,7 @@ import {
 } from '@angular/ssr/node';
 import { createServer } from '@home/backend/';
 import { Logger } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import express, { NextFunction, Request, Response } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import net from 'node:net';
