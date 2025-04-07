@@ -1,16 +1,13 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import express, { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import { ApiModule } from './api.module';
 
 export * from './api.module';
 
-export async function createServer(): Promise<{
-  app: NestExpressApplication;
-  server: express.Express;
-}> {
+export async function createServer(): Promise<NestExpressApplication> {
   // Create the NestJS application
   const app = await NestFactory.create<NestExpressApplication>(ApiModule);
 
@@ -27,16 +24,12 @@ export async function createServer(): Promise<{
     }),
   );
 
-  const server = app.getHttpAdapter().getInstance();
-  server.use((req: Request, res: Response, next: NextFunction) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     // LOG INCOMING REQUESTS
     // (except proxy requests which has its own logger)
     Logger.log(`${req.url}`, `${req.method}`);
     next();
   });
 
-  return {
-    app,
-    server,
-  };
+  return app;
 }

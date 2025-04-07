@@ -15,9 +15,8 @@ import { proxyRoutes } from './proxy.routes';
 
 export async function bootstrap() {
   // Create the NestJS application
-  const nest = await createServer();
-  const app = nest.app;
-  const server = nest.server;
+  const app = await createServer();
+  const server = app.getHttpAdapter().getInstance();
 
   // Setup reverse proxy routes
   Object.entries(proxyRoutes).forEach(([path, config]) => {
