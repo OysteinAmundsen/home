@@ -45,15 +45,26 @@ export class NotificationService {
     if (!subscription) {
       const { publicKey } = await fetch('/api/notification/vapid').then((res) => res.json());
       const convertedKey = urlBase64ToUint8Array(publicKey);
-      // This will ask for user permission and create a subscription
-      subscription = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: convertedKey });
-      if (subscription) {
-        // User accepted. Save the subscription to the server
-        const res = await fetch('/api/notification/register', {
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(subscription),
-        }).then((res) => res.json());
+      try {
+        // This will ask for user permission and create a subscription
+        subscription = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: convertedKey });
+        // TODO: Do not `register` again if we already have a subscription
+        // The only reason we do this for now, is because we do not persist
+        // the subscription on the server side yet.
+        if (subscription) {
+          // User accepted. Save the subscription to the server
+          const res = await fetch('/api/notification/register', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(subscription),
+          }).then((res) => res.json());
+        }
+      } catch (e) {
+        // NOTE: If this is an AbortError, and you are sure you've accepted the permission,
+        // the issue might be with a stricter browser policy. Brave does not want to
+        // show notifications on localhost at all, for example. You can try running it
+        // on chrome, which should work.
+        console.error('Failed to subscribe.', e);
       }
     }
     return subscription || undefined;

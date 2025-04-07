@@ -1,7 +1,6 @@
 import { GeoLocationItem } from '@home/shared/browser/geo-location/location.model';
-import { Controller, Get, NotFoundException, Query } from '@nestjs/common';
+import { Controller, Get, Logger, NotFoundException, Query } from '@nestjs/common';
 import * as dotenv from 'dotenv';
-import { logger } from '../../logger';
 
 /**
  * The controller for the /api/location route.
@@ -22,7 +21,7 @@ export class LocationController {
     const endpoint = new URL('https://maps.googleapis.com/maps/api/geocode/json');
     endpoint.searchParams.append('address', search);
     endpoint.searchParams.append('key', this.apiKey!);
-    logger('Nest', 'GET', endpoint.toString());
+    Logger.log(endpoint.toString(), 'GET');
     const response = await fetch(endpoint);
     if (!response.ok) {
       throw new Error(`Error: ${response.status} - ${response.statusText}`);
