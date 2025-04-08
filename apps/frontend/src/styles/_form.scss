@@ -65,6 +65,12 @@ input {
       border-color: var(--color-border);
       border-style: solid;
       border-width: 1px;
+      &:not(:is(button)) {
+        background-color: var(--color-background);
+      }
+      &:is(span) {
+        width: 1.5rem;
+      }
     }
     > :first-child {
       border-radius: var(--border-radius-input) 0 0 var(--border-radius-input);
@@ -78,6 +84,8 @@ input {
     > :last-child {
       border-radius: 0 var(--border-radius-input) var(--border-radius-input) 0;
       border-left: 0;
+      display: flex;
+      place-items: center;
     }
     &:has(> input:focus) {
       outline-style: solid;

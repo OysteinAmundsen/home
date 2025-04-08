@@ -1,5 +1,5 @@
 import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Component, effect, inject, linkedSignal, resource, signal } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, resource, signal } from '@angular/core';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
 
@@ -51,10 +51,11 @@ export default class FundComponent extends AbstractWidgetComponent {
       containLabel: true,
     },
     legend: {
-      bottom: 0,
-      textStyle: {
-        color: 'var(--color-text)',
-      },
+      show: false,
+      // bottom: 0,
+      // textStyle: {
+      //   color: 'var(--color-text)',
+      // },
     },
     xAxis: {
       type: 'time',
@@ -66,6 +67,7 @@ export default class FundComponent extends AbstractWidgetComponent {
     tooltip: {
       trigger: 'axis',
     },
+    series: [],
   });
   // Set dark mode in chart options when theme changes
   onThemeChanged = effect(() => {
@@ -79,7 +81,7 @@ export default class FundComponent extends AbstractWidgetComponent {
         const splitColor = legendColor ? setAlpha(legendColor, 0.1) : legendColor;
         const newOptions = deepMerge(original, {
           darkMode: theme === 'dark',
-          legend: { textStyle: { color: legendColor } },
+          // legend: { textStyle: { color: legendColor } },
           xAxis: {
             axisLabel: { color: axisColor },
           },
@@ -97,6 +99,7 @@ export default class FundComponent extends AbstractWidgetComponent {
     }, duration);
   });
 
+  selectedInstruments = this.settings.watchInstruments;
   availableTimeslots = this.fundService.timeslots;
   selectedTimeslot = linkedSignal(() => this.fundService.timeslots[1].value);
   dataLoader = resource({
@@ -128,10 +131,9 @@ export default class FundComponent extends AbstractWidgetComponent {
           grid: {
             bottom: this.isFullscreen() ? 40 : 0,
           },
-          legend: {
-            data: data.map((item: any) => item.instrument_info.long_name),
-            show: this.isFullscreen(),
-          },
+          // legend: {
+          //   data: data.map((item: any) => item.instrument_info.long_name),
+          // },
           series: data.map((item: any) => ({
             name: item.instrument_info.long_name,
             type: 'line',
@@ -148,6 +150,32 @@ export default class FundComponent extends AbstractWidgetComponent {
 
       return data;
     },
+  });
+
+  instruments = computed(() => {
+    const instruments = this.settings.watchInstruments();
+    const options = this.api()?.getOption() as any;
+    if (this.dataLoader.isLoading() || this.dataLoader.error()) {
+      return this.settings
+        .watchInstruments()
+        .map((id) => ({ id, name: '', color: '' }))
+        .sort((a: any, b: any) => b.id - a.id);
+    }
+    return this.dataLoader
+      .value()
+      .map((item: any) => {
+        let seriesIdx = 0;
+        if (options && Array.isArray(options.series)) {
+          seriesIdx = (options.series as []).findIndex((s: any) => s.name === item.instrument_info.long_name);
+        }
+
+        return {
+          id: item.instrument_info.instrument_id,
+          name: item.instrument_info.long_name,
+          color: options.color[seriesIdx],
+        };
+      })
+      .sort((a: any, b: any) => b.id - a.id);
   });
 
   onChartInit($event: echarts.ECharts) {

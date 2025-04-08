@@ -19,6 +19,30 @@
     <div echarts [options]="chartOption()" [autoResize]="true" class="chart" (chartInit)="onChartInit($event)"></div>
   }
   @if (isFullscreen()) {
-    <section>Can has fullscreen content?</section>
+    <section>
+      <!-- Show selected instruments and add a search box to add more instruments. -->
+      <div>
+        <header>
+          <h3>Instruments:</h3>
+          <div>
+            <div class="form-group">
+              <input type="text" placeholder="Search instruments..." />
+              <span class="material-symbols-outlined">search</span>
+            </div>
+          </div>
+        </header>
+        <ul class="list">
+          @for (instrument of instruments(); track instrument.id) {
+            <li class="list-item">
+              <span class="bullet" style="--col: {{ instrument.color }}"></span>
+              <span>{{ instrument.id }} - {{ instrument.name }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+      <footer>
+        Data is collected from&nbsp;<a href="https://www.nordnet.se/fonder/lista" target="_blank">nordnet.se</a>
+      </footer>
+    </section>
   }
 </lib-widget>

@@ -3,11 +3,13 @@
     ::ng-deep .widget-content {
       display: grid;
       grid-template:
+        'toolbar' auto
         'fund-chart' 1fr
         'fund-content' 1fr / 1fr;
     }
   }
   .toolbar {
+    grid-area: toolbar;
     display: flex;
     place-content: flex-end;
     place-items: center;
@@ -37,5 +39,23 @@
   }
   section {
     grid-area: fund-content;
+    header {
+      display: flex;
+      place-items: center;
+      gap: 1rem;
+    }
+    .bullet {
+      border-radius: 50%;
+      width: 0.5rem;
+      height: 0.5rem;
+      display: inline-block;
+      margin-right: 0.5rem;
+      background-color: var(--col);
+    }
+    footer {
+      margin-top: 2rem;
+      display: flex;
+      place-content: flex-end;
+    }
   }
 }
