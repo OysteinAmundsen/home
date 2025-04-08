@@ -7,6 +7,23 @@
         'fund-content' 1fr / 1fr;
     }
   }
+  .toolbar {
+    display: flex;
+    place-content: flex-end;
+    place-items: center;
+    gap: 0.25rem;
+    line-height: 2rem;
+    margin-top: -1rem;
+    .list {
+      display: flex;
+      gap: 0.25rem;
+      .list-item {
+        padding: 0;
+        background-color: transparent;
+        overflow: visible;
+      }
+    }
+  }
   .chart {
     grid-area: fund-chart;
     display: block;
@@ -14,6 +31,9 @@
     width: 100%;
     height: 100%;
     max-width: 100vw;
+    ::ng-deep > div:has(canvas) {
+      width: 100% !important;
+    }
   }
   section {
     grid-area: fund-content;

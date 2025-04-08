@@ -14,6 +14,15 @@ export type CacheOptions = {
   expirationTime?: number;
 };
 
+function keyToString(key: CacheKey): string {
+  if (typeof key === 'function') {
+    return key();
+  } else if (typeof key === 'string') {
+    return key;
+  }
+  throw new Error('Invalid cache key type');
+}
+
 /** The cache map is global */
 const cacheMap = new Map<CacheKey, CacheValue>();
 /**
@@ -22,16 +31,17 @@ const cacheMap = new Map<CacheKey, CacheValue>();
 export class Cache {
   /** Get a cache map entry */
   static get(key: CacheKey) {
-    return cacheMap.get(key);
+    return cacheMap.get(keyToString(key));
   }
 
   /** Set a cache map entry */
   static set(key: CacheKey, value: CacheValue) {
-    cacheMap.set(key, value);
+    cacheMap.set(keyToString(key), value);
   }
 
   /** Manipulate a cache map entry */
   static update(key: CacheKey, value: Partial<CacheValue>) {
+    key = keyToString(key);
     const current = cacheMap.get(key);
     if (current) {
       cacheMap.set(key, { ...current, ...value });
@@ -63,7 +73,7 @@ export class Cache {
  */
 export function cache<T>(callback: () => Observable<T>, cacheKey: CacheKey, options?: CacheOptions): Observable<T> {
   const now = Date.now();
-  const key = typeof cacheKey === 'function' ? cacheKey() : cacheKey;
+  const key = keyToString(cacheKey);
   const subject = new ReplaySubject<T>(CACHE_SIZE);
 
   let cacheEntry = Cache.get(key);

@@ -5,7 +5,9 @@
   "scripts": {
     "nx": "nx",
     "ng": "ng",
-    "start": "nx serve frontend",
+    "start": "bun run front",
+    "front": "nx serve frontend",
+    "back": "nx serve backend",
     "build": "nx build frontend --stats-json && bun run build:wb",
     "test": "nx test frontend",
     "lint": "nx lint frontend",

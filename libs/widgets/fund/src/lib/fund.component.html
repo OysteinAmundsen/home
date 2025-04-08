@@ -1,5 +1,21 @@
 <lib-widget [host]="host()">
   @if (canRender()) {
+    <div class="toolbar">
+      <div>Months:</div>
+      <ul class="list">
+        @for (timeslot of availableTimeslots; track timeslot.value) {
+          <li class="list-item">
+            <button
+              type="button"
+              (click)="selectedTimeslot.set(timeslot.value)"
+              [class]="{ active: selectedTimeslot() === timeslot.value }"
+            >
+              {{ timeslot.label }}
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
     <div echarts [options]="chartOption()" [autoResize]="true" class="chart" (chartInit)="onChartInit($event)"></div>
   }
   @if (isFullscreen()) {

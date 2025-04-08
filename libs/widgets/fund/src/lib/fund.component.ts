@@ -1,5 +1,5 @@
 import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Component, effect, inject, linkedSignal, signal } from '@angular/core';
+import { Component, effect, inject, linkedSignal, resource, signal } from '@angular/core';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
 
@@ -67,8 +67,6 @@ export default class FundComponent extends AbstractWidgetComponent {
       trigger: 'axis',
     },
   });
-  // Update chart when options change
-  onDataChanged = effect(() => this.api()?.setOption(this.chartOption()));
   // Set dark mode in chart options when theme changes
   onThemeChanged = effect(() => {
     const theme = this.theme.selectedTheme();
@@ -98,23 +96,34 @@ export default class FundComponent extends AbstractWidgetComponent {
       });
     }, duration);
   });
-  onInstrumentChanged = effect(() => this.loadData(this.settings.watchInstruments()));
 
-  async loadData(instruments = this.settings.watchInstruments()) {
-    try {
+  availableTimeslots = this.fundService.timeslots;
+  selectedTimeslot = linkedSignal(() => this.fundService.timeslots[1].value);
+  dataLoader = resource({
+    request: () => ({
+      instruments: this.settings.watchInstruments(),
+      timeslot: this.selectedTimeslot(),
+    }),
+    loader: async ({ request }) => {
       // Load instrument data
-      const data = await firstValueFrom(this.fundService.getFundData(instruments));
+      const data = await firstValueFrom(this.fundService.getFundData(request.instruments));
 
       // For each instrument, fetch price time series
       await Promise.allSettled(
         data.map(async (item: any) => {
-          const res = await firstValueFrom(this.fundService.getTimeSeries(item.nnx_info.market_data_order_book_id));
+          const res = await firstValueFrom(
+            this.fundService.getTimeSeries(item.nnx_info.market_data_order_book_id, request.timeslot),
+          );
           item.timeSeries = res;
         }),
       );
-
       // Map data to chart options
       this.chartOption.update((original) => {
+        if ('series' in original && Array.isArray(original['series'])) {
+          original['series'].forEach((s) => {
+            s.data = [];
+          });
+        }
         const newOptions = deepMerge(original, {
           grid: {
             bottom: this.isFullscreen() ? 40 : 0,
@@ -133,10 +142,13 @@ export default class FundComponent extends AbstractWidgetComponent {
         // Must return a new object to trigger change detection
         return { ...newOptions };
       });
-    } catch (error) {
-      console.error('Error fetching fund data', error);
-    }
-  }
+
+      this.api()?.clear();
+      this.api()?.setOption(this.chartOption());
+
+      return data;
+    },
+  });
 
   onChartInit($event: echarts.ECharts) {
     this.api.set($event);
