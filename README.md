@@ -1,36 +1,36 @@
 # Home
 
-Dashboard app testing Angular 19 features using custom API from SSR server and lazy-loaded and lazy-rendered components.
+This is a dashboard app for experimenting with Angular features, custom APIs from an SSR server, and lazy-loaded/rendered components.
 
-The app features:
+## Features
 
-- [BFF - NestJS powered api](#backend-for-frontend)
-- [Workbox service-worker](#service-worker) built into the dev process.
-- [Experimentation with browser api's and best practices on permission handling](#utilities)
-- [Widget dashboard](#dashboard-system) system where each widget is a [self enclosed library](./libs/widgets/) with a dashboard view and a fullscreen view.
-  - [Integrations to third parties](#integrations) like met.no for weather data and nordnet.no for financial instrument data.
-  - Experimentation with canvas and webGPU
-  - [Experimentation with local AI models](#transcription-service)
+- [BFF - NestJS-powered API](#backend-for-frontend)
+- [Workbox service-worker](#service-worker) integrated into the development process
+- [Browser API experimentation and permission handling best practices](#utilities)
+- [Widget dashboard system](#dashboard-system) where each widget is a [self-contained library](./libs/widgets/) with both dashboard and fullscreen views:
+  - [Third-party integrations](#integrations) like met.no (weather data) and nordnet.no (financial data)
+  - Canvas and WebGPU experiments
+  - [Local AI model experimentation](#transcription-service)
 
-This is my feature playground. Nothing useful here, just me playing around.
+This is a personal feature playground. It is not intended for production use.
 
 ![NX Graph](./docs/nx-graph.png)
 ![Screenshot](./apps/frontend/public/screenshots/dashboard.png)
 
-## How to build and use
+## How to Build and Run
 
-This project is built using [`bun`](https://bun.sh/).
+This project uses [`bun`](https://bun.sh/) for dependency management and development.
 
 ```bash
 bun install
 bun start
 ```
 
-This will install dependencies and spin up the dev-server.
+This installs dependencies and starts the development server.
 
-### Use npm instead
+### Using npm Instead
 
-I have heard that some people might have had difficulties in installing dependencies and getting this to run using `npm`. If you do not want to use `bun` for some reason, you might get this to run by
+If you encounter issues with `bun` or prefer `npm`, you can try the following:
 
 ```bash
 rm -rf bun.lock
@@ -38,27 +38,25 @@ npm install --force
 sed -i.bak -e 's/bun x/npx/g' -e 's/bun /npm /g' package.json
 ```
 
-This will remove the bun lockfile, install dependencies using npm and lastly replace all usage of `bun` in `package.json` with the `npm` equivalent.
+This removes the `bun` lockfile, installs dependencies with `npm`, and replaces `bun` commands in `package.json` with their `npm` equivalents.
 
-## Backend for frontend
+## Backend for Frontend
 
-Angular now allows the use of a express http server for its server side rendering. By utilizing this, we can extend the capabilities here by also introducing a backend framework like NestJS. This is how I do it:
+Angular supports using an Express HTTP server for server-side rendering (SSR). This project extends that capability by integrating NestJS as a backend framework.
 
-In [server.ts](./apps/frontend/server.ts) I first setup a NestExpressApplication
+In [server.ts](./apps/frontend/server.ts), a `NestExpressApplication` is created:
 
 ```typescript
 const app = await NestFactory.create<NestExpressApplication>(ApiModule);
 ```
 
-This creates the nest application with my [main module](./apps/backend/src/api.module.ts).
-
-I then get the express instance:
+The Express instance is retrieved:
 
 ```typescript
 const server = app.getHttpAdapter().getInstance();
 ```
 
-which the `AngularNodeAppEngine` requires for server-side rendering.
+This instance is required by `AngularNodeAppEngine` for SSR:
 
 ```typescript
 const angularNodeAppEngine = new AngularNodeAppEngine();
@@ -82,33 +80,33 @@ server.use('*splat', (req, res, next) => {
 });
 ```
 
-Then lastly, after I'm done configuring express with anything that cannot or should not be done in Nest, I initialize my NestJS application
+Finally, the NestJS application is initialized:
 
 ```typescript
 app.init();
 ```
 
-Angular SSR process is here used as an express middleware, which NestJS has support for. So I could probably move the entire rendering process inside a `NestMiddleware`. I will probably experiment with this later.
+The Angular SSR process is used as Express middleware. This could potentially be moved into a `NestMiddleware` for further experimentation.
 
-## Service-worker
+## Service Worker
 
-This app is a PWA. Which means that it needs a [web manifest](./apps/frontend/public/manifest.webmanifest) and a [javascript file](./apps/frontend/src/sw.ts) which is loaded and registered on startup.
+This app is a PWA, requiring a [web manifest](./apps/frontend/public/manifest.webmanifest) and a [service worker script](./apps/frontend/src/sw.ts) registered at startup.
 
-One of the main things a service-worker does, is it instructs the browser to pre-load and cache all the static resources of your app - like javascript, css and other files (the most important being your `index.html`).
+One of the things a service worker does is preloading and caching static resources like JavaScript, CSS, and `index.html` in the client. Angular's built-in [ngsw](https://angular.dev/ecosystem/service-workers/config) generates a generic service worker at build time. However, for more control, this project uses [WorkBox](https://developer.chrome.com/docs/workbox). But WorkBox is not quite compatible with Angulars build process yet.
 
-Angular has its built in [ngsw](https://angular.dev/ecosystem/service-workers/config), which generates a generic service-worker build time. This is fine in simple cases, but if you want to have more control, you will want to roll your own. Google has [WorkBox](https://developer.chrome.com/docs/workbox), a "framework" for building service-workers which is excellent.
+### Challenges with Angular Builds
 
-When angular builds using ngsw, it knows about all the artifacts it builds and can give these to their sw generator to properly pre-cache the app - and it does so on both build and serve. But
-angular does not expose anything yet which can hook into the proper place in the build process to retrieve all artifacts.
+- **Production Builds (`nx build`)**: Static files are available in the `dist` folder, making it straightforward to generate a pre-cache list.
+- **Development Builds (`ng serve`)**: Files are built and served in memory, so the `dist` folder is unavailable.
 
-This is no problem when running a production build (`nx build`). All you have to do then is to loop through the files in the `dist` folder of your app to build this list, but when you want to `ng serve` your app locally - _like you often do when you are developing_ - the dist folder is not present because angular now builds and serves the files in memory.
+### Solution
 
-This repo tries to solve this by using 2 things to do build the service-worker pre-cache:
+This project uses two custom plugins:
 
-- [A custom esbuild plugin](./apps/frontend/builders/custom-esbuild.ts) which runs on `nx serve` and tries to hook into esbuild's `onEnd` hook. But angular uses both esbuild and vite to build, and esbuild only bundles the javascript. So I get the bundles here, but nothing else. I try to loop through what is known and generate a pre-cache regardless, but I cannot get the generated css here.
-- [A custom webpack plugin](./apps/frontend/builders/webpack.config.js) which runs on `nx build` and properly creates the precache based on files actually outputted to disk.
+1. **Custom esbuild plugin**: Runs during `nx serve` to hook into esbuild's `onEnd` event. It generates a partial pre-cache list but cannot include CSS files.
+2. **Custom webpack plugin**: Runs during `nx build` to generate a complete pre-cache list from files written to disk.
 
-The first is given to esbuild by using the [nx application executor](./apps/frontend/project.json) for our builds:
+The esbuild plugin is configured in [project.json](./apps/frontend/project.json):
 
 ```json
   "targets": {
@@ -118,56 +116,59 @@ The first is given to esbuild by using the [nx application executor](./apps/fron
         "plugins": ["apps/frontend/builders/custom-esbuild.ts"],
 ```
 
-Which actually means that it runs both on build and on serve, but for `nx build` I overwrite the results with the proper pre-cache. This is done using a separate script:
+For production builds, the pre-cache is overwritten using:
 
 ```bash
 nx build
 bun x webpack --config ./apps/frontend/builders/webpack.config.js
 ```
 
-So angular builds first, then I run the `workbox-build.injectManifest` after.
-
-The most important thing here, is that I have an active and working service-worker on both build and serve, which allows me to test out service-worker specific code without having to prod build every single time.
+This ensures an active service worker during both development and production, enabling testing of service worker-specific code without requiring production builds.
 
 ## Utilities
 
-This repo contains several generic utilities which are great for reuse. If you find anything useful here, feel free to steal anything you like.
+This repository includes reusable utilities. Feel free to use anything you find helpful.
 
-- [Browser api helpers](./libs/shared/src/lib/browser/)
-  - [Connectivity](./libs/shared/src/lib/browser/connectivity/connectivity.service.ts) listens for change in offline/online status
-  - [GeoLocation](./libs/shared/src/lib/browser/geo-location/geo-location.service.ts) listens for device latitude/longitude (_Permission required_)
-  - [Notification](./libs/shared/src/lib/browser/notification/notification.service.ts) allows for push notifications (_Permission required_)
-  - [Directive for ResizeObserver](./libs/shared/src/lib/browser/resize/resize.directive.ts) gives programmatic support for observing the size of DOM elements
-  - [Service worker initializer](./libs/shared/src/lib/browser/service-worker/service-worker.ts)
-  - [Localstorage abstraction](./libs/shared/src/lib/browser/storage/storage.service.ts) allows storing complex json structures in localStorage
-  - [Theme (Dark/Light mode) service](./libs/shared/src/lib/browser/theme/theme.service.ts) manages user selected theme. Together with modern [CSS variables](./apps/frontend/src/styles/_variables.scss) this is golden.
-  - [Active browser tab listener](./libs/shared/src/lib/browser/visibility/visibility.service.ts) reports if the apps browser tab is active and visible or not. Can help pause background stuff when user is not active in the tab. This ultimately saves CPU cycles and memory consumption.
-- [rxjs](./libs/shared/src/lib/rxjs/)
-  - A [cache observable operator](./libs/shared/src/lib/rxjs/cache.ts) which caches the results of an observable and reuses it for all other subscribers. I have previously setup a http interceptor for this, but that will only cache http calls. This is more flexible in that it can cache the result of any observable you give it.
-- [Other utilities](./libs/shared/src/lib/utils/)
-  - [Color manipulation](./libs/shared/src/lib/utils/color.ts) utilities
-  - [Cookie management](./libs/shared/src/lib/utils/cookie.ts)
-  - [Debounce](./libs/shared/src/lib/utils/debounce.ts) function and decorator
-  - [Number utilities](./libs/shared/src/lib/utils/numbers.ts)
-  - [Object utilities](./libs/shared/src/lib/utils/object.ts) and helpers
-  - [String manipulation](./libs/shared/src/lib/utils/string.ts). Also includes a [pipe](./libs/shared/src/lib/pipes/string.pipe.ts) for string manipulation in the template.
-  - [View transition](./libs/shared/src/lib/utils/transitions.ts) helper to minimize boilerplate when starting view transition animations.
+### Browser API Helpers
 
-## Dashboard system
+- [Connectivity](./libs/shared/src/lib/browser/connectivity/connectivity.service.ts): Monitors offline/online status
+- [GeoLocation](./libs/shared/src/lib/browser/geo-location/geo-location.service.ts): Tracks device latitude/longitude (_requires permission_)
+- [Notification](./libs/shared/src/lib/browser/notification/notification.service.ts): Enables push notifications (_requires permission_)
+- [ResizeObserver Directive](./libs/shared/src/lib/browser/resize/resize.directive.ts): Observes DOM element size changes
+- [Service Worker Initializer](./libs/shared/src/lib/browser/service-worker/service-worker.ts)
+- [LocalStorage Abstraction](./libs/shared/src/lib/browser/storage/storage.service.ts): Stores complex JSON structures in `localStorage`
+- [Theme Service](./libs/shared/src/lib/browser/theme/theme.service.ts): Manages dark/light mode using [CSS variables](./apps/frontend/src/styles/_variables.scss)
+- [Active Tab Listener](./libs/shared/src/lib/browser/visibility/visibility.service.ts): Detects if the browser tab is active, helping optimize background tasks
 
-I wanted to make a dashboard of mini-applications. Each mini-application (widget) should be lazily loaded. For individual routes, this is easy using angular and the `loadChildren` route config. But when the widgets should be displayed in a single view, like a dashboard, it becomes a bit more tricky.
+### rxjs Utilities
 
-We have a [dashboard view](./apps/frontend/src/app/views/dashboard/) and we use a [widget-loader](./libs/shared/src/lib/widget/widget-loader.component.ts) to load in our widgets at runtime. So widgets are only loaded when something in the dashboard instructs the widget loader to do so. This means that you can create an endless portfolio of widgets, but they take up no space on the client before the client is instructed to show them.
+- [Cache](./libs/shared/src/lib/rxjs/cache.ts) operator: Caches observable results for reuse across subscribers
 
-Our [widget service](./libs/shared/src/lib/widget/widget.service.ts) uses the [widget-routes](./libs/widgets/widget.routes.ts) as a repository of which widget names are available and how to load them. The dashboard view asks the backend for a dashboard configuration, which is basically an array of widget names to display. When this is received, the dashboard view creates one widget-loader per widget name, and the loader takes care of loading the code, creating the component dynamically and render it in the dashboard viewport. And since the widget repository is also a route configuration, we can use this to create routes to show our widgets in fullscreen.
+### Other
 
-This opens up for the possibility to have several different dashboard configurations depending on your need. We could for instance have a dashboard driven application where we have multiple levels of information and each level required different kinds of widgets.
+- [Color Manipulation](./libs/shared/src/lib/utils/color.ts)
+- [Cookie Management](./libs/shared/src/lib/utils/cookie.ts)
+- [Debounce](./libs/shared/src/lib/utils/debounce.ts): Includes a function and decorator
+- [Number Utilities](./libs/shared/src/lib/utils/numbers.ts)
+- [Object Utilities](./libs/shared/src/lib/utils/object.ts)
+- [String Manipulation](./libs/shared/src/lib/utils/string.ts): Includes a [pipe](./libs/shared/src/lib/pipes/string.pipe.ts) for templates
+- [View Transition Helper](./libs/shared/src/lib/utils/transitions.ts): Simplifies view transition animations
+
+## Dashboard System
+
+This app features a dashboard of mini-applications (widgets), each lazily loaded. While individual routes can use Angular's `loadChildren`, displaying multiple widgets in a single view (dashboard) requires additional logic.
+
+The [dashboard view](./apps/frontend/src/app/views/dashboard/) uses a [widget-loader](./libs/shared/src/lib/widget/widget-loader.component.ts) to load widgets dynamically. Widgets are only loaded when instructed, minimizing client-side resource usage.
+
+The [widget service](./libs/shared/src/lib/widget/widget.service.ts) references [widget routes](./libs/widgets/widget.routes.ts) to determine available widgets and their loading mechanisms. The dashboard view fetches a configuration from the backend (an array of widget names) and creates one widget-loader per widget. This approach also supports fullscreen widget routes.
+
+This system allows for multiple dashboard configurations tailored to different needs.
 
 ## Widgets
 
 ### Integrations
 
-The integrations don't have a local backend. They use a [reverse proxy](./apps/frontend/proxy.routes.ts) to forward calls from the client. The reverse proxy is setup in our [SSR express server](./apps/frontend/server.ts) like this:
+Third-party integrations use a [reverse proxy](./apps/frontend/proxy.routes.ts) configured in the [SSR Express server](./apps/frontend/server.ts):
 
 ```typescript
 import { createProxyMiddleware } from 'http-proxy-middleware';
@@ -178,15 +179,18 @@ Object.entries(proxyRoutes).forEach(([path, config]) => {
 });
 ```
 
-### Canvas and webGPU experiments
+### Canvas and WebGPU Experiments
 
-I have two widgets where I experiment with some effects in canvas with both 2d context and webgpu contexts.
+Two widgets demonstrate canvas and WebGPU effects:
 
-One is a [starfield animation](./libs/widgets/starfield/), the other is just a [rotating pyramid](./libs/widgets/pyramid/). Nothing groundbreaking here, I just wanted to teach myself some new (for me) technologies and techniques.
+- [Starfield Animation](./libs/widgets/starfield/)
+- [Rotating Pyramid](./libs/widgets/pyramid/)
 
-### Transcription service
+These are simple experiments to explore some new (for me) technologies and techniques.
 
-One of the widgets here use a transcription AI translating audio to text. In order to use this, you will need to install some prerequisites:
+### Transcription Service
+
+A transcription widget uses AI to convert audio to text. To set it up:
 
 ```cmd
 winget install --id Python.Python.3.11
@@ -195,6 +199,10 @@ pip install faster-whisper
 python -c "from faster_whisper import WhisperModel; WhisperModel('NbAiLab/nb-whisper-small', device='cpu', compute_type='int8')"
 ```
 
-This installs python and loads up the whisper ai model. After this, `bun start` will be able to handle audio inputs from the client and transcribe it. Currently only transcribing in norwegian, and it will try to translate any audio.
+This installs Python and the Whisper AI model. After setup, `bun start` enables audio transcription (currently Norwegian only).
 
-The transcribing is done by a [python script](./apps/whisper/transcribe.py), which is instantiated by our [backend controller](./apps/backend/src/app/transcribe/transcribe.controller.ts), which is invoked by a file upload from the [widget](./libs/widgets/transcribe/). The widget can either upload a recording by accessing the users microphone (_permission required_), or upload an audio file.
+The transcription process involves:
+
+1. A [Python script](./apps/whisper/transcribe.py) for transcription
+2. A [backend controller](./apps/backend/src/app/transcribe/transcribe.controller.ts) to handle file uploads
+3. A [widget](./libs/widgets/transcribe/) for audio input - via microphone (_requires permission_) or file upload
