@@ -7,7 +7,7 @@ import { ApiModule } from './api.module';
 
 export * from './api.module';
 
-export async function createServer(): Promise<NestExpressApplication> {
+export async function createServer(ssrMode = false): Promise<NestExpressApplication> {
   // Create the NestJS application
   const app = await NestFactory.create<NestExpressApplication>(ApiModule);
 

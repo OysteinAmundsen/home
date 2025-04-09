@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, forwardRef, Get, Inject, Post } from '@nestjs/common';
 import { PushSubscription } from 'web-push';
 import { NotificationService } from './notification.service';
 
@@ -11,7 +11,7 @@ import { NotificationService } from './notification.service';
  */
 @Controller('api/notification')
 export class NotificationController {
-  constructor(private notification: NotificationService) {}
+  constructor(@Inject(forwardRef(() => NotificationService)) private notification: NotificationService) {}
 
   @Get('vapid')
   publicKey() {

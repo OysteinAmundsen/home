@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { objToString } from '@home/shared/utils/object';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { PushSubscription, sendNotification, SendResult, setVapidDetails } from 'web-push';
 import { NotificationContent } from './notification.model';
+import { Subscription } from './subscription.entity';
 
 @Injectable()
 export class NotificationService {
@@ -10,16 +14,17 @@ export class NotificationService {
 
   clients: PushSubscription[] = [];
 
-  constructor() {
+  constructor(@InjectRepository(Subscription) private subscriptionRepository: Repository<Subscription>) {
     if (!this.PUBLIC_KEY || !this.PRIVATE_KEY || !this.VAPID) {
-      throw new Error(`
+      Logger.error(`
         VAPID keys are not set. Please add:
           "VAPID",
           "VAPID_PUBLIC_KEY" and
           "VAPID_PRIVATE_KEY"
         to your environment variables.`);
+    } else {
+      setVapidDetails(this.VAPID, this.PUBLIC_KEY, this.PRIVATE_KEY);
     }
-    setVapidDetails(this.VAPID, this.PUBLIC_KEY, this.PRIVATE_KEY);
   }
 
   getPublicKey() {
@@ -28,19 +33,18 @@ export class NotificationService {
 
   async addSubscriptionClient(subscription: PushSubscription) {
     // Save the subscription to the database
-    // return await this.subscriptionRepository.save({ subscriptionObject: objToString(subscription) } as Subscription);
-    return Promise.resolve(subscription);
+    return await this.subscriptionRepository.save({ subscriptionObject: objToString(subscription) } as Subscription);
   }
 
   async removeSubscriptionClient(subscription: PushSubscription): Promise<boolean> {
     // Remove the subscription from the database
-    // const sub = await this.subscriptionRepository.findOneBy({
-    //   subscriptionObject: objToString(subscription),
-    // } as Subscription);
-    // if (sub) {
-    //   const entity = await this.subscriptionRepository.remove(sub);
-    //   return true;
-    // }
+    const sub = await this.subscriptionRepository.findOneBy({
+      subscriptionObject: objToString(subscription),
+    } as Subscription);
+    if (sub) {
+      const entity = await this.subscriptionRepository.remove(sub);
+      return true;
+    }
     return false;
   }
 

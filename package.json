@@ -2,6 +2,10 @@
   "name": "@home/source",
   "version": "0.0.0",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0",
+    "bun": ">=1.2.7"
+  },
   "scripts": {
     "nx": "nx",
     "ng": "ng",
@@ -44,6 +48,7 @@
     "@nestjs/platform-express": "^11.0.13",
     "@nestjs/platform-socket.io": "^11.0.13",
     "@nestjs/swagger": "^11.1.1",
+    "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.0.13",
     "@simplewebauthn/browser": "^13.1.0",
     "@simplewebauthn/server": "^13.1.1",
@@ -67,6 +72,8 @@
     "ngx-echarts": "^19.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "~7.8.2",
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.21",
     "vite-plugin-glsl": "^1.4.0",
     "web-push": "^3.6.7",
     "workbox-core": "^7.3.0",
