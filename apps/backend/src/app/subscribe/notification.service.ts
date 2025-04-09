@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { PushSubscription, sendNotification, SendResult, setVapidDetails } from 'web-push';
-import { NotificationContent } from './notification.model';
+import { objToString } from '@home/shared/utils/object';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PushSubscription, sendNotification, SendResult, setVapidDetails } from 'web-push';
+import { NotificationContent } from './notification.model';
 import { Subscription } from './subscription.entity';
-import { objToString } from '@home/shared/utils/object';
 
 @Injectable()
 export class NotificationService {
@@ -16,14 +16,15 @@ export class NotificationService {
 
   constructor(@InjectRepository(Subscription) private subscriptionRepository: Repository<Subscription>) {
     if (!this.PUBLIC_KEY || !this.PRIVATE_KEY || !this.VAPID) {
-      throw new Error(`
+      Logger.error(`
         VAPID keys are not set. Please add:
           "VAPID",
           "VAPID_PUBLIC_KEY" and
           "VAPID_PRIVATE_KEY"
         to your environment variables.`);
+    } else {
+      setVapidDetails(this.VAPID, this.PUBLIC_KEY, this.PRIVATE_KEY);
     }
-    setVapidDetails(this.VAPID, this.PUBLIC_KEY, this.PRIVATE_KEY);
   }
 
   getPublicKey() {
