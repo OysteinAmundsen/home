@@ -39,6 +39,10 @@ a {
 }
 a,
 a:visited {
+  color: var(--color-primary-text);
+}
+a:has(> .material-symbols-outlined),
+a:has(> .material-symbols-outlined):visited {
   color: inherit;
 }
 

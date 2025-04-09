@@ -24,10 +24,21 @@ a.button {
   // States
   &:hover:not(.flat):not([disabled]),
   &:focus:not(.flat):not([disabled]) {
+    background-color: color-mix(
+      in srgb,
+      var(--color-background-button),
+      var(--color-primary) 20%
+    );
+  }
+  &:hover:not(.flat):not([disabled]),
+  &:focus:not(.flat):not([disabled]),
+  &.active:not([disabled]),
+  &:active:not([disabled]) {
     outline-offset: -1px;
     outline-width: 2px;
     outline-style: solid;
   }
+  &.active:not([disabled]),
   &:active:not([disabled]) {
     scale: 0.9;
   }

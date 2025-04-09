@@ -9,7 +9,6 @@
   "scripts": {
     "nx": "nx",
     "ng": "ng",
-    "serve": "nx serve",
     "start": "bun run front",
     "front": "nx serve frontend",
     "back": "nx serve backend",

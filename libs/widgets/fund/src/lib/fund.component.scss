@@ -3,8 +3,27 @@
     ::ng-deep .widget-content {
       display: grid;
       grid-template:
+        'toolbar' auto
         'fund-chart' 1fr
         'fund-content' 1fr / 1fr;
+    }
+  }
+  .toolbar {
+    grid-area: toolbar;
+    display: flex;
+    place-content: flex-end;
+    place-items: center;
+    gap: 0.25rem;
+    line-height: 2rem;
+    margin-top: -1rem;
+    .list {
+      display: flex;
+      gap: 0.25rem;
+      .list-item {
+        padding: 0;
+        background-color: transparent;
+        overflow: visible;
+      }
     }
   }
   .chart {
@@ -14,8 +33,29 @@
     width: 100%;
     height: 100%;
     max-width: 100vw;
+    ::ng-deep > div:has(canvas) {
+      width: 100% !important;
+    }
   }
   section {
     grid-area: fund-content;
+    header {
+      display: flex;
+      place-items: center;
+      gap: 1rem;
+    }
+    .bullet {
+      border-radius: 50%;
+      width: 0.5rem;
+      height: 0.5rem;
+      display: inline-block;
+      margin-right: 0.5rem;
+      background-color: var(--col);
+    }
+    footer {
+      margin-top: 2rem;
+      display: flex;
+      place-content: flex-end;
+    }
   }
 }

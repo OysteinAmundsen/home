@@ -10,6 +10,13 @@ export class FundService {
   private readonly http = inject(HttpClient);
   private readonly settings = inject(AppSettingsService);
 
+  timeslots = [
+    { label: '1', value: 'MONTH_1' },
+    { label: '3', value: 'MONTH_3' },
+    { label: '6', value: 'MONTH_6' },
+    { label: '12', value: 'YEAR_1' },
+  ];
+
   getFundData(instrumentIDs = this.settings.watchInstruments()) {
     return cache(
       () =>
@@ -24,13 +31,13 @@ export class FundService {
     );
   }
 
-  getTimeSeries(identifier: string) {
+  getTimeSeries(identifier: string, timeslot = this.timeslots[1].value) {
     return cache(
       () =>
         this.http.get<any>(
-          `/api/fund/market-data/price-time-series/v2/period/MONTH_1/identifier/${identifier}:FUND_NOK`,
+          `/api/fund/market-data/price-time-series/v2/period/${timeslot}/identifier/${identifier}:FUND_NOK`,
         ),
-      identifier,
+      `${timeslot}_${identifier}`,
     );
   }
 }

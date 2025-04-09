@@ -4,6 +4,10 @@
 
   // Theme colors
   --color-primary: light-dark(hsl(200, 100%, 50%), hsl(210, 100%, 30%));
+  --color-primary-text: light-dark(
+    hsl(from var(--color-primary) h 50% 30%),
+    hsl(from var(--color-primary) h 50% 60%)
+  );
   --color-warn: light-dark(hsl(14, 100%, 30%), hsl(2, 100%, 63%));
 
   // Base color configuration

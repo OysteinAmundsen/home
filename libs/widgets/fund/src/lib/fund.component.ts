@@ -1,5 +1,5 @@
 import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Component, effect, inject, linkedSignal, signal } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, resource, signal } from '@angular/core';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
 
@@ -51,10 +51,11 @@ export default class FundComponent extends AbstractWidgetComponent {
       containLabel: true,
     },
     legend: {
-      bottom: 0,
-      textStyle: {
-        color: 'var(--color-text)',
-      },
+      show: false,
+      // bottom: 0,
+      // textStyle: {
+      //   color: 'var(--color-text)',
+      // },
     },
     xAxis: {
       type: 'time',
@@ -66,9 +67,8 @@ export default class FundComponent extends AbstractWidgetComponent {
     tooltip: {
       trigger: 'axis',
     },
+    series: [],
   });
-  // Update chart when options change
-  onDataChanged = effect(() => this.api()?.setOption(this.chartOption()));
   // Set dark mode in chart options when theme changes
   onThemeChanged = effect(() => {
     const theme = this.theme.selectedTheme();
@@ -81,7 +81,7 @@ export default class FundComponent extends AbstractWidgetComponent {
         const splitColor = legendColor ? setAlpha(legendColor, 0.1) : legendColor;
         const newOptions = deepMerge(original, {
           darkMode: theme === 'dark',
-          legend: { textStyle: { color: legendColor } },
+          // legend: { textStyle: { color: legendColor } },
           xAxis: {
             axisLabel: { color: axisColor },
           },
@@ -98,31 +98,42 @@ export default class FundComponent extends AbstractWidgetComponent {
       });
     }, duration);
   });
-  onInstrumentChanged = effect(() => this.loadData(this.settings.watchInstruments()));
 
-  async loadData(instruments = this.settings.watchInstruments()) {
-    try {
+  selectedInstruments = this.settings.watchInstruments;
+  availableTimeslots = this.fundService.timeslots;
+  selectedTimeslot = linkedSignal(() => this.fundService.timeslots[1].value);
+  dataLoader = resource({
+    request: () => ({
+      instruments: this.settings.watchInstruments(),
+      timeslot: this.selectedTimeslot(),
+    }),
+    loader: async ({ request }) => {
       // Load instrument data
-      const data = await firstValueFrom(this.fundService.getFundData(instruments));
+      const data = await firstValueFrom(this.fundService.getFundData(request.instruments));
 
       // For each instrument, fetch price time series
       await Promise.allSettled(
         data.map(async (item: any) => {
-          const res = await firstValueFrom(this.fundService.getTimeSeries(item.nnx_info.market_data_order_book_id));
+          const res = await firstValueFrom(
+            this.fundService.getTimeSeries(item.nnx_info.market_data_order_book_id, request.timeslot),
+          );
           item.timeSeries = res;
         }),
       );
-
       // Map data to chart options
       this.chartOption.update((original) => {
+        if ('series' in original && Array.isArray(original['series'])) {
+          original['series'].forEach((s) => {
+            s.data = [];
+          });
+        }
         const newOptions = deepMerge(original, {
           grid: {
             bottom: this.isFullscreen() ? 40 : 0,
           },
-          legend: {
-            data: data.map((item: any) => item.instrument_info.long_name),
-            show: this.isFullscreen(),
-          },
+          // legend: {
+          //   data: data.map((item: any) => item.instrument_info.long_name),
+          // },
           series: data.map((item: any) => ({
             name: item.instrument_info.long_name,
             type: 'line',
@@ -133,10 +144,39 @@ export default class FundComponent extends AbstractWidgetComponent {
         // Must return a new object to trigger change detection
         return { ...newOptions };
       });
-    } catch (error) {
-      console.error('Error fetching fund data', error);
+
+      this.api()?.clear();
+      this.api()?.setOption(this.chartOption());
+
+      return data;
+    },
+  });
+
+  instruments = computed(() => {
+    const instruments = this.settings.watchInstruments();
+    const options = this.api()?.getOption() as any;
+    if (this.dataLoader.isLoading() || this.dataLoader.error()) {
+      return this.settings
+        .watchInstruments()
+        .map((id) => ({ id, name: '', color: '' }))
+        .sort((a: any, b: any) => b.id - a.id);
     }
-  }
+    return this.dataLoader
+      .value()
+      .map((item: any) => {
+        let seriesIdx = 0;
+        if (options && Array.isArray(options.series)) {
+          seriesIdx = (options.series as []).findIndex((s: any) => s.name === item.instrument_info.long_name);
+        }
+
+        return {
+          id: item.instrument_info.instrument_id,
+          name: item.instrument_info.long_name,
+          color: options.color[seriesIdx],
+        };
+      })
+      .sort((a: any, b: any) => b.id - a.id);
+  });
 
   onChartInit($event: echarts.ECharts) {
     this.api.set($event);
