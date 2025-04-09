@@ -34,9 +34,7 @@ async function bootstrap() {
     Logger.log('Backend already up and running. Starting just Angular SSR.');
     server = express();
   } else {
-    // Create the NestJS application (without DB connection)
-    // We cannot use a database in this context.
-    // see https://github.com/OysteinAmundsen/home/issues/33 for more details
+    // Create the NestJS application
     app = await createServer(true);
     server = app.getHttpAdapter().getInstance();
   }

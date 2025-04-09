@@ -1,10 +1,5 @@
 import type { AuthenticatorTransportFuture, Base64URLString, CredentialDeviceType } from '@simplewebauthn/server';
-
-type User = {
-  id: any;
-  username: string;
-  createdAt: Date;
-};
+import { User } from './user.entity';
 
 /**
  *

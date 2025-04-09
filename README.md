@@ -5,12 +5,12 @@ Dashboard app testing Angular 19 features using custom API from SSR server and l
 The app features:
 
 - [BFF - NestJS powered api](#backend-for-frontend)
-- [Workbox service-worker built into the dev process](#service-worker).
-- [Widget dashboard](#dashboard-system) system where each widget is a [self enclosed library](./libs/widgets/) with a dashboard view and a fullscreen view.
-- Integrations to third parties like met.no for weather data and nordnet.no for financial instrument data.
-- Experimentation with canvas and webGPU
-- Experimentation with local AI models
+- [Workbox service-worker](#service-worker) built into the dev process.
 - [Experimentation with browser api's and best practices on permission handling](#utilities)
+- [Widget dashboard](#dashboard-system) system where each widget is a [self enclosed library](./libs/widgets/) with a dashboard view and a fullscreen view.
+  - [Integrations to third parties](#integrations) like met.no for weather data and nordnet.no for financial instrument data.
+  - Experimentation with canvas and webGPU
+  - [Experimentation with local AI models](#transcription-service)
 
 This is my feature playground. Nothing useful here, just me playing around.
 
@@ -39,19 +39,6 @@ sed -i.bak -e 's/bun x/npx/g' -e 's/bun /npm /g' package.json
 ```
 
 This will remove the bun lockfile, install dependencies using npm and lastly replace all usage of `bun` in `package.json` with the `npm` equivalent.
-
-### Prerequisites (Windows)
-
-One of the widgets here use a transcription AI translating audio to text. In order to use this, you will need to install some prerequisites:
-
-```cmd
-winget install --id Python.Python.3.11
-python -m pip install --upgrade pip
-pip install faster-whisper
-python -c "from faster_whisper import WhisperModel; WhisperModel('NbAiLab/nb-whisper-small', device='cpu', compute_type='int8')"
-```
-
-This installs python and loads up the whisper ai model. After this, `bun start` will be able to handle audio inputs from the client and transcribe it. Currently only transcribing in norwegian, and it will try to translate any audio.
 
 ## Backend for frontend
 
@@ -101,7 +88,7 @@ Then lastly, after I'm done configuring express with anything that cannot or sho
 app.init();
 ```
 
-Angular SSR process is here used as an express middleware, which NestJS has support for. So I could probably move the entire rendering process inside a `NestMiddleware`.
+Angular SSR process is here used as an express middleware, which NestJS has support for. So I could probably move the entire rendering process inside a `NestMiddleware`. I will probably experiment with this later.
 
 ## Service-worker
 
@@ -142,6 +129,30 @@ So angular builds first, then I run the `workbox-build.injectManifest` after.
 
 The most important thing here, is that I have an active and working service-worker on both build and serve, which allows me to test out service-worker specific code without having to prod build every single time.
 
+## Utilities
+
+This repo contains several generic utilities which are great for reuse. If you find anything useful here, feel free to steal anything you like.
+
+- [Browser api helpers](./libs/shared/src/lib/browser/)
+  - [Connectivity](./libs/shared/src/lib/browser/connectivity/connectivity.service.ts) listens for change in offline/online status
+  - [GeoLocation](./libs/shared/src/lib/browser/geo-location/geo-location.service.ts) listens for device latitude/longitude (_Permission required_)
+  - [Notification](./libs/shared/src/lib/browser/notification/notification.service.ts) allows for push notifications (_Permission required_)
+  - [Directive for ResizeObserver](./libs/shared/src/lib/browser/resize/resize.directive.ts) gives programmatic support for observing the size of DOM elements
+  - [Service worker initializer](./libs/shared/src/lib/browser/service-worker/service-worker.ts)
+  - [Localstorage abstraction](./libs/shared/src/lib/browser/storage/storage.service.ts) allows storing complex json structures in localStorage
+  - [Theme (Dark/Light mode) service](./libs/shared/src/lib/browser/theme/theme.service.ts) manages user selected theme. Together with modern [CSS variables](./apps/frontend/src/styles/_variables.scss) this is golden.
+  - [Active browser tab listener](./libs/shared/src/lib/browser/visibility/visibility.service.ts) reports if the apps browser tab is active and visible or not. Can help pause background stuff when user is not active in the tab. This ultimately saves CPU cycles and memory consumption.
+- [rxjs](./libs/shared/src/lib/rxjs/)
+  - A [cache observable operator](./libs/shared/src/lib/rxjs/cache.ts) which caches the results of an observable and reuses it for all other subscribers. I have previously setup a http interceptor for this, but that will only cache http calls. This is more flexible in that it can cache the result of any observable you give it.
+- [Other utilities](./libs/shared/src/lib/utils/)
+  - [Color manipulation](./libs/shared/src/lib/utils/color.ts) utilities
+  - [Cookie management](./libs/shared/src/lib/utils/cookie.ts)
+  - [Debounce](./libs/shared/src/lib/utils/debounce.ts) function and decorator
+  - [Number utilities](./libs/shared/src/lib/utils/numbers.ts)
+  - [Object utilities](./libs/shared/src/lib/utils/object.ts) and helpers
+  - [String manipulation](./libs/shared/src/lib/utils/string.ts). Also includes a [pipe](./libs/shared/src/lib/pipes/string.pipe.ts) for string manipulation in the template.
+  - [View transition](./libs/shared/src/lib/utils/transitions.ts) helper to minimize boilerplate when starting view transition animations.
+
 ## Dashboard system
 
 I wanted to make a dashboard of mini-applications. Each mini-application (widget) should be lazily loaded. For individual routes, this is easy using angular and the `loadChildren` route config. But when the widgets should be displayed in a single view, like a dashboard, it becomes a bit more tricky.
@@ -152,10 +163,38 @@ Our [widget service](./libs/shared/src/lib/widget/widget.service.ts) uses the [w
 
 This opens up for the possibility to have several different dashboard configurations depending on your need. We could for instance have a dashboard driven application where we have multiple levels of information and each level required different kinds of widgets.
 
-## Utilities
+## Widgets
 
-This repo contains several generic utilities which are great for reuse:
+### Integrations
 
-- [Browser api helpers](./libs/shared/src/lib/browser/)
-- [rxjs](./libs/shared/src/lib/rxjs/)
-- [Other utilities](./libs/shared/src/lib/utils/)
+The integrations don't have a local backend. They use a [reverse proxy](./apps/frontend/proxy.routes.ts) to forward calls from the client. The reverse proxy is setup in our [SSR express server](./apps/frontend/server.ts) like this:
+
+```typescript
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import { proxyRoutes } from './proxy.routes';
+
+Object.entries(proxyRoutes).forEach(([path, config]) => {
+  server.use(path, createProxyMiddleware(config));
+});
+```
+
+### Canvas and webGPU experiments
+
+I have two widgets where I experiment with some effects in canvas with both 2d context and webgpu contexts.
+
+One is a [starfield animation](./libs/widgets/starfield/), the other is just a [rotating pyramid](./libs/widgets/pyramid/). Nothing groundbreaking here, I just wanted to teach myself some new (for me) technologies and techniques.
+
+### Transcription service
+
+One of the widgets here use a transcription AI translating audio to text. In order to use this, you will need to install some prerequisites:
+
+```cmd
+winget install --id Python.Python.3.11
+python -m pip install --upgrade pip
+pip install faster-whisper
+python -c "from faster_whisper import WhisperModel; WhisperModel('NbAiLab/nb-whisper-small', device='cpu', compute_type='int8')"
+```
+
+This installs python and loads up the whisper ai model. After this, `bun start` will be able to handle audio inputs from the client and transcribe it. Currently only transcribing in norwegian, and it will try to translate any audio.
+
+The transcribing is done by a [python script](./apps/whisper/transcribe.py), which is instantiated by our [backend controller](./apps/backend/src/app/transcribe/transcribe.controller.ts), which is invoked by a file upload from the [widget](./libs/widgets/transcribe/). The widget can either upload a recording by accessing the users microphone (_permission required_), or upload an audio file.

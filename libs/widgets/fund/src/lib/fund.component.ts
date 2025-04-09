@@ -1,19 +1,16 @@
 import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Component, computed, effect, inject, linkedSignal, resource, signal } from '@angular/core';
-import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
-import { WidgetComponent } from '@home/shared/widget/widget.component';
-
-import * as echarts from 'echarts/core';
-import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
-
-import { LineChart } from 'echarts/charts';
-import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
-
 import { AppSettingsService } from '@home/shared/app.settings';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
 import { getComputedStyle, setAlpha } from '@home/shared/utils/color';
 import { deepMerge } from '@home/shared/utils/object';
+import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
+import { WidgetComponent } from '@home/shared/widget/widget.component';
+import { LineChart } from 'echarts/charts';
+import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components';
+import * as echarts from 'echarts/core';
+import { CanvasRenderer } from 'echarts/renderers';
+import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { firstValueFrom } from 'rxjs';
 import { FundService } from './fund.service';
 
@@ -52,10 +49,6 @@ export default class FundComponent extends AbstractWidgetComponent {
     },
     legend: {
       show: false,
-      // bottom: 0,
-      // textStyle: {
-      //   color: 'var(--color-text)',
-      // },
     },
     xAxis: {
       type: 'time',
@@ -81,7 +74,6 @@ export default class FundComponent extends AbstractWidgetComponent {
         const splitColor = legendColor ? setAlpha(legendColor, 0.1) : legendColor;
         const newOptions = deepMerge(original, {
           darkMode: theme === 'dark',
-          // legend: { textStyle: { color: legendColor } },
           xAxis: {
             axisLabel: { color: axisColor },
           },
@@ -131,9 +123,6 @@ export default class FundComponent extends AbstractWidgetComponent {
           grid: {
             bottom: this.isFullscreen() ? 40 : 0,
           },
-          // legend: {
-          //   data: data.map((item: any) => item.instrument_info.long_name),
-          // },
           series: data.map((item: any) => ({
             name: item.instrument_info.long_name,
             type: 'line',

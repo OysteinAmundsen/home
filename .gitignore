@@ -6,6 +6,7 @@ tmp
 out-tsc
 build
 *.sqlite
+*.db
 
 # dependencies
 node_modules
