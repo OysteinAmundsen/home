@@ -69,7 +69,7 @@ export const requestLogger = (proxyServer: httpProxy, options: Options) => {
     }
     Logger.log(
       `${proxyPath} ${wrap([Color.FG_White, Color.BG_Blue], ' → ')} ${target.toString()} [${proxyRes.statusCode}]`,
-      `${req.method}`,
+      `${req.method} (${res.statusCode})`,
     );
   });
 };

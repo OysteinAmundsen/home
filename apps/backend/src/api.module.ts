@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import 'reflect-metadata';
 import { AuthenticatorModule } from './app/auth/authenticator.module';
@@ -28,7 +28,7 @@ try {
     WidgetModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'home.db',
+      database: resolve(process.cwd(), 'home.db'),
       entities: [User, Subscription],
       synchronize: true,
       logging: true,
