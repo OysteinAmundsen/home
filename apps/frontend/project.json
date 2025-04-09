@@ -26,6 +26,7 @@
         "outputMode": "server",
         "externalDependencies": [
           "node_modules/*",
+          "typeorm",
           "class-transformer",
           "class-validator",
           "mysql2",

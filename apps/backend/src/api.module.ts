@@ -1,45 +1,37 @@
-import { DynamicModule, Logger, Module } from '@nestjs/common';
 import 'reflect-metadata';
+import { Module } from '@nestjs/common';
 import { AuthenticatorModule } from './app/auth/authenticator.module';
 import { LocationModule } from './app/location/location.module';
 import { NotificationModule } from './app/subscribe/notification.module';
 import { TranscribeModule } from './app/transcribe/transcribe.module';
 import { WidgetModule } from './app/widget/widget.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { Subscription } from './app/subscribe/subscription.entity';
 
-/**
- * When running standalone, we can take full advantage of the NestJS framework
- * When running in SSR mode, we cannot use a database connection as this utilizes
- * native modules not available in ESM and through Vite.
- */
-@Module({})
-export class ApiModule {
-  static forRoot(withDB = true): DynamicModule {
-    // Setup backend modules
-    const moduleImports = [AuthenticatorModule, LocationModule, NotificationModule, TranscribeModule, WidgetModule];
-
-    let TypeOrmModule: any;
-    if (!withDB) {
-      Logger.log('DB Not available when running in SSR mode', 'SSR');
-    } else {
-      // We need to import TypeOrmModule dynamically as it is not available in ESM mode
-      TypeOrmModule = require('@nestjs/typeorm').TypeOrmModule;
-    }
-
-    return {
-      module: ApiModule,
-      imports: [
-        ...moduleImports,
-        ...(withDB
-          ? [
-              TypeOrmModule.forRoot({
-                type: 'sqlite',
-                database: 'homeDB.sqlite',
-                entities: [__dirname + '/**/*.entity{.ts,.js}'],
-                synchronize: true,
-              }),
-            ]
-          : []),
-      ],
-    };
-  }
+try {
+  // This is required for ESM support when running backend through SSR
+  globalThis.__filename = fileURLToPath(import.meta.url); // Resolve current file path for ESM
+  globalThis.__dirname = dirname(globalThis.__filename); // Resolve directory path for ESM
+} catch (error) {
+  // This happens when running pure backend
 }
+
+@Module({
+  imports: [
+    AuthenticatorModule,
+    LocationModule,
+    NotificationModule,
+    TranscribeModule,
+    WidgetModule,
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: 'homeDB.sqlite',
+      entities: [Subscription],
+      synchronize: true,
+      logging: true,
+    }),
+  ],
+})
+export class ApiModule {}

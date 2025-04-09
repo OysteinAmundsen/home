@@ -37,7 +37,7 @@ async function bootstrap() {
     // Create the NestJS application (without DB connection)
     // We cannot use a database in this context.
     // see https://github.com/OysteinAmundsen/home/issues/33 for more details
-    app = await createServer(false);
+    app = await createServer(true);
     server = app.getHttpAdapter().getInstance();
   }
 

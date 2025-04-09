@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PushSubscription, sendNotification, SendResult, setVapidDetails } from 'web-push';
 import { NotificationContent } from './notification.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Subscription } from './subscription.entity';
+import { objToString } from '@home/shared/utils/object';
 
 @Injectable()
 export class NotificationService {
@@ -10,7 +14,7 @@ export class NotificationService {
 
   clients: PushSubscription[] = [];
 
-  constructor() {
+  constructor(@InjectRepository(Subscription) private subscriptionRepository: Repository<Subscription>) {
     if (!this.PUBLIC_KEY || !this.PRIVATE_KEY || !this.VAPID) {
       throw new Error(`
         VAPID keys are not set. Please add:
@@ -28,19 +32,18 @@ export class NotificationService {
 
   async addSubscriptionClient(subscription: PushSubscription) {
     // Save the subscription to the database
-    // return await this.subscriptionRepository.save({ subscriptionObject: objToString(subscription) } as Subscription);
-    return Promise.resolve(subscription);
+    return await this.subscriptionRepository.save({ subscriptionObject: objToString(subscription) } as Subscription);
   }
 
   async removeSubscriptionClient(subscription: PushSubscription): Promise<boolean> {
     // Remove the subscription from the database
-    // const sub = await this.subscriptionRepository.findOneBy({
-    //   subscriptionObject: objToString(subscription),
-    // } as Subscription);
-    // if (sub) {
-    //   const entity = await this.subscriptionRepository.remove(sub);
-    //   return true;
-    // }
+    const sub = await this.subscriptionRepository.findOneBy({
+      subscriptionObject: objToString(subscription),
+    } as Subscription);
+    if (sub) {
+      const entity = await this.subscriptionRepository.remove(sub);
+      return true;
+    }
     return false;
   }
 

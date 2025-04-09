@@ -7,9 +7,9 @@ import { ApiModule } from './api.module';
 
 export * from './api.module';
 
-export async function createServer(withDB = true): Promise<NestExpressApplication> {
+export async function createServer(ssrMode = false): Promise<NestExpressApplication> {
   // Create the NestJS application
-  const app = await NestFactory.create<NestExpressApplication>(ApiModule.forRoot(withDB));
+  const app = await NestFactory.create<NestExpressApplication>(ApiModule);
 
   // Setup session middleware
   app.use(
