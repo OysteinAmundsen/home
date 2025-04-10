@@ -46,8 +46,8 @@ export async function loadServiceWorker() {
       const reg = await wb.register({ immediate: true });
       if (!reg) throw 'Service worker not registered!';
 
-      // Check for updates every 5 minutes
-      setInterval(() => wb.update(), 1 * 60 * 1000);
+      // Check for updates every 10 minutes
+      setInterval(() => wb.update(), 10 * 60 * 1000);
     } catch (err) {
       console.log('WS registration failed: ', err);
     }

@@ -83,7 +83,11 @@ export default class WeatherComponent extends AbstractWidgetComponent implements
   private url = computed(() => {
     const location = this.locationService.location();
     if (location == null) return undefined;
-    return `/api/weather?lat=${location.latitude}&lon=${location.longitude}`;
+    // The geolocation api gives a resolution of 6 digits, which is approximately 10 cm.
+    // By using all decimal places, mobile devices tries to load data for every minor movements,
+    // which is overkill for a weather forecast. We fix the position to the nearest 100m by using 3 digits.
+    // This is a good tradeoff between accuracy and performance.
+    return `/api/weather?lat=${location.latitude.toFixed(3)}&lon=${location.longitude.toFixed(3)}`;
   });
 
   /** Fetch weather data for current position using yr.no api */

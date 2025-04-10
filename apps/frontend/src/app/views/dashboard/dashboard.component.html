@@ -1,4 +1,4 @@
-<nav>
+<ng-template #filterMenu>
   <menu>
     @for (tag of tags.value(); track tag) {
       <button type="button" (click)="filter(tag)">{{ tag | string: 'titleCase' }}</button>
@@ -6,9 +6,17 @@
     <button type="button" (click)="filter('nothing')">Nothing</button>
     <button type="button" (click)="filter(undefined)">All</button>
   </menu>
-  <lib-popover-toggle [popoverPanel]="popoverPanel"></lib-popover-toggle>
+</ng-template>
+
+<nav>
+  <lib-popover-toggle [popoverPanel]="filterPopover" [icon]="'filter_alt'" class="filter"></lib-popover-toggle>
+  <ng-container *ngTemplateOutlet="filterMenu"></ng-container>
+  <lib-popover-toggle [popoverPanel]="popoverPanel" class="settings"></lib-popover-toggle>
 </nav>
 
+<lib-popover #filterPopover [hideOn]="'click'">
+  <ng-container *ngTemplateOutlet="filterMenu"></ng-container>
+</lib-popover>
 <lib-popover #popoverPanel>
   <lib-settings-form></lib-settings-form>
 </lib-popover>

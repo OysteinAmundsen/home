@@ -1,4 +1,5 @@
 import { trigger } from '@angular/animations';
+import { NgTemplateOutlet } from '@angular/common';
 import { afterNextRender, AfterViewInit, Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router } from '@angular/router';
@@ -19,7 +20,14 @@ import { dashboardAnimation } from './dashboard.animation';
  */
 @Component({
   selector: 'app-dashboard',
-  imports: [WidgetLoaderComponent, StringPipe, PopoverToggleComponent, PopoverComponent, SettingsFormComponent],
+  imports: [
+    WidgetLoaderComponent,
+    StringPipe,
+    PopoverToggleComponent,
+    PopoverComponent,
+    SettingsFormComponent,
+    NgTemplateOutlet,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   animations: [trigger('widgets', [dashboardAnimation])],

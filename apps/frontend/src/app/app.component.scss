@@ -51,6 +51,12 @@
   }
 
   // Other styles
+  &:has(app-dashboard) > header {
+    @media screen and (max-width: 470px) {
+      padding-right: 4.2rem;
+    }
+  }
+
   > header {
     display: flex;
     place-items: center;

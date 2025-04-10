@@ -7,10 +7,11 @@ import { PopoverComponent } from './popover.component';
   imports: [PopoverAnchorDirective],
   template: `
     <button type="button" [libPopoverAnchor]="popoverPanel()">
-      <span class="material-symbols-outlined">more_vert</span>
+      <span class="material-symbols-outlined">{{ icon() }}</span>
     </button>
   `,
 })
 export class PopoverToggleComponent {
+  icon = input<string>('more_vert');
   popoverPanel = input.required<PopoverComponent>();
 }

@@ -25,7 +25,9 @@ RUN apt-get update && \
     python -m venv /opt/venv && \
     . /opt/venv/bin/activate && \
     pip install Flask faster-whisper --break-system-packages && \
-    python -c "from faster_whisper import WhisperModel; WhisperModel('NbAiLab/nb-whisper-small', device='cpu', compute_type='int8')"
+    python -c "from faster_whisper import WhisperModel; WhisperModel('NbAiLab/nb-whisper-small', device='cpu', compute_type='int8')" && \
+    # Clean up
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Ensure bun and virtual environment are available in all stages
 ENV BUN_INSTALL="/root/.bun"

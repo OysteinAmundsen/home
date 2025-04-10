@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, ElementRef, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, input, PLATFORM_ID, signal } from '@angular/core';
 
 let id = 0;
 
@@ -65,6 +65,8 @@ export class PopoverComponent {
   private platformId = inject(PLATFORM_ID);
   uniqueId = signal(`popover-${id++}`);
 
+  hideOn = input<'auto' | 'click'>('auto');
+
   open() {
     (this.el.nativeElement as HTMLElement).showPopover();
   }
@@ -72,6 +74,13 @@ export class PopoverComponent {
     const elm = this.el.nativeElement as HTMLElement;
     if (isPlatformBrowser(this.platformId) && elm.matches(':popover-open')) {
       elm.hidePopover();
+    }
+  }
+
+  @HostListener('click', ['$event'])
+  onClick(event: MouseEvent) {
+    if (this.hideOn() === 'click') {
+      this.close();
     }
   }
 }
