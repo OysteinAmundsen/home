@@ -86,6 +86,10 @@ Finally, the NestJS application is initialized:
 app.init();
 ```
 
+This produces an environment which has an api, a database and a frontend fully built and served by angular SSR. If served through the production ready docker image, it also gives a nice lighthouse score:
+![Lighthouse score when running in docker](./docs/lighthouse_score_docker_env.png)
+
+**Note**:
 The Angular SSR process is used as Express middleware. This could potentially be moved into a `NestMiddleware` for further experimentation.
 
 ## Service Worker

@@ -9,11 +9,10 @@ LICENSE
 .vscode
 Makefile
 helm-charts
-.env
 .editorconfig
 .idea
 .angular
 .nx
 tmp
-# dist # Because of build issues, we are including the locally built dist folder in the repository
+dist # Because of build issues, we are including the locally built dist folder in the repository
 coverage*

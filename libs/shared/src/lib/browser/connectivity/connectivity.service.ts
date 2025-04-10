@@ -45,8 +45,8 @@ export class ConnectivityService implements OnDestroy {
 
   /* Apply event listeners */
   private applyConnectivityChangeHandler() {
-    this.window.addEventListener('online', this.updateConnectivityState.bind(this));
-    this.window.addEventListener('offline', this.updateConnectivityState.bind(this));
+    this.window.addEventListener('online', this.updateConnectivityState.bind(this), { passive: true });
+    this.window.addEventListener('offline', this.updateConnectivityState.bind(this), { passive: true });
   }
 
   /* Event handler for connectivity state changes */

@@ -14,7 +14,12 @@ export async function loadServiceWorker() {
       // Log out events in sequence:
       // [installing -> installed -> redundant -> waiting -> activating -> controlling -> activated]
       wb.addEventListener('installing', () => console.log('Installing service worker'));
-      wb.addEventListener('installed', () => console.log('Installed!'));
+      wb.addEventListener('installed', (event) => {
+        console.log('Installed!');
+        if (event.isUpdate) {
+          console.log('New service worker waiting to activate');
+        }
+      });
       wb.addEventListener('redundant', () => console.log('Redundant service worker found'));
       wb.addEventListener('waiting', () => {
         console.log('Waiting to activate service worker <- Auto skip');
@@ -22,10 +27,20 @@ export async function loadServiceWorker() {
       });
       wb.addEventListener('activating', () => console.log('Activating service worker'));
       wb.addEventListener('controlling', () => {
-        console.log('Service worker controlling page <- Reloading');
-        window.location.reload();
+        console.log('Service worker controlling page');
+        // Avoid redundant reloads if already controlled
+        if (!navigator.serviceWorker.controller) {
+          console.log('Reloading page to apply new service worker');
+          window.location.reload();
+        }
       });
-      wb.addEventListener('activated', () => console.log('New service worker activated!'));
+      wb.addEventListener('activated', () => {
+        console.log('New service worker activated!');
+        // Notify the service worker to hot-swap pre-cached content
+        if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({ type: 'HOT_SWAP' });
+        }
+      });
 
       // Register the service worker
       const reg = await wb.register({ immediate: true });

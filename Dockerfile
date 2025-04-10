@@ -1,49 +1,74 @@
-# use the official Bun image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1 AS base
+###########################################
+# Base image for building and running the application
+#
+#
+###########################################
+FROM node:22-slim AS base
 WORKDIR /usr/src/app
+
+# Install dependencies and prerequisites
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
       git \
       unzip \
+      curl \
       # tools needed for whisper ai
       python3 \
       python3-pip \
+      python3-venv \
       ffmpeg && \
-    ln -s /usr/bin/python3 /usr/bin/python
-
-# install dependencies into temp directory
-# this will cache them and speed up future builds
-FROM base AS builder
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
-COPY . .
-
-# Currently hangs because of https://github.com/nrwl/nx/issues/27494
-# That's why we skip this step and build the app before we build our docker image.
-# The locally built app is copied into the builder image in the previous step.
-# RUN export NX_DAEMON=false NX_ISOLATE_PLUGINS=false NX_VERBOSE_LOGGING=true && \
-#     bun run nx run home:build:production --skip-nx-cache --verbose && \
-#     bun run build:wb
-
-# copy compiled code into final image
-FROM base AS release
-
-# Install whisper
-RUN python -m pip install --upgrade pip && \
-    pip install Flask faster-whisper && \
+    # Install bun
+    curl -fsSL https://bun.sh/install | bash && \
+    # Install whisper dependencies
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    python -m pip install --upgrade pip --break-system-packages && \
+    python -m venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    pip install Flask faster-whisper --break-system-packages && \
     python -c "from faster_whisper import WhisperModel; WhisperModel('NbAiLab/nb-whisper-small', device='cpu', compute_type='int8')"
 
-# Don't know yet if having node_modules in the final image is needed.
-# If it is, we probably should install a production version
-# of our dependencies in the builder stage and copy them here.
-# COPY --from=builder /usr/src/app/node_modules ./node_modules
+# Ensure bun and virtual environment are available in all stages
+ENV BUN_INSTALL="/root/.bun"
+ENV PATH="$BUN_INSTALL/bin:/opt/venv/bin:$PATH"
+
+###########################################
+# Install layer for dependencies
+###########################################
+FROM base AS installer
+RUN mkdir -p /temp/dev
+COPY package.json bun.lock /temp/dev/
+RUN cd /temp/dev && bun install --frozen-lockfile
+
+# install with --production (exclude devDependencies)
+RUN mkdir -p /temp/prod
+COPY package.json bun.lock /temp/prod/
+RUN cd /temp/prod && bun install --frozen-lockfile --production
+
+###########################################
+# Builder stage
+###########################################
+FROM base AS builder
+COPY --from=installer /temp/dev/node_modules ./node_modules
+COPY . .
+
+RUN export NX_DAEMON=false NX_ISOLATE_PLUGINS=false && \
+    bun run nx run frontend:build:production --skip-nx-cache && \
+    bun run build:wb
+
+###########################################
+# Final image for running the application
+###########################################
+FROM base AS release
+
+# Copy production dependencies
+COPY --from=installer /temp/prod/node_modules ./node_modules
+
+# Copy other necessary files
 COPY --from=builder /usr/src/app/dist/ .
 COPY --from=builder /usr/src/app/.env .
 COPY --from=builder /usr/src/app/apps/whisper/ ./apps/whisper/
 COPY --from=builder /usr/src/app/package.json .
 
 # run the app
-USER bun
 EXPOSE 4200/tcp
 ENTRYPOINT [ "bun", "apps/frontend/server/server.mjs" ]

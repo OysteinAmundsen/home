@@ -48,9 +48,9 @@ export class VisibilityService implements OnDestroy {
 
   /* Event handler for document visibility and focus state changes */
   private applyVisibilityChangeHandler() {
-    this.window.addEventListener('focus', this.updateTabState.bind(this));
-    this.window.addEventListener('blur', this.updateTabState.bind(this));
-    this.document.addEventListener('visibilitychange', this.updateTabState.bind(this));
+    this.window.addEventListener('focus', this.updateTabState.bind(this), { passive: true });
+    this.window.addEventListener('blur', this.updateTabState.bind(this), { passive: true });
+    this.document.addEventListener('visibilitychange', this.updateTabState.bind(this), { passive: true });
   }
 
   private updateTabState() {

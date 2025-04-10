@@ -28,7 +28,7 @@ try {
     WidgetModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: resolve(process.cwd(), 'home.db'),
+      database: resolve(process.cwd(), 'db', 'home.db'),
       entities: [User, Subscription],
       synchronize: true,
       logging: true,
