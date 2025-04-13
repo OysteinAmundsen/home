@@ -37,6 +37,8 @@
               <span class="bullet" style="--col: {{ instrument.color }}"></span>
               <span>{{ instrument.id }} - {{ instrument.name }}</span>
             </li>
+          } @empty {
+            <li class="list-item">No instruments selected</li>
           }
         </ul>
       </div>

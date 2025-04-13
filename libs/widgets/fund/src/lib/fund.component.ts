@@ -142,13 +142,10 @@ export default class FundComponent extends AbstractWidgetComponent {
   });
 
   instruments = computed(() => {
-    const instruments = this.settings.watchInstruments();
+    const instruments = this.settings.watchInstruments() || [];
     const options = this.api()?.getOption() as any;
     if (this.dataLoader.isLoading() || this.dataLoader.error()) {
-      return this.settings
-        .watchInstruments()
-        .map((id) => ({ id, name: '', color: '' }))
-        .sort((a: any, b: any) => b.id - a.id);
+      return instruments.map((id) => ({ id, name: '', color: '' })).sort((a: any, b: any) => b.id - a.id);
     }
     return this.dataLoader
       .value()
@@ -161,7 +158,7 @@ export default class FundComponent extends AbstractWidgetComponent {
         return {
           id: item.instrument_info.instrument_id,
           name: item.instrument_info.long_name,
-          color: options.color[seriesIdx],
+          color: options?.color[seriesIdx] ?? '',
         };
       })
       .sort((a: any, b: any) => b.id - a.id);

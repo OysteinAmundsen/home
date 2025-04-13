@@ -52,9 +52,10 @@ a:not(.button):has(> .material-symbols-outlined):visited {
 
 .material-symbols-outlined {
   display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  font-size: 1rem;
+  width: 1em;
+  height: 1em;
+  font-size: 1em;
+  overflow: hidden;
 }
 
 .text-shadow {
