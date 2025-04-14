@@ -19,16 +19,6 @@ export const proxyRoutes: Record<string, Options> = {
     },
     plugins: [requestLogger],
   },
-  '/api/fund/instrument_search': {
-    target: 'https://public.nordnet.no',
-    changeOrigin: true,
-    followRedirects: true,
-    pathRewrite: (path, req) => '/api/2/instrument_search' + path.replace(/^\/api\/fund\/instrument_search/, ''),
-    headers: {
-      'client-id': 'NEXT',
-    },
-    plugins: [requestLogger],
-  },
   '/api/fund/market-data': {
     target: 'https://api.prod.nntech.io',
     changeOrigin: true,
@@ -36,6 +26,16 @@ export const proxyRoutes: Record<string, Options> = {
     pathRewrite: (path, req) => '/market-data' + path.replace(/^\/api\/fund\/market-data/, ''),
     headers: {
       'x-locale': 'ng-NO',
+    },
+    plugins: [requestLogger],
+  },
+  '/api/fund': {
+    target: 'https://public.nordnet.no',
+    changeOrigin: true,
+    followRedirects: true,
+    pathRewrite: (path, req) => '/api/2' + path.replace(/^\/api\/fund/, ''),
+    headers: {
+      'client-id': 'NEXT',
     },
     plugins: [requestLogger],
   },

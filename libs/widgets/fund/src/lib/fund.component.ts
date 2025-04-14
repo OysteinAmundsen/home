@@ -1,9 +1,11 @@
 import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Component, computed, effect, inject, linkedSignal, resource, signal } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, OnInit, resource, signal } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AppSettingsService } from '@home/shared/app.settings';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
 import { getComputedStyle, setAlpha } from '@home/shared/utils/color';
 import { deepMerge } from '@home/shared/utils/object';
+import { TypeaheadComponent } from '@home/shared/ux/typeahead/typeahead.component';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
 import { LineChart } from 'echarts/charts';
@@ -20,12 +22,12 @@ if (typeof window !== 'undefined') {
 
 @Component({
   selector: 'lib-fund',
-  imports: [CommonModule, WidgetComponent, NgxEchartsDirective],
+  imports: [CommonModule, ReactiveFormsModule, WidgetComponent, NgxEchartsDirective, TypeaheadComponent],
   templateUrl: './fund.component.html',
   styleUrl: './fund.component.scss',
   providers: [{ provide: FundService }, provideEchartsCore({ echarts })],
 })
-export default class FundComponent extends AbstractWidgetComponent {
+export default class FundComponent extends AbstractWidgetComponent implements OnInit {
   private readonly fundService = inject(FundService);
   private readonly theme = inject(ThemeService);
   private readonly settings = inject(AppSettingsService);
@@ -35,6 +37,7 @@ export default class FundComponent extends AbstractWidgetComponent {
 
   // Got in trouble when rendering through SSR, so skip it when not in browser
   canRender = linkedSignal(() => isPlatformBrowser(this.platformId));
+  displayValue = (item: any) => item.name || '';
 
   // The chart API
   api = signal<echarts.ECharts | undefined>(undefined);
@@ -91,6 +94,7 @@ export default class FundComponent extends AbstractWidgetComponent {
     }, duration);
   });
 
+  instrumentSearch = new FormControl<string>('', { updateOn: 'change' });
   selectedInstruments = this.settings.watchInstruments;
   availableTimeslots = this.fundService.timeslots;
   selectedTimeslot = linkedSignal(() => this.fundService.timeslots[1].value);
@@ -114,11 +118,13 @@ export default class FundComponent extends AbstractWidgetComponent {
       );
       // Map data to chart options
       this.chartOption.update((original) => {
+        // Clear previous series data
         if ('series' in original && Array.isArray(original['series'])) {
           original['series'].forEach((s) => {
             s.data = [];
           });
         }
+        // ... before merging in new data because otherwise new data will be merged with old data
         const newOptions = deepMerge(original, {
           grid: {
             bottom: this.isFullscreen() ? 40 : 0,
@@ -163,6 +169,35 @@ export default class FundComponent extends AbstractWidgetComponent {
       })
       .sort((a: any, b: any) => b.id - a.id);
   });
+
+  ngOnInit(): void {
+    this.instrumentSearch.valueChanges.pipe().subscribe(async (value: any) => {
+      if (!value) return;
+      // Search for instruments
+      this.settings.watchInstruments.update((instruments: any) => {
+        if (Array.isArray(value)) {
+          return [...instruments, ...value.map((i: any) => i.id)];
+        } else if (value != null && typeof value === 'object') {
+          return [...instruments, value.id];
+        }
+        return instruments;
+      });
+      this.instrumentSearch.setValue('', { emitEvent: false });
+    });
+  }
+
+  async searchInstruments(value: string) {
+    return await firstValueFrom(this.fundService.searchFunds(value));
+  }
+
+  async removeInstrument(item: any) {
+    this.settings.watchInstruments.update((instruments: any) => {
+      if (Array.isArray(instruments)) {
+        return instruments.filter((i: any) => i !== item.id);
+      }
+      return instruments;
+    });
+  }
 
   onChartInit($event: echarts.ECharts) {
     this.api.set($event);

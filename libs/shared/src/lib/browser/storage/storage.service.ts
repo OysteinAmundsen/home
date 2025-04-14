@@ -141,6 +141,14 @@ export class StorageService {
       current = current[segment] as Record<string, unknown>;
     });
     const obj = this.findKey(key, this.values);
+    if (obj != null && k in obj && obj[k] === value) {
+      // Value is the same. No need to store it again.
+      return;
+    }
+    if (obj != null && Array.isArray(obj[k])) {
+      // Do not merge arrays. Replace them.
+      obj[k] = [];
+    }
 
     if (obj != null) {
       if (k in obj) {

@@ -29,7 +29,6 @@
   .chart {
     grid-area: fund-chart;
     display: block;
-    min-width: 300px;
     width: 100%;
     height: 100%;
     max-width: 100vw;
@@ -42,15 +41,57 @@
     header {
       display: flex;
       place-items: center;
-      gap: 1rem;
+      gap: 0 1rem;
+      flex-wrap: wrap;
+      margin-block-start: 1em;
+      margin-block-end: 1em;
+      h3 {
+        margin: 0;
+      }
     }
-    .bullet {
-      border-radius: 50%;
-      width: 0.5rem;
-      height: 0.5rem;
-      display: inline-block;
-      margin-right: 0.5rem;
-      background-color: var(--col);
+    .list {
+      max-width: calc(100vw - 2rem);
+      .list-item {
+        .material-symbols-outlined {
+          display: none;
+          opacity: 0;
+          margin-left: -0.2rem;
+          margin-right: 0.2rem;
+          margin-bottom: -0.1rem;
+          color: var(--color-warn);
+          transition-behavior: allow-discrete;
+          transition:
+            opacity var(--animation-duration) ease-in,
+            display var(--animation-duration) ease-in;
+        }
+        .bullet {
+          border-radius: 50%;
+          width: 0.5rem;
+          height: 0.5rem;
+          display: inline-block;
+          opacity: 1;
+          margin-right: 0.5rem;
+          background-color: var(--col);
+          transition-behavior: allow-discrete;
+          transition:
+            opacity var(--animation-duration) ease-in,
+            display var(--animation-duration) ease-in;
+        }
+        &:hover,
+        &:focus {
+          span {
+            color: var(--color-warn);
+          }
+          .material-symbols-outlined {
+            display: inline-block;
+            opacity: 1;
+          }
+          .bullet {
+            display: none;
+            opacity: 0;
+          }
+        }
+      }
     }
     footer {
       margin-top: 2rem;

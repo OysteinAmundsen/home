@@ -3,6 +3,10 @@
  * with it's corresponding equal key. If no key can be determined, it will push the object as a new object onto the
  * return stack.
  *
+ * NOTE: This function will _merge_ all the objects given. It will not overwrite them. This means that if you have
+ * an array of one length in one object and an array of another length in another object, the result will be an
+ * array of the longest length. This means you cannot use this function to delete objects from an array.
+ *
  * @param comparables a list of source objects or arrays to merge
  */
 export function deepMerge(...comparables: unknown[]): any {

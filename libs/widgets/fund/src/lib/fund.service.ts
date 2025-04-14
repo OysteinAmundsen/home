@@ -40,4 +40,22 @@ export class FundService {
       `${timeslot}_${identifier}`,
     );
   }
+
+  searchFunds(query: string) {
+    return this.http.get<any>(`/api/fund/main_search`, { params: { query } }).pipe(
+      map((res) => {
+        if (Array.isArray(res) && res.length > 0) {
+          return (
+            res
+              .find((r) => r.display_group_type === 'FUND')
+              ?.results.map((item: any) => ({
+                id: item.instrument_id,
+                name: item.display_name,
+              })) ?? []
+          );
+        }
+        return [];
+      }),
+    );
+  }
 }

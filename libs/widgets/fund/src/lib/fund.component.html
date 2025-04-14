@@ -25,15 +25,26 @@
         <header>
           <h3>Instruments:</h3>
           <div>
-            <div class="form-group">
-              <input type="text" placeholder="Search instruments..." />
+            <lib-typeahead
+              placeholder="Search instruments..."
+              [formControl]="instrumentSearch"
+              [searchFn]="searchInstruments.bind(this)"
+              [displayValue]="displayValue.bind(this)"
+            >
               <span class="material-symbols-outlined">search</span>
-            </div>
+            </lib-typeahead>
           </div>
         </header>
         <ul class="list">
           @for (instrument of instruments(); track instrument.id) {
-            <li class="list-item">
+            <li
+              class="list-item"
+              tabindex="0"
+              (click)="removeInstrument(instrument)"
+              (keydown.delete)="removeInstrument(instrument)"
+              title="Click to remove instrument"
+            >
+              <span class="material-symbols-outlined">close</span>
               <span class="bullet" style="--col: {{ instrument.color }}"></span>
               <span>{{ instrument.id }} - {{ instrument.name }}</span>
             </li>
