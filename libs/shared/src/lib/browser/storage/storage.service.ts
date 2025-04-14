@@ -57,8 +57,9 @@ const shouldEncode = true;
  */
 @Injectable({ providedIn: 'root' })
 export class StorageService {
+  // prettier-ignore
+  private readonly document = (() => { try { return inject(DOCUMENT); } catch { return document; } })();
   private readonly platformId = inject(PLATFORM_ID);
-  private readonly document = inject(DOCUMENT);
   private storage: Storage = getLocalStorage(this.document);
 
   // Our storage is a json object of unknown complexity and values

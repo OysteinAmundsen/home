@@ -10,6 +10,11 @@
   cursor: pointer;
   padding: 0.5rem 1rem;
   &:hover {
-    background-color: var(--color-background-button);
+    background-color: var(--color-background-list);
   }
+}
+.list-item-empty {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }

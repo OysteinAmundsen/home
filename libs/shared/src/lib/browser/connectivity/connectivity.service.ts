@@ -22,7 +22,8 @@ import { toObservable } from '@angular/core/rxjs-interop';
  */
 @Injectable({ providedIn: 'root' })
 export class ConnectivityService implements OnDestroy {
-  private readonly document = inject(DOCUMENT);
+  // prettier-ignore
+  private readonly document = (() => { try { return inject(DOCUMENT); } catch { return document; } })();
   // In SSR environment, the window object does not exist. We need to get a mockup window object from the globalThis object.
   // from angulars DOCUMENT object.
   private window = globalThis.window || this.document.defaultView;

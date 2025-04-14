@@ -41,15 +41,18 @@
               class="list-item"
               tabindex="0"
               (click)="removeInstrument(instrument)"
-              (keydown.delete)="removeInstrument(instrument)"
+              (keypress.delete)="removeInstrument(instrument)"
               title="Click to remove instrument"
             >
-              <span class="material-symbols-outlined">close</span>
+              <span class="material-symbols-outlined">remove</span>
               <span class="bullet" style="--col: {{ instrument.color }}"></span>
-              <span>{{ instrument.id }} - {{ instrument.name }}</span>
+              <span class="content">{{ instrument.id }} - {{ instrument.name }}</span>
             </li>
           } @empty {
-            <li class="list-item">No instruments selected</li>
+            <div class="list-item-empty">
+              No instruments selected.
+              <button (click)="setDefaults()">Set defaults?</button>
+            </div>
           }
         </ul>
       </div>

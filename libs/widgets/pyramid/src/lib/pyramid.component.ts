@@ -34,7 +34,8 @@ import pyramidShader from './shaders/pyramid.wgsl';
   styleUrl: './pyramid.component.scss',
 })
 export default class PyramidComponent extends AbstractWidgetComponent implements AfterViewInit, OnDestroy {
-  private readonly document = inject(DOCUMENT);
+  // prettier-ignore
+  private readonly document = (() => { try { return inject(DOCUMENT); } catch { return document; } })();
   private readonly theme = inject(ThemeService);
   private readonly visibility = inject(VisibilityService);
   private readonly settings = inject(AppSettingsService);

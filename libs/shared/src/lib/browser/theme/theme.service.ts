@@ -40,7 +40,8 @@ export type Theme = 'light' | 'dark';
  */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private readonly doc = inject(DOCUMENT);
+  // prettier-ignore
+  private readonly document = (() => { try { return inject(DOCUMENT); } catch { return document; } })();
   private readonly cookieService = inject(CookieService);
 
   selectedTheme = linkedSignal<Theme>(() => {
@@ -59,6 +60,6 @@ export class ThemeService {
     // Store the selection in a cookie
     this.cookieService.setCookie('theme', theme, { expireIn: 365 });
 
-    doSafeTransition(() => this.doc.documentElement.setAttribute('data-schema', theme));
+    doSafeTransition(() => this.document.documentElement.setAttribute('data-schema', theme));
   });
 }

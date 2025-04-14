@@ -3,9 +3,10 @@ import { inject, Injectable, PLATFORM_ID, REQUEST_CONTEXT } from '@angular/core'
 
 @Injectable({ providedIn: 'root' })
 export class CookieService {
-  document = inject(DOCUMENT);
-  platform = inject(PLATFORM_ID);
-  reqCtx = inject(REQUEST_CONTEXT);
+  // prettier-ignore
+  private readonly document = (() => { try { return inject(DOCUMENT); } catch { return document; } })();
+  private readonly platform = inject(PLATFORM_ID);
+  private readonly reqCtx = inject(REQUEST_CONTEXT);
 
   /**
    * Get a cookie by name

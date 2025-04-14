@@ -10,6 +10,9 @@
   align-self: auto;
   min-width: 11rem;
   max-height: 25rem;
+  .widget-wrapper {
+    overflow: hidden;
+  }
   &:has(~ .widget-loader),
   + .widget-loader {
     // Only grow if there is another widget-loader next to it
@@ -41,7 +44,7 @@
       'header' auto
       'content' 1fr / 1fr;
     border-radius: var(--border-radius);
-    overflow: hidden;
+    // overflow: hidden;
 
     > .widget-header {
       grid-area: header;
@@ -93,11 +96,10 @@
     background-color: var(--color-background);
 
     @layer widget {
-      transition-behavior: allow-discrete;
       transition:
         opacity var(--animation-duration) ease-in,
         scale var(--animation-duration) ease-in,
-        display var(--animation-duration) ease-in;
+        display var(--animation-duration) allow-discrete;
 
       // Enter animation
       @starting-style {

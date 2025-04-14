@@ -104,15 +104,14 @@ label.button + input[type='file'] {
   place-items: center;
   button {
     color: var(--color-text);
-    height: 1.5rem;
-    line-height: 1.7rem;
-    padding-top: 1px;
-    padding-bottom: 0;
+    &:active {
+      outline: 0;
+    }
     span {
-      font-size: 1.1rem;
+      display: flex;
+      font-size: 1.1em;
+      line-height: 1em;
       font-weight: bold;
-      line-height: 1.3rem;
-      height: 1.5rem;
       transition:
         scale var(--animation-duration) ease-in-out,
         opacity var(--animation-duration) ease-in-out;

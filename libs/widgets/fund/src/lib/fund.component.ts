@@ -28,10 +28,11 @@ if (typeof window !== 'undefined') {
   providers: [{ provide: FundService }, provideEchartsCore({ echarts })],
 })
 export default class FundComponent extends AbstractWidgetComponent implements OnInit {
+  // prettier-ignore
+  private readonly document = (() => { try { return inject(DOCUMENT); } catch { return document; } })();
   private readonly fundService = inject(FundService);
   private readonly theme = inject(ThemeService);
   private readonly settings = inject(AppSettingsService);
-  private readonly document = inject(DOCUMENT);
 
   override id = signal('fund');
 
@@ -105,7 +106,10 @@ export default class FundComponent extends AbstractWidgetComponent implements On
     }),
     loader: async ({ request }) => {
       // Load instrument data
-      const data = await firstValueFrom(this.fundService.getFundData(request.instruments));
+      let data = [];
+      if (request.instruments.length) {
+        data = await firstValueFrom(this.fundService.getFundData(request.instruments));
+      }
 
       // For each instrument, fetch price time series
       await Promise.allSettled(
@@ -197,6 +201,10 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       }
       return instruments;
     });
+  }
+
+  setDefaults() {
+    this.settings.watchInstruments.set([16802428, 16801174, 16801692, 18282786]);
   }
 
   onChartInit($event: echarts.ECharts) {

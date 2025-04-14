@@ -35,49 +35,9 @@ let id = 0;
     </ul>
   `,
   styles: `
-    $xStart: -90deg;
-    $yStart: 0;
-    $zStart: 0;
     :host {
       .form-group {
         anchor-name: var(--anchor);
-      }
-      .list {
-        position-anchor: var(--anchor);
-        bottom: unset;
-        top: calc(anchor(bottom) + 0.2rem);
-        left: unset;
-        right: anchor(right);
-        transition:
-          transform var(--animation-duration) ease-in-out,
-          rotate var(--animation-duration) ease-in-out,
-          opacity var(--animation-duration) ease-in-out,
-          scale var(--animation-duration) ease-in-out,
-          display var(--animation-duration) allow-discrete; // This enables close transition
-        background-color: var(--color-background);
-        transform-origin: top right;
-        border-radius: var(--border-radius);
-        border: 2px solid var(--color-border-focused);
-
-        // Will animate back to these on close
-        transform: rotateX($xStart) rotateY($yStart) rotateZ($zStart);
-        scale: 0.2;
-        opacity: 0.3;
-
-        &:popover-open {
-          transform: rotateX(0) rotateY(0) rotateZ(0);
-          scale: 1;
-          opacity: 1;
-
-          border: 2px solid var(--color-border-focused);
-
-          // Will animate from these on open
-          @starting-style {
-            transform: rotateX($xStart) rotateY($yStart) rotateZ($zStart);
-            scale: 0.2;
-            opacity: 0.3;
-          }
-        }
       }
     }
   `,

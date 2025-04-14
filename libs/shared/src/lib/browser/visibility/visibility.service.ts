@@ -21,7 +21,8 @@ import { toObservable } from '@angular/core/rxjs-interop';
  */
 @Injectable({ providedIn: 'root' })
 export class VisibilityService implements OnDestroy {
-  private readonly document = inject(DOCUMENT);
+  // prettier-ignore
+  private readonly document = (() => { try { return inject(DOCUMENT); } catch { return document; } })();
   private readonly platformId = inject(PLATFORM_ID);
   // In SSR environment, the window object does not exist. We need to get a mockup window object from the globalThis object.
   // from angulars DOCUMENT object.

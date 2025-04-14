@@ -14,10 +14,11 @@ export type Widget = {
 
 @Injectable({ providedIn: 'root' })
 export class WidgetService {
-  private http = inject(HttpClient);
-  private document = inject(DOCUMENT);
-  private injector = inject(Injector);
-  private widgetRoutes = inject(WIDGET_ROUTES_TOKEN);
+  // prettier-ignore
+  private readonly document = (() => { try { return inject(DOCUMENT); } catch { return document; } })();
+  private readonly http = inject(HttpClient);
+  private readonly injector = inject(Injector);
+  private readonly widgetRoutes = inject(WIDGET_ROUTES_TOKEN);
 
   /** Filter widgets by id */
   filter = signal<string | undefined>(undefined);

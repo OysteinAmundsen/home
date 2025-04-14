@@ -1,4 +1,4 @@
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -33,7 +33,6 @@ import { Star } from './star';
 export default class StarFieldComponent extends AbstractWidgetComponent implements AfterViewInit, OnDestroy {
   private readonly el = inject(ElementRef);
   private readonly theme = inject(ThemeService);
-  private readonly doc = inject(DOCUMENT);
   private readonly visibility = inject(VisibilityService);
   private readonly settings = inject(AppSettingsService);
 

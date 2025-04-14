@@ -41,6 +41,7 @@
     header {
       display: flex;
       place-items: center;
+      // place-content: space-between;
       gap: 0 1rem;
       flex-wrap: wrap;
       margin-block-start: 1em;
@@ -50,21 +51,30 @@
       }
     }
     .list {
-      max-width: calc(100vw - 2rem);
       .list-item {
+        display: grid;
+        grid-template: 'bullet text' auto / auto 1fr;
+        align-items: center;
+        .content {
+          grid-area: text;
+          transition: color var(--animation-duration) ease-in;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
         .material-symbols-outlined {
+          grid-area: bullet;
           display: none;
           opacity: 0;
           margin-left: -0.2rem;
           margin-right: 0.2rem;
-          margin-bottom: -0.1rem;
           color: var(--color-warn);
-          transition-behavior: allow-discrete;
           transition:
             opacity var(--animation-duration) ease-in,
-            display var(--animation-duration) ease-in;
+            display var(--animation-duration) allow-discrete;
         }
         .bullet {
+          grid-area: bullet;
           border-radius: 50%;
           width: 0.5rem;
           height: 0.5rem;
@@ -72,10 +82,9 @@
           opacity: 1;
           margin-right: 0.5rem;
           background-color: var(--col);
-          transition-behavior: allow-discrete;
           transition:
             opacity var(--animation-duration) ease-in,
-            display var(--animation-duration) ease-in;
+            display var(--animation-duration) allow-discrete;
         }
         &:hover,
         &:focus {
