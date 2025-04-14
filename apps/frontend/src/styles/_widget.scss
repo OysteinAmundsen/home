@@ -127,6 +127,9 @@
         transition: opacity var(--animation-duration) ease-in;
       }
     }
+    &:not(:hover):has(.widget-header > a:focus) {
+      outline: 1px solid;
+    }
     &:hover > header {
       h2 {
         opacity: 1;
