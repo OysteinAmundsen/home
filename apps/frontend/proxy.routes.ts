@@ -2,12 +2,14 @@ import { Options } from 'http-proxy-middleware';
 import { requestLogger } from './logger';
 
 export const proxyRoutes: Record<string, Options> = {
+  // Weather forecast API
   '/api/weather': {
     target: 'https://api.met.no',
     changeOrigin: true,
     pathRewrite: (path, req) => '/weatherapi/locationforecast/2.0/compact' + path.replace(/^\/api\/weather/, ''),
     plugins: [requestLogger],
   },
+  // Random background image API
   '/api/background': {
     target: 'https://picsum.photos',
     changeOrigin: true,
@@ -19,6 +21,7 @@ export const proxyRoutes: Record<string, Options> = {
     },
     plugins: [requestLogger],
   },
+  // Nordnet API
   '/api/fund/market-data': {
     target: 'https://api.prod.nntech.io',
     changeOrigin: true,

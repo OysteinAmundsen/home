@@ -29,7 +29,8 @@
               placeholder="Search instruments..."
               [formControl]="instrumentSearch"
               [searchFn]="searchInstruments.bind(this)"
-              [displayValue]="displayValue.bind(this)"
+              [displayValueFn]="displayValueFn.bind(this)"
+              [valueFn]="valueFn.bind(this)"
             >
               <span class="material-symbols-outlined">search</span>
             </lib-typeahead>

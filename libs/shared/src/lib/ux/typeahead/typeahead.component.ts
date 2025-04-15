@@ -10,7 +10,7 @@ let id = 0;
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="form-group" [attr.popovertarget]="uniqueId()">
-      <input type="text" [placeholder]="placeholder()" [formControl]="input" />
+      <input type="search" [placeholder]="placeholder()" [formControl]="input" />
       <ng-content></ng-content>
     </div>
     <ul class="list" [id]="uniqueId()" popover="auto" #dropdown>
@@ -31,6 +31,8 @@ let id = 0;
             {{ getDisplayValue(item) }}
           </li>
         }
+      } @empty {
+        <li class="list-item empty" [attr.aria-hidden]="true">No results</li>
       }
     </ul>
   `,
@@ -57,7 +59,8 @@ export class TypeaheadComponent implements ControlValueAccessor, OnInit {
   // The search function to call when the input changes
   searchFn = input.required<(query: string) => Promise<any[]>>();
   // The function to display the item in the list
-  displayValue = input<(item: any) => string>();
+  displayValueFn = input<(item: any) => string>();
+  valueFn = input<(item: any) => any>();
   placeholder = input<string>('');
 
   dropdown = viewChild<ElementRef<HTMLUListElement>>('dropdown');
@@ -76,7 +79,7 @@ export class TypeaheadComponent implements ControlValueAccessor, OnInit {
     // If the value is the same as the current value, do nothing
     if (value === this.value()) return;
 
-    this.value.set(value);
+    this.value.set(this.valueFn() ? this.valueFn()!(value) : value);
     this.input.setValue(this.getDisplayValue(value), { emitEvent: false });
     this.selectedItems.set(Array.isArray(value) ? value : [value]);
     this._onChange(this.value());
@@ -111,8 +114,8 @@ export class TypeaheadComponent implements ControlValueAccessor, OnInit {
   }
 
   getDisplayValue(item: any) {
-    if (this.displayValue()) {
-      return this.displayValue()!(item);
+    if (this.displayValueFn()) {
+      return this.displayValueFn()!(item);
     }
     return item;
   }

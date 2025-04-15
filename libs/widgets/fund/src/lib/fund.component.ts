@@ -38,7 +38,8 @@ export default class FundComponent extends AbstractWidgetComponent implements On
 
   // Got in trouble when rendering through SSR, so skip it when not in browser
   canRender = linkedSignal(() => isPlatformBrowser(this.platformId));
-  displayValue = (item: any) => item.name || '';
+  displayValueFn = (item: any) => item.name || '';
+  valueFn = (item: any) => item.id || '';
 
   // The chart API
   api = signal<echarts.ECharts | undefined>(undefined);
@@ -137,6 +138,7 @@ export default class FundComponent extends AbstractWidgetComponent implements On
             name: item.instrument_info.long_name,
             type: 'line',
             smooth: true,
+            showSymbol: false,
             data: item.timeSeries.pricePoints.map((p: any) => [p.timeStamp, p.value]),
           })),
         });
@@ -180,9 +182,9 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       // Search for instruments
       this.settings.watchInstruments.update((instruments: any) => {
         if (Array.isArray(value)) {
-          return [...instruments, ...value.map((i: any) => i.id)];
-        } else if (value != null && typeof value === 'object') {
-          return [...instruments, value.id];
+          return [...instruments, ...value];
+        } else if (value != null) {
+          return [...instruments, value];
         }
         return instruments;
       });
