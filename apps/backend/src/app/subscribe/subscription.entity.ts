@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { PushSubscription } from 'web-push';
+import { User } from '../auth/user.entity';
 
 @Entity({ name: 'subscription' })
 export class Subscription {
@@ -8,6 +10,14 @@ export class Subscription {
   id!: number;
 
   @ApiProperty()
-  @Column({ type: 'text' })
-  subscriptionObject!: string;
+  @Column({ type: 'json' })
+  subscriptionObject!: PushSubscription;
+
+  @ApiProperty()
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt!: Date;
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  user?: User;
 }

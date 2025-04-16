@@ -1,6 +1,6 @@
 # Home
 
-This is a dashboard app for experimenting with Angular features, custom APIs from an SSR server, and lazy-loaded/rendered components.
+This is a personal playground featuring a dashboard app for experimenting with Angular features, custom APIs with database from an NestJS powered SSR server, and lazy-loaded/rendered components.
 
 ## Features
 
@@ -86,11 +86,42 @@ Finally, the NestJS application is initialized:
 app.init();
 ```
 
+You would also need to expose the request handler so that the angular app engine can properly work:
+
+```typescript
+export const reqHandler = createNodeRequestHandler(server);
+```
+
 This produces an environment which has an api, a database and a frontend fully built and served by angular SSR. If served through the production ready docker image, it also gives a nice lighthouse score:
 ![Lighthouse score when running in docker](./docs/lighthouse_score_docker_env.png)
 
-**Note**:
-The Angular SSR process is used as Express middleware. This could potentially be moved into a `NestMiddleware` for further experimentation.
+> [!NOTE]  
+> The Angular SSR process is used as Express middleware. This could potentially be moved into a `NestMiddleware` for further experimentation.
+
+### Database
+
+One weakness of running the entire app in one single instance here, is that it compiles to ESM - which is not so great for auto detecting entities. This is why we reference the entities directly in an array instead:
+
+```typescript
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: resolve(process.cwd(), 'db', 'home.db'),
+      entities: [User, Subscription], // Would love for this to be auto detected though
+      synchronize: true,
+      logging: true,
+    }),
+```
+
+I spent a long time trying to get the default `entities: [resolve(__dirname, 'app/**/*.entity{.ts,.js}')]` working until I realized that there is no directory structure to traverse in ESM. The autodetect works great if you are running the backend separately though.
+
+```bash
+# in one shell:
+bun run back
+# and in another shell
+bun run front
+```
+
+This is because the backend will then compile to commonJS format, which does have support for directory traversal.
 
 ## Service Worker
 

@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Headers, HttpException, HttpStatus, Post, Session } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Headers, HttpException, HttpStatus, Logger, Post, Session } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiForbiddenResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import type { RegisterRequestBody } from './authenticator.model';
 import { AuthenticatorService } from './authenticator.service';
 
@@ -21,10 +21,7 @@ export class AuthenticatorController {
    * @returns
    */
   @Get('register')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Registration options retreived.',
-  })
+  @ApiOkResponse({ description: 'Registration options retreived.' })
   async getRegistrationOptions(@Session() session: Record<string, unknown>) {
     return await this.authService.getRegistrationOptions(session);
   }
@@ -37,20 +34,18 @@ export class AuthenticatorController {
    * @returns
    */
   @Post('register')
-  @ApiResponse({ status: HttpStatus.OK, description: 'Registerred.' })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Failed to register.',
-  })
+  @ApiOkResponse({ description: 'Registerred.' })
+  @ApiBadRequestResponse({ description: 'Failed to register.' })
   async register(
     @Session() session: Record<string, unknown>,
     @Headers() headers: Record<string, string>,
     @Body() body: RegisterRequestBody,
   ) {
     try {
-      const result = await this.authService.doRegister(body.credential, session, headers['origin'] || '');
+      const result = await this.authService.doRegister(body, session, headers['origin'] || '');
       return { status: result ? 'ok' : 'failed' };
     } catch (error: any) {
+      Logger.error(error);
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
@@ -61,10 +56,7 @@ export class AuthenticatorController {
    * @returns
    */
   @Get('authenticate')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Authentication options retreived.',
-  })
+  @ApiOkResponse({ description: 'Authentication options retreived.' })
   async getAuthenticationOptions(@Session() session: Record<string, unknown>) {
     return await this.authService.getAuthenticationOptions(session);
   }
@@ -76,11 +68,8 @@ export class AuthenticatorController {
    * @returns
    */
   @Post('authenticate')
-  @ApiResponse({ status: HttpStatus.OK, description: 'Authenticated.' })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Failed to authenticate.',
-  })
+  @ApiOkResponse({ description: 'Authenticated.' })
+  @ApiForbiddenResponse({ description: 'Failed to authenticate.' })
   async authenticate(
     @Session() session: Record<string, unknown>,
     @Headers() headers: Record<string, string>,

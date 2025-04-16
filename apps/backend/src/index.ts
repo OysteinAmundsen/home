@@ -17,9 +17,10 @@ export async function createServer(ssrMode = false): Promise<NestExpressApplicat
     session({
       secret: 'Not a real secret',
       resave: false,
-      saveUninitialized: false,
+      saveUninitialized: true,
       cookie: {
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
         maxAge: 60000,
       },
     }),

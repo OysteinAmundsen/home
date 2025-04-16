@@ -8,8 +8,18 @@ export class User {
   id!: number;
 
   @ApiProperty()
+  @Column()
+  userId!: string;
+
+  @ApiProperty()
   @Column({ type: 'text' })
   username!: string;
+
+  @Column('text')
+  publicKey!: string;
+
+  @Column('bigint')
+  counter?: number;
 
   @ApiProperty()
   @Column({ type: 'text' })

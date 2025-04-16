@@ -1,5 +1,6 @@
 import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiOkResponse } from '@nestjs/swagger';
 import { spawn } from 'node:child_process';
 
 /**
@@ -13,6 +14,7 @@ export class TranscribeController {
    * Fetch all widgets.
    */
   @Post()
+  @ApiOkResponse({ description: 'Transcribe the audio file.' })
   @UseInterceptors(FileInterceptor('file'))
   transscribe(@UploadedFile() file: Express.Multer.File) {
     if (!file) {

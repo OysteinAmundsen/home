@@ -17,6 +17,7 @@ type Passkey = {
 
 export type RegisterRequestBody = {
   credential: RegisterRequestCredential;
+  user: PublicKeyCredentialUserEntityJSON;
 };
 
 export interface RegisterRequestCredential {

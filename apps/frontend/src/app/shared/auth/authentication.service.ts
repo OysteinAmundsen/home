@@ -2,12 +2,10 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { GetRegistrationOptionsResponse } from '@home/backend/app/auth/authenticator.model';
 import { StorageService } from '@home/shared/browser/storage/storage.service';
+import { base64ToBuffer, bufferToBase64 } from '@home/shared/utils/object';
 import { firstValueFrom } from 'rxjs';
 
-const bufferToBase64 = (buffer: ArrayBuffer) => btoa(String.fromCharCode(...new Uint8Array(buffer)));
-const base64ToBuffer = (base64: string) => Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
 const CREDENTIALS_KEY = 'credentials';
 
 /**
@@ -64,60 +62,60 @@ export class AuthenticationService {
    * @param displayName The display name of the user
    */
   async register(userName: string, displayName: string) {
-    // Step 1: Get the registration options from the server
-    const { token, options } = await firstValueFrom(
-      this.http.get<GetRegistrationOptionsResponse>(`/api/auth/register`),
-    );
+    try {
+      // Step 1: Get the registration options from the server
+      const options = await firstValueFrom(this.http.get<PublicKeyCredentialCreationOptions>(`/api/auth/register`));
 
-    // Step 2 + 3: Get user consent and create the webauth credentials
-    const credential = (await navigator.credentials.create({
-      publicKey: {
-        ...options,
-        challenge: new Uint8Array((options.challenge as any).data),
-        user: {
-          id: new Uint8Array((options.user.id as any).data),
-          name: userName,
-          displayName: displayName,
+      // Step 2 + 3: Get user consent and create the webauth credentials
+      const user = {
+        id: Uint8Array.from((options.user.id as any).data),
+        name: userName,
+        displayName: displayName,
+      };
+      const credential = (await navigator.credentials.create({
+        publicKey: {
+          ...options,
+          challenge: new Uint8Array((options.challenge as any).data),
+          user,
         },
-      },
-    })) as PublicKeyCredential;
+      })) as PublicKeyCredential;
 
-    // Step 4: Send the credential to the server
-    await this.postCredentials(credential);
+      // Step 4: Send the credential to the server
+      await this.postCredentials(credential, user);
+    } catch (ex) {
+      console.error('Failed to register', ex);
+    }
   }
 
   /**
    * Post the created credentials to the server
    * @param credential The public key credential to post
    */
-  private async postCredentials(credential: PublicKeyCredential) {
+  private async postCredentials(credential: PublicKeyCredential, user: PublicKeyCredentialUserEntity) {
     const rawId = bufferToBase64(credential.rawId);
-    try {
-      await firstValueFrom(
-        this.http.post(
-          `/api/auth/register`,
-          {
-            credential: {
-              rawId,
-              response: {
-                attestationObject: bufferToBase64((credential.response as any).attestationObject),
-                clientDataJSON: bufferToBase64(credential.response.clientDataJSON),
-                id: credential.id,
-                type: credential.type,
-              },
+    await firstValueFrom(
+      this.http.post(
+        `/api/auth/register`,
+        {
+          credential: {
+            rawId,
+            response: {
+              attestationObject: bufferToBase64((credential.response as any).attestationObject),
+              clientDataJSON: bufferToBase64(credential.response.clientDataJSON),
+              id: credential.id,
+              type: credential.type,
             },
           },
-          { withCredentials: true },
-        ),
-      );
+          user,
+        },
+        { withCredentials: true },
+      ),
+    );
 
-      // Store a reference to the user id in localStorage
-      // This, along with the public key, is used to retrieve the
-      // credentials when authenticating
-      this.setCredentials(rawId);
-    } catch (e) {
-      console.error('registration failed', e);
-    }
+    // Store a reference to the user id in localStorage
+    // This, along with the public key, is used to retrieve the
+    // credentials when authenticating
+    this.setCredentials(rawId);
   }
 
   // #region Authentication
@@ -125,15 +123,19 @@ export class AuthenticationService {
    * Authenticate the user
    */
   async authenticate() {
-    // Get the server part of the authentication options
-    const options = await firstValueFrom(this.http.get<PublicKeyCredentialRequestOptions>(`/api/auth/authenticate`));
+    try {
+      // Get the server part of the authentication options
+      const options = await firstValueFrom(this.http.get<PublicKeyCredentialRequestOptions>(`/api/auth/authenticate`));
 
-    // Get the client part or our webauth credentials
-    const credential = await this.getCredentials(options);
+      // Get the client part or our webauth credentials
+      const credential = await this.getCredentials(options);
 
-    // Do the actual authentication
-    if (credential) {
-      this.doAuthentication(credential);
+      // Do the actual authentication
+      if (credential) {
+        this.doAuthentication(credential);
+      }
+    } catch (ex) {
+      console.error('failed to authenticate', ex);
     }
   }
 

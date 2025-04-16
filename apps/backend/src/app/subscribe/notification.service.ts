@@ -1,4 +1,3 @@
-import { objToString } from '@home/shared/utils/object';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -33,13 +32,16 @@ export class NotificationService {
 
   async addSubscriptionClient(subscription: PushSubscription) {
     // Save the subscription to the database
-    return await this.subscriptionRepository.save({ subscriptionObject: objToString(subscription) } as Subscription);
+    const entity = this.subscriptionRepository.create({
+      subscriptionObject: subscription,
+    } as Subscription);
+    return await this.subscriptionRepository.save(entity);
   }
 
   async removeSubscriptionClient(subscription: PushSubscription): Promise<boolean> {
     // Remove the subscription from the database
     const sub = await this.subscriptionRepository.findOneBy({
-      subscriptionObject: objToString(subscription),
+      subscriptionObject: subscription,
     } as Subscription);
     if (sub) {
       const entity = await this.subscriptionRepository.remove(sub);

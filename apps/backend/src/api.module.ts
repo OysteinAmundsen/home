@@ -29,7 +29,12 @@ try {
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: resolve(process.cwd(), 'db', 'home.db'),
-      entities: [User, Subscription],
+      // When running in SSR mode, the default way of auto detecting entities
+      // ```
+      //   entities: [resolve(__dirname, 'app/**/*.entity{.ts,.js}')],
+      // ```
+      // does not work, so we need to specify the path manually.
+      entities: [User, Subscription], // Would love for this to be auto detected though
       synchronize: true,
       logging: true,
     }),

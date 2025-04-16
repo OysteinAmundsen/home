@@ -1,5 +1,6 @@
 import { Controller, forwardRef, Get, Inject, Param } from '@nestjs/common';
 import { WidgetService } from './widget.service';
+import { ApiOkResponse } from '@nestjs/swagger';
 
 /**
  * The controller for the /api/widgets route.
@@ -14,6 +15,7 @@ export class WidgetController {
    * Fetch all widgets.
    */
   @Get()
+  @ApiOkResponse({ description: 'All widgets.' })
   getAll() {
     return this.widgetService.getWidgets();
   }
@@ -22,6 +24,7 @@ export class WidgetController {
    * Fetch all widget tags.
    */
   @Get('tags')
+  @ApiOkResponse({ description: 'All widget tags.' })
   getAllTags() {
     return this.widgetService.getAvailableTags();
   }
@@ -30,6 +33,7 @@ export class WidgetController {
    * Fetch widgets by tag
    */
   @Get(':tag')
+  @ApiOkResponse({ description: 'Widgets filtered by tag.' })
   filterByTag(@Param('tag') tag: string) {
     return this.widgetService.getWidgetsByTag(tag);
   }
