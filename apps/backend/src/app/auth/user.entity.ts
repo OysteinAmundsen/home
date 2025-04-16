@@ -8,17 +8,17 @@ export class User {
   id!: number;
 
   @ApiProperty()
-  @Column()
+  @Column({ type: 'text' })
   userId!: string;
 
   @ApiProperty()
   @Column({ type: 'text' })
   username!: string;
 
-  @Column('text')
+  @Column({ type: 'text' })
   publicKey!: string;
 
-  @Column('bigint')
+  @Column({ type: 'bigint' })
   counter?: number;
 
   @ApiProperty()
