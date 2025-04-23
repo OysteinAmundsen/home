@@ -1,6 +1,22 @@
 import { Body, Controller, Get, Headers, HttpException, HttpStatus, Logger, Post, Session } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiForbiddenResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import type { RegisterRequestBody } from './authenticator.model';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiForbiddenResponse,
+  ApiHeader,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  AuthenticateRequestBody,
+  AuthenticateResponse,
+  AuthenticationOptionsResponse,
+  AuthSessionData,
+  RegisterRequestBody,
+  RegisterResponse,
+  RegistrationOptionsResponse,
+} from './authenticator.model';
 import { AuthenticatorService } from './authenticator.service';
 
 /**
@@ -21,8 +37,11 @@ export class AuthenticatorController {
    * @returns
    */
   @Get('register')
-  @ApiOkResponse({ description: 'Registration options retreived.' })
-  async getRegistrationOptions(@Session() session: Record<string, unknown>) {
+  @ApiOperation({
+    summary: 'Get registration options. This sets up a session cookie and returns a temporary user id.',
+  })
+  @ApiOkResponse({ description: 'Registration options retreived.', type: RegistrationOptionsResponse })
+  async getRegistrationOptions(@Session() session: AuthSessionData) {
     return await this.authService.getRegistrationOptions(session);
   }
 
@@ -34,10 +53,13 @@ export class AuthenticatorController {
    * @returns
    */
   @Post('register')
-  @ApiOkResponse({ description: 'Registerred.' })
+  @ApiOperation({ summary: 'Register user credentials. ' })
+  @ApiOkResponse({ description: 'Registered.', type: RegisterResponse })
   @ApiBadRequestResponse({ description: 'Failed to register.' })
+  @ApiBody({ description: 'Registration request body', type: RegisterRequestBody })
+  @ApiHeader({ name: 'origin', description: 'Origin header', required: true, example: 'https://example.com' })
   async register(
-    @Session() session: Record<string, unknown>,
+    @Session() session: AuthSessionData,
     @Headers() headers: Record<string, string>,
     @Body() body: RegisterRequestBody,
   ) {
@@ -56,8 +78,9 @@ export class AuthenticatorController {
    * @returns
    */
   @Get('authenticate')
-  @ApiOkResponse({ description: 'Authentication options retreived.' })
-  async getAuthenticationOptions(@Session() session: Record<string, unknown>) {
+  @ApiOperation({ summary: 'Get authentication options' })
+  @ApiOkResponse({ description: 'Authentication options retreived.', type: AuthenticationOptionsResponse })
+  async getAuthenticationOptions(@Session() session: AuthSessionData) {
     return await this.authService.getAuthenticationOptions(session);
   }
 
@@ -68,12 +91,15 @@ export class AuthenticatorController {
    * @returns
    */
   @Post('authenticate')
-  @ApiOkResponse({ description: 'Authenticated.' })
+  @ApiOperation({ summary: 'Authenticate user credentials' })
+  @ApiOkResponse({ description: 'Authenticated.', type: AuthenticateResponse })
   @ApiForbiddenResponse({ description: 'Failed to authenticate.' })
+  @ApiBody({ description: 'Authentication request body', type: AuthenticateRequestBody })
+  @ApiHeader({ name: 'origin', description: 'Origin header', required: true, example: 'https://example.com' })
   async authenticate(
-    @Session() session: Record<string, unknown>,
+    @Session() session: AuthSessionData,
     @Headers() headers: Record<string, string>,
-    @Body() body: any,
+    @Body() body: AuthenticateRequestBody,
   ) {
     try {
       return await this.authService.doAuthenticate(body.credential, session, headers['origin'] || '');

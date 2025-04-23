@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import compression from 'compression';
 import { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
@@ -45,6 +46,16 @@ export async function createServer(ssrMode = false): Promise<NestExpressApplicat
   });
 
   app.use(compression());
+
+  const config = new DocumentBuilder()
+    .setTitle('Home')
+    .setDescription('Documentation for the Home API')
+    .setVersion('1.0')
+    .build();
+  const documentBuilder = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentBuilder, {
+    jsonDocumentUrl: 'api/json',
+  });
 
   return app;
 }

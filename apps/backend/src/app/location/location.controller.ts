@@ -1,7 +1,7 @@
 import { A } from '@angular/core/weak_ref.d-DOjz-6fK';
 import { GeoLocationItem } from '@home/shared/browser/geo-location/location.model';
 import { Controller, Get, Logger, NotFoundException, Query } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 
 /**
@@ -9,6 +9,7 @@ import * as dotenv from 'dotenv';
  *
  * @param server
  */
+@ApiTags('location')
 @Controller('api/location')
 export class LocationController {
   apiKey?: string;
@@ -19,7 +20,8 @@ export class LocationController {
   }
 
   @Get('search')
-  @ApiOkResponse({ description: 'Search for a location.' })
+  @ApiOperation({ summary: 'Search for a location' })
+  @ApiOkResponse({ description: 'An array of locations.' })
   async search(@Query('s') search: string): Promise<GeoLocationItem[]> {
     const endpoint = new URL('https://maps.googleapis.com/maps/api/geocode/json');
     endpoint.searchParams.append('address', search);

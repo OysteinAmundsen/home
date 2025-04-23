@@ -1,7 +1,8 @@
 import { Body, Controller, forwardRef, Get, Inject, Post } from '@nestjs/common';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PushSubscription } from 'web-push';
+import { PublicKeyResponse, PushSubscriptionRequest } from './notification.model';
 import { NotificationService } from './notification.service';
-import { ApiOkResponse } from '@nestjs/swagger';
 
 /**
  * The controller for the /api/notification route.
@@ -10,19 +11,23 @@ import { ApiOkResponse } from '@nestjs/swagger';
  *
  * @param server
  */
+@ApiTags('notification')
 @Controller('api/notification')
 export class NotificationController {
   constructor(@Inject(forwardRef(() => NotificationService)) private notification: NotificationService) {}
 
   @Get('vapid')
-  @ApiOkResponse({ description: 'VAPID public key.' })
-  publicKey() {
-    return { publicKey: this.notification.getPublicKey() };
+  @ApiOperation({ summary: 'Get VAPID public key' })
+  @ApiOkResponse({ description: 'Servers VAPID public key.', type: PublicKeyResponse })
+  publicKey(): PublicKeyResponse {
+    return { publicKey: this.notification.getPublicKey() } as PublicKeyResponse;
   }
 
   @Post('register')
-  @ApiOkResponse({ description: 'Successfully registered for notifications.' })
-  async subscribe(@Body() subscription: PushSubscription) {
+  @ApiOperation({ summary: 'Register for notifications' })
+  @ApiBody({ description: 'Push subscription request', type: PushSubscriptionRequest })
+  @ApiOkResponse({ description: 'Success flag' })
+  async subscribe(@Body() subscription: PushSubscriptionRequest) {
     await this.notification.addSubscriptionClient(subscription);
     setTimeout(
       () =>
@@ -38,8 +43,10 @@ export class NotificationController {
   }
 
   @Post('unregister')
-  @ApiOkResponse({ description: 'Successfully unregistered from notifications.' })
-  async unsubscribe(@Body() subscription: PushSubscription) {
+  @ApiOperation({ summary: 'Unregister from notifications' })
+  @ApiBody({ description: 'Push subscription request', type: PushSubscriptionRequest })
+  @ApiOkResponse({ description: 'Success flag' })
+  async unsubscribe(@Body() subscription: PushSubscriptionRequest) {
     await this.notification.removeSubscriptionClient(subscription);
     return { success: true };
   }

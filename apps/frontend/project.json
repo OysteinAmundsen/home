@@ -44,6 +44,11 @@
           {
             "glob": "**/*",
             "input": "apps/frontend/public"
+          },
+          {
+            "glob": "**/{swagger-ui.css,swagger-ui-bundle.js,swagger-ui-standalone-preset.js,favicon-32x32.png,favicon-16x16.png}",
+            "input": "./node_modules/swagger-ui-dist",
+            "output": "./api/api"
           }
         ],
         "styles": ["apps/frontend/src/styles.scss"],

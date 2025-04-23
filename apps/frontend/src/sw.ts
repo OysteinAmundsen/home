@@ -56,6 +56,9 @@ registerRoute(
     // If this looks like a URL for a resource, because it contains // a file extension, skip.
     if (url.pathname.match(fileExtensionRegexp)) return false;
 
+    // If the url starts with /api, skip.
+    if (url.pathname.startsWith('/api')) return false;
+
     // Return true to signal that we want to use the handler.
     return true;
   },
@@ -83,7 +86,7 @@ registerRoute(
 
 // cache the data request so that, if the network is off we get the last good response
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/'),
+  ({ url }) => url.pathname.startsWith('/api'),
   new NetworkFirst({
     cacheName: `${prefix}-api-${version}`,
     plugins: [

@@ -1,22 +1,32 @@
-import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { Controller, Post, UploadedFile } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags, ApiUnsupportedMediaTypeResponse } from '@nestjs/swagger';
 import { spawn } from 'node:child_process';
+import { ApiFile } from '../../shared/api-file.decorator';
+import { fileMimetypeFilter } from '../../shared/file-mimetype.filter';
+import { TranscribeResponse } from './transcribe.model';
 
 /**
  * The controller for the /api/transcribe route.
  *
  * @param server
  */
+@ApiTags('transcribe')
 @Controller('api/transcribe')
 export class TranscribeController {
   /**
    * Fetch all widgets.
    */
   @Post()
-  @ApiOkResponse({ description: 'Transcribe the audio file.' })
-  @UseInterceptors(FileInterceptor('file'))
-  transscribe(@UploadedFile() file: Express.Multer.File) {
+  @ApiOperation({ summary: 'Transcribe audio file' })
+  @ApiFile({
+    fieldName: 'file',
+    description: 'The audio file to be transcribed',
+    required: true,
+    localOptions: { fileFilter: fileMimetypeFilter(['audio']) },
+  })
+  @ApiOkResponse({ description: 'The transcription', type: TranscribeResponse })
+  @ApiUnsupportedMediaTypeResponse({ description: 'Only supports audio filetypes' })
+  transscribe(@UploadedFile() file: Express.Multer.File): Promise<TranscribeResponse> {
     if (!file) {
       throw new Error('File is undefined');
     }

@@ -25,7 +25,8 @@
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "backend:build",
-        "runBuildTargetDependencies": false
+        "runBuildTargetDependencies": false,
+        "watch": true
       },
       "configurations": {
         "development": {

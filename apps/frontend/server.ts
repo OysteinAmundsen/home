@@ -77,11 +77,11 @@ async function bootstrap() {
   });
 
   // Serve static files from the browser distribution folder
-  const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-  const browserDistFolder = resolve(serverDistFolder, '../browser');
+  const distFolder = dirname(fileURLToPath(import.meta.url));
+  const webRootFolder = resolve(distFolder, '../browser');
   server.get(
     '*splat',
-    express.static(browserDistFolder, {
+    express.static(webRootFolder, {
       maxAge: '1y',
       index: 'index.html',
     }),

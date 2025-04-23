@@ -4,7 +4,7 @@ import base64url from 'base64url';
 import crypto from 'crypto';
 import { Factor, Fido2Lib } from 'fido2-lib';
 import { Repository } from 'typeorm';
-import { RegisterRequestBody } from './authenticator.model';
+import { AuthSessionData, RegisterRequestBody, RegistrationOptionsResponse } from './authenticator.model';
 import { JwtAge, JWTHandler } from './jwt';
 import { User } from './user.entity';
 
@@ -36,7 +36,7 @@ export class AuthenticatorService {
    *
    * @returns
    */
-  async getRegistrationOptions(session: Record<string, any>): Promise<PublicKeyCredentialCreationOptions> {
+  async getRegistrationOptions(session: AuthSessionData): Promise<RegistrationOptionsResponse> {
     const registrationOptions = await this.fido.attestationOptions();
     const userIdBuffer = crypto.randomBytes(32); // Generate random bytes for user ID
     const userIdBase64 = userIdBuffer.toString('base64'); // Convert to Base64 string
@@ -64,8 +64,8 @@ export class AuthenticatorService {
    *
    * @returns
    */
-  async doRegister(body: RegisterRequestBody, session: Record<string, any>, origin: string): Promise<boolean> {
-    const challenge: ArrayBuffer = new Uint8Array(session.challenge.data).buffer;
+  async doRegister(body: RegisterRequestBody, session: AuthSessionData, origin: string): Promise<boolean> {
+    const challenge: ArrayBuffer = new Uint8Array((session.challenge as any).data).buffer;
     const regResult = await this.fido.attestationResult(
       {
         rawId: new Uint8Array(Buffer.from(body.credential.rawId, 'base64')).buffer,
@@ -98,7 +98,7 @@ export class AuthenticatorService {
    *
    * @returns
    */
-  async getAuthenticationOptions(session: Record<string, unknown>) {
+  async getAuthenticationOptions(session: AuthSessionData) {
     const authnOptions = await this.fido.assertionOptions();
     const authOptions = Object.assign(authnOptions, {
       challenge: Buffer.from(authnOptions.challenge),
@@ -116,9 +116,9 @@ export class AuthenticatorService {
    * @param session
    * @param origin
    */
-  async doAuthenticate(credential: any, session: Record<string, any>, origin: string): Promise<{ token: string }> {
+  async doAuthenticate(credential: any, session: AuthSessionData, origin: string): Promise<{ token: string }> {
     credential.rawId = new Uint8Array(Buffer.from(credential.rawId, 'base64')).buffer;
-    const challenge = new Uint8Array(session.challenge.data).buffer;
+    const challenge = new Uint8Array((session.challenge as any).data).buffer;
 
     // Retrieve the public key and counter from the database
     const userHandle = credential.response.userHandle.toString('base64');
