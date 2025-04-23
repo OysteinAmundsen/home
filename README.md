@@ -1,6 +1,6 @@
 # Home
 
-This is a personal playground featuring a dashboard app for experimenting with Angular features, custom APIs with database from an NestJS powered SSR server, and lazy-loaded/rendered components.
+This repository is a proof of concept playground for building a full-stack application with Angular and NestJS. It demonstrates setting up Angular SSR with a NestJS-powered backend, integrating a database, configuring a reverse proxy, and generating Swagger API documentation. The frontend is a fully installable PWA with a custom service worker that supports continuous builds during development. Perfect for exploring modern web development techniques and best practices.
 
 ## Features
 
