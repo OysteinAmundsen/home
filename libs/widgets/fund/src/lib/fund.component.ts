@@ -162,13 +162,13 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       .map((item: any) => {
         let seriesIdx = 0;
         if (options && Array.isArray(options.series)) {
-          seriesIdx = (options.series as []).findIndex((s: any) => s.name === item.instrument_info.long_name);
+          seriesIdx = (options.series as []).findIndex((s: any) => s.id === item.instrument_info.instrument_id);
         }
 
         return {
           id: item.instrument_info.instrument_id,
           name: item.instrument_info.long_name,
-          color: options?.color[seriesIdx] ?? '',
+          color: options?.color[seriesIdx % options?.color.length] ?? '',
         };
       })
       .sort((a: any, b: any) => b.id - a.id);
