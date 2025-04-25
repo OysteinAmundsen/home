@@ -5,7 +5,7 @@
       grid-template:
         'toolbar' auto
         'fund-chart' 1fr
-        'fund-content' 1fr / 1fr;
+        'fund-content' minmax(50vh, 1fr) / 1fr;
     }
   }
   .toolbar {
@@ -38,66 +38,90 @@
   }
   section {
     grid-area: fund-content;
-    header {
-      display: flex;
-      place-items: center;
-      // place-content: space-between;
-      gap: 0 1rem;
-      flex-wrap: wrap;
-      margin-block-start: 1em;
-      margin-block-end: 1em;
-      h3 {
-        margin: 0;
+    display: grid;
+    grid-template:
+      'list-container' 1fr
+      'footer' auto / 1fr;
+    > div {
+      grid-area: list-container;
+      overflow: hidden;
+      display: grid;
+      grid-template:
+        'header' auto
+        'list' 1fr / 1fr;
+      header {
+        grid-area: header;
+        display: flex;
+        place-items: center;
+        // place-content: space-between;
+        gap: 0 1rem;
+        flex-wrap: wrap;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        h3 {
+          margin: 0;
+        }
+        .pager {
+          display: inline-flex;
+        }
       }
-    }
-    .list {
-      .list-item {
-        display: grid;
-        grid-template: 'bullet text' auto / auto 1fr;
-        align-items: center;
-        .content {
-          grid-area: text;
-          transition: color var(--animation-duration) ease-in;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
+      .list {
+        overflow: auto;
+        grid-area: list;
+        &.all {
+          --color-hover: var(--color-success);
         }
-        .material-symbols-outlined {
-          grid-area: bullet;
-          display: none;
-          opacity: 0;
-          margin-left: -0.2rem;
-          margin-right: 0.2rem;
-          color: var(--color-warn);
-          transition:
-            opacity var(--animation-duration) ease-in,
-            display var(--animation-duration) allow-discrete;
+        &.watchlist {
+          --color-hover: var(--color-warn);
         }
-        .bullet {
-          grid-area: bullet;
-          border-radius: 50%;
-          width: 0.5rem;
-          height: 0.5rem;
-          display: inline-block;
-          opacity: 1;
-          margin-right: 0.5rem;
-          background-color: var(--col);
-          transition:
-            opacity var(--animation-duration) ease-in,
-            display var(--animation-duration) allow-discrete;
-        }
-        &:hover,
-        &:focus {
-          span {
-            color: var(--color-warn);
+        .list-item {
+          display: grid;
+          grid-template: 'bullet text' auto / auto 1fr;
+          align-items: center;
+          .content {
+            grid-area: text;
+            transition: color var(--animation-duration) ease-in;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
           }
           .material-symbols-outlined {
-            display: inline-block;
-            opacity: 1;
-          }
-          .bullet {
+            grid-area: bullet;
             display: none;
             opacity: 0;
+            margin-left: -0.2rem;
+            margin-right: 0.2rem;
+            color: var(--color-warn);
+            transition:
+              opacity var(--animation-duration) ease-in,
+              display var(--animation-duration) allow-discrete;
+          }
+          .bullet {
+            grid-area: bullet;
+            border-radius: 50%;
+            width: 0.5rem;
+            height: 0.5rem;
+            display: inline-block;
+            opacity: 1;
+            margin-right: 0.5rem;
+            background-color: var(--col);
+            transition:
+              opacity var(--animation-duration) ease-in,
+              display var(--animation-duration) allow-discrete;
+          }
+          &:hover:not(.selected),
+          &:focus:not(.selected) {
+            span {
+              color: var(--color-hover);
+            }
+            .material-symbols-outlined {
+              display: inline-block;
+              opacity: 1;
+            }
+            .bullet {
+              display: none;
+              opacity: 0;
+            }
           }
         }
       }

@@ -9,6 +9,7 @@
   text-overflow: ellipsis;
   cursor: pointer;
   padding: 0.5rem 1rem;
+  &.active,
   &:hover {
     background-color: var(--color-background-list);
   }

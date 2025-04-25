@@ -23,8 +23,6 @@ const externalWidgets = widgetFiles
   .filter((file) => !file.startsWith('widget.routes')) // Exclude `widget.routes`
   .map((file) => `@home/widgets/${file}`);
 
-console.log('Exclude external widgets from bundle:', externalWidgets);
-
 esbuild
   .build({
     entryPoints: ['apps/backend/src/main.ts'], // Adjust the entry point as needed
@@ -45,5 +43,8 @@ esbuild
         },
       }),
     ],
+  })
+  .then(() => {
+    console.log('Exclude external widgets from bundle:', externalWidgets);
   })
   .catch(() => process.exit(1));

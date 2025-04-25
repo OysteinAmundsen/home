@@ -67,9 +67,9 @@ export const requestLogger = (proxyServer: httpProxy, options: Options) => {
       target = new URL(options.target as URL);
       target.pathname = proxyRes.req.path;
     }
-    Logger.log(
-      `${proxyPath} ${wrap([Color.FG_White, Color.BG_Blue], ' → ')} ${target.toString()} [${proxyRes.statusCode}]`,
-      `${req.method} (${res.statusCode})`,
-    );
+    const fadIn = wrap([Color.FG_Black, Color.BG_Blue], '▓▒');
+    const fadOut = wrap([Color.FG_Black, Color.BG_Blue], '▒▓');
+    const arrow = `${fadIn}${wrap([Color.FG_White, Color.BG_Blue], '→')}${fadOut}`;
+    Logger.log(`${proxyPath} ${arrow} ${target.toString()}`, `${req.method} (${res.statusCode})`);
   });
 };

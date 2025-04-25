@@ -16,11 +16,17 @@
         }
       </ul>
     </div>
-    <div echarts [options]="chartOption()" [autoResize]="true" class="chart" (chartInit)="onChartInit($event)"></div>
+    <div
+      echarts
+      [options]="chartOption()"
+      [autoResize]="true"
+      class="chart"
+      (chartInit)="onChartInit($event)"
+      [theme]="colorSchema()"
+    ></div>
   }
   @if (isFullscreen()) {
     <section>
-      <!-- Show selected instruments and add a search box to add more instruments. -->
       <div>
         <header>
           <h3>Instruments:</h3>
@@ -35,25 +41,58 @@
               <span class="material-symbols-outlined">search</span>
             </lib-typeahead>
           </div>
+          @if (showAll()) {
+            <button (click)="showAll.set(false)">Watchlist</button>
+          } @else {
+            <button (click)="showAll.set(true)">Show all</button>
+          }
+
+          @if (totalInstruments() > 20) {
+            <div class="pager">
+              <button type="button" (click)="prevPage()" [disabled]="!hasPrevPage()">
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+              <button type="button" (click)="nextPage()" [disabled]="!hasNextPage()">
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+          }
         </header>
-        <ul class="list">
+        <ul class="list" [class]="showAll() ? 'all' : 'watchlist'">
           @for (instrument of instruments(); track instrument.id) {
             <li
               class="list-item"
               tabindex="0"
-              (click)="removeInstrument(instrument)"
+              [id]="'instrument_' + instrument.id"
+              (click)="showAll() ? addInstrument(instrument) : removeInstrument(instrument)"
               (keypress.delete)="removeInstrument(instrument)"
-              title="Click to remove instrument"
+              (pointerover)="highlightGraph(instrument, $event)"
+              (pointerout)="unhighlightGraph(instrument)"
+              [class.active]="instrument.id === highlightedInstrument()"
+              [class.selected]="showAll() && selectedInstruments().includes(instrument.id)"
+              [title]="showAll() ? 'Click to add to watchlist' : 'Click to remove from watchlist'"
             >
-              <span class="material-symbols-outlined">remove</span>
+              @if (showAll()) {
+                <span class="material-symbols-outlined">add</span>
+              } @else {
+                <span class="material-symbols-outlined">remove</span>
+              }
               <span class="bullet" style="--col: {{ instrument.color }}"></span>
               <span class="content">{{ instrument.id }} - {{ instrument.name }}</span>
             </li>
           } @empty {
-            <div class="list-item-empty">
-              No instruments selected.
-              <button (click)="setDefaults()">Set defaults?</button>
-            </div>
+            @if (dataLoader.isLoading()) {
+              <div class="list-item-empty">Loading...</div>
+            } @else if (dataLoader.error()) {
+              <div class="list-item-empty">Error: {{ dataLoader.error() }}</div>
+            } @else if (showAll()) {
+              <div class="list-item-empty">No instruments found.</div>
+            } @else {
+              <div class="list-item-empty">
+                No instruments selected.
+                <button (click)="setDefaults()">Set defaults?</button>
+              </div>
+            }
           }
         </ul>
       </div>

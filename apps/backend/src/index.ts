@@ -31,6 +31,9 @@ export async function createServer(ssrMode = false): Promise<NestExpressApplicat
     // LOG INCOMING REQUESTS
     // (except proxy requests which has its own logger)
     res.on('finish', () => {
+      if (req.originalUrl.startsWith('/api')) {
+        return;
+      }
       switch (Math.round(res.statusCode / 100)) {
         case 4:
           Logger.warn(`${req.url}`, `${req.method} (${res.statusCode})`);

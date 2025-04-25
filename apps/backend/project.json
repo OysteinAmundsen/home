@@ -8,14 +8,18 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node apps/backend/esbuild.config.js"
+        "command": "echo 'Building backend'"
       },
       "configurations": {
         "development": {
-          "command": "cross-env NODE_ENV=development node apps/backend/esbuild.config.js"
+          "command": "cross-env NODE_ENV=development node apps/backend/esbuild.config.js",
+          "sourceMap": true,
+          "watch": true
         },
         "production": {
-          "command": "cross-env NODE_ENV=production node apps/backend/esbuild.config.js"
+          "command": "cross-env NODE_ENV=production node apps/backend/esbuild.config.js",
+          "bundle": true,
+          "minify": true
         }
       }
     },
@@ -25,8 +29,7 @@
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "backend:build",
-        "runBuildTargetDependencies": false,
-        "watch": true
+        "runBuildTargetDependencies": false
       },
       "configurations": {
         "development": {

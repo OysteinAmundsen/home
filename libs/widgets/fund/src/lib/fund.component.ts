@@ -3,7 +3,6 @@ import { Component, computed, effect, inject, linkedSignal, OnInit, resource, si
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AppSettingsService } from '@home/shared/app.settings';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
-import { getComputedStyle, setAlpha } from '@home/shared/utils/color';
 import { deepMerge } from '@home/shared/utils/object';
 import { TypeaheadComponent } from '@home/shared/ux/typeahead/typeahead.component';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
@@ -14,6 +13,7 @@ import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { firstValueFrom } from 'rxjs';
+import { FundInstrument } from './fund.model';
 import { FundService } from './fund.service';
 
 if (typeof window !== 'undefined') {
@@ -25,7 +25,7 @@ if (typeof window !== 'undefined') {
   imports: [CommonModule, ReactiveFormsModule, WidgetComponent, NgxEchartsDirective, TypeaheadComponent],
   templateUrl: './fund.component.html',
   styleUrl: './fund.component.scss',
-  providers: [{ provide: FundService }, provideEchartsCore({ echarts })],
+  providers: [provideEchartsCore({ echarts })],
 })
 export default class FundComponent extends AbstractWidgetComponent implements OnInit {
   // prettier-ignore
@@ -52,6 +52,7 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       bottom: 0,
       containLabel: true,
     },
+    backgroundColor: 'transparent',
     legend: {
       show: false,
     },
@@ -68,99 +69,96 @@ export default class FundComponent extends AbstractWidgetComponent implements On
     series: [],
   });
   // Set dark mode in chart options when theme changes
-  onThemeChanged = effect(() => {
-    const theme = this.theme.selectedTheme();
-    const s = getComputedStyle(this.document.body, '--animation-duration', 'duration');
-    const duration = parseFloat(s) * (/\ds$/.test(s) ? 1000 : 1);
-    setTimeout(() => {
-      this.chartOption.update((original) => {
-        const legendColor = getComputedStyle(this.document.body, 'color');
-        const axisColor = legendColor ? setAlpha(legendColor, 0.5) : legendColor;
-        const splitColor = legendColor ? setAlpha(legendColor, 0.1) : legendColor;
-        const newOptions = deepMerge(original, {
-          darkMode: theme === 'dark',
-          xAxis: {
-            axisLabel: { color: axisColor },
-          },
-          yAxis: {
-            axisLabel: { color: axisColor },
-            axisLine: { lineStyle: { color: axisColor } },
-            splitLine: { lineStyle: { color: splitColor } },
-          },
-          tooltip: {
-            show: this.isFullscreen(),
-          },
-        });
-        return { ...newOptions };
-      });
-    }, duration);
-  });
+  colorSchema = this.theme.selectedTheme;
 
+  // User input and values
   instrumentSearch = new FormControl<string>('', { updateOn: 'change' });
   selectedInstruments = this.settings.watchInstruments;
   availableTimeslots = this.fundService.timeslots;
-  selectedTimeslot = linkedSignal(() => this.fundService.timeslots[1].value);
+  selectedTimeslot = this.fundService.selectedTimeslot;
+
+  // Tab switch
+  showAll = this.fundService.showAll;
+
+  // Pager
+  currentPage = this.fundService.currentPage; // Set in service to persist across routes
+  totalInstruments = signal(0);
+  maxPage = computed(() => Math.ceil(this.totalInstruments() / 20) - 1);
+  hasPrevPage = computed(() => this.currentPage() > 0);
+  hasNextPage = computed(() => this.currentPage() < this.maxPage());
+  prevPage = () => this.currentPage.update((page) => Math.max(page - 1, 0));
+  nextPage = () => this.currentPage.update((page) => Math.min(page + 1, this.maxPage()));
+
+  // Load data
   dataLoader = resource({
     request: () => ({
+      // Triggers
       instruments: this.settings.watchInstruments(),
       timeslot: this.selectedTimeslot(),
+      showAll: this.showAll(),
+      offset: this.currentPage(),
     }),
     loader: async ({ request }) => {
       // Load instrument data
-      let data = [];
-      if (request.instruments.length) {
-        data = await firstValueFrom(this.fundService.getFundData(request.instruments));
-      }
+      if (!request.showAll && request.instruments.length === 0) return [];
+      const instruments = request.showAll ? [] : request.instruments;
+      const response = await firstValueFrom(this.fundService.getFundData(instruments, request.offset * 20));
+      const data = response.results || [];
+      this.totalInstruments.update(() => response.total_hits || 0);
 
       // For each instrument, fetch price time series
       await Promise.allSettled(
         data.map(async (item: any) => {
-          const res = await firstValueFrom(
-            this.fundService.getTimeSeries(item.nnx_info.market_data_order_book_id, request.timeslot),
-          );
+          const id = item.instrument_info.instrument_id;
+          const res = await firstValueFrom(this.fundService.getTimeSeries(id, request.timeslot));
           item.timeSeries = res;
         }),
       );
-      // Map data to chart options
-      this.chartOption.update((original) => {
-        // Clear previous series data
-        if ('series' in original && Array.isArray(original['series'])) {
-          original['series'].forEach((s) => {
-            s.data = [];
-          });
-        }
-        // ... before merging in new data because otherwise new data will be merged with old data
-        const newOptions = deepMerge(original, {
-          grid: {
-            bottom: this.isFullscreen() ? 40 : 0,
-          },
-          series: data.map((item: any) => ({
-            name: item.instrument_info.long_name,
-            type: 'line',
-            smooth: true,
-            showSymbol: false,
-            data: item.timeSeries.pricePoints.map((p: any) => [p.timeStamp, p.value]),
-          })),
-        });
-        // Must return a new object to trigger change detection
-        return { ...newOptions };
-      });
-
-      this.api()?.clear();
-      this.api()?.setOption(this.chartOption());
-
       return data;
     },
   });
 
-  instruments = computed(() => {
-    const instruments = this.settings.watchInstruments() || [];
+  // Render data to graph
+  onDataLoaded = effect(() => {
+    if (this.dataLoader.isLoading() || this.dataLoader.error()) return;
+    const data = this.dataLoader.value();
+    // Map data to chart options
+    this.chartOption.update((original) => {
+      // Clear previous series data
+      original['series'] = [];
+      // ... before merging in new data because otherwise new data will be merged with old data
+      const newOptions = deepMerge(original, {
+        grid: {
+          bottom: this.isFullscreen() ? 40 : 0,
+        },
+        series: data.map((item: any) => ({
+          id: item.instrument_info.instrument_id,
+          name: item.instrument_info.long_name,
+          type: 'line',
+          smooth: true,
+          showSymbol: false,
+          data: item.timeSeries.pricePoints.map((p: any) => [p.timeStamp, p.value]),
+          emphasis: {
+            focus: 'series',
+            blurScope: 'coordinateSystem',
+          },
+        })),
+      });
+      // Must return a new object to trigger change detection
+      return { ...newOptions };
+    });
+
+    this.api()?.clear();
+    this.api()?.setOption(this.chartOption());
+  });
+
+  instruments = computed<FundInstrument[]>(() => {
     const options = this.api()?.getOption() as any;
+    const data = this.dataLoader.value() || [];
     if (this.dataLoader.isLoading() || this.dataLoader.error()) {
-      return instruments.map((id) => ({ id, name: '', color: '' })).sort((a: any, b: any) => b.id - a.id);
+      return [].map((id) => ({ id, name: '', color: '' })).sort((a: any, b: any) => b.id - a.id);
     }
-    return this.dataLoader
-      .value()
+    return data
       .map((item: any) => {
         let seriesIdx = 0;
         if (options && Array.isArray(options.series)) {
@@ -180,6 +178,7 @@ export default class FundComponent extends AbstractWidgetComponent implements On
     this.instrumentSearch.valueChanges.pipe().subscribe(async (value: any) => {
       if (!value) return;
       // Search for instruments
+      this.showAll.set(false);
       this.settings.watchInstruments.update((instruments: any) => {
         if (Array.isArray(value)) {
           return [...instruments, ...value];
@@ -191,12 +190,24 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       this.instrumentSearch.setValue('', { emitEvent: false });
     });
   }
+  onChartInit(api: echarts.ECharts) {
+    this.api.set(api);
+    api.on('mouseover', (params: any) => this.highlightGraph({ id: params.seriesId }));
+    api.on('mouseout', (params: any) => this.unhighlightGraph({ id: params.seriesId }));
+  }
 
+  // Search to add to watch list
   async searchInstruments(value: string) {
     return await firstValueFrom(this.fundService.searchFunds(value));
   }
 
-  async removeInstrument(item: any) {
+  // Add to watch list
+  async addInstrument(item: FundInstrument) {
+    this.settings.watchInstruments.update((instruments: number[]) => [...instruments, item.id]);
+  }
+
+  // Remove from watch list
+  async removeInstrument(item: FundInstrument) {
     this.settings.watchInstruments.update((instruments: any) => {
       if (Array.isArray(instruments)) {
         return instruments.filter((i: any) => i !== item.id);
@@ -205,11 +216,23 @@ export default class FundComponent extends AbstractWidgetComponent implements On
     });
   }
 
+  // Set default instruments to watch
   setDefaults() {
     this.settings.watchInstruments.set([16802428, 16801174, 16801692, 18282786]);
   }
 
-  onChartInit($event: echarts.ECharts) {
-    this.api.set($event);
+  // Highlight graph and list item on hover over any of them
+  highlightedInstrument = signal<number | undefined>(undefined);
+  highlightGraph(instrument: any, $event?: PointerEvent) {
+    this.highlightedInstrument.set(Number(instrument.id));
+    this.api()?.dispatchAction({ type: 'highlight', seriesId: instrument.id });
+    if ($event) return;
+    this.document
+      .querySelector('#instrument_' + instrument.id)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  unhighlightGraph(instrument: any) {
+    this.highlightedInstrument.set(undefined);
+    this.api()?.dispatchAction({ type: 'downplay', seriesId: instrument.id });
   }
 }

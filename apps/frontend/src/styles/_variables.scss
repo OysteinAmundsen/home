@@ -9,6 +9,7 @@
     hsl(from var(--color-primary) h 50% 60%)
   );
   --color-warn: light-dark(hsl(14, 100%, 30%), hsl(2, 100%, 63%));
+  --color-success: light-dark(hsl(143, 100%, 30%), hsl(143, 100%, 63%));
 
   // Base color configuration
   --base-color: var(--color-primary);
