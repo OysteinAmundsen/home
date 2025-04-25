@@ -87,14 +87,23 @@
           }
           .material-symbols-outlined {
             grid-area: bullet;
-            display: none;
-            opacity: 0;
             margin-left: -0.2rem;
             margin-right: 0.2rem;
-            color: var(--color-warn);
-            transition:
-              opacity var(--animation-duration) ease-in,
-              display var(--animation-duration) allow-discrete;
+            transform-origin: 10px 46%;
+            &.hint {
+              color: var(--color-warn);
+              display: none;
+              opacity: 0;
+              scale: 0.6;
+              transition:
+                opacity var(--animation-duration) ease-in,
+                scale var(--animation-duration) ease-in,
+                display var(--animation-duration) allow-discrete;
+            }
+            &:not(.hint) {
+              scale: 1.4;
+              color: var(--col);
+            }
           }
           .bullet {
             grid-area: bullet;
@@ -114,9 +123,10 @@
             span {
               color: var(--color-hover);
             }
-            .material-symbols-outlined {
+            .hint {
               display: inline-block;
               opacity: 1;
+              scale: 1.4;
             }
             .bullet {
               display: none;

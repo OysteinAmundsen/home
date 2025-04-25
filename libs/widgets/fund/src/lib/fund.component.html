@@ -73,11 +73,17 @@
               [title]="showAll() ? 'Click to add to watchlist' : 'Click to remove from watchlist'"
             >
               @if (showAll()) {
-                <span class="material-symbols-outlined">add</span>
+                <span class="hint material-symbols-outlined">
+                  {{ selectedInstruments().includes(instrument.id) ? 'check' : 'add' }}
+                </span>
               } @else {
-                <span class="material-symbols-outlined">remove</span>
+                <span class="hint material-symbols-outlined">remove</span>
               }
-              <span class="bullet" style="--col: {{ instrument.color }}"></span>
+              @if (showAll() && selectedInstruments().includes(instrument.id)) {
+                <span class="material-symbols-outlined" style="--col: {{ instrument.color }}">check</span>
+              } @else {
+                <span class="bullet" style="--col: {{ instrument.color }}"></span>
+              }
               <span class="content">{{ instrument.id }} - {{ instrument.name }}</span>
             </li>
           } @empty {
