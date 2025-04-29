@@ -13,6 +13,7 @@ import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { firstValueFrom } from 'rxjs';
+import { ColorCodeNumberDirective } from './color-code-number.directive';
 import { FundInstrument } from './fund.model';
 import { FundService } from './fund.service';
 
@@ -22,7 +23,14 @@ if (typeof window !== 'undefined') {
 
 @Component({
   selector: 'lib-fund',
-  imports: [CommonModule, ReactiveFormsModule, WidgetComponent, NgxEchartsDirective, TypeaheadComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    WidgetComponent,
+    NgxEchartsDirective,
+    TypeaheadComponent,
+    ColorCodeNumberDirective,
+  ],
   templateUrl: './fund.component.html',
   styleUrl: './fund.component.scss',
   providers: [provideEchartsCore({ echarts })],
@@ -169,9 +177,14 @@ export default class FundComponent extends AbstractWidgetComponent implements On
           id: item.instrument_info.instrument_id,
           name: item.instrument_info.long_name,
           color: options?.color[seriesIdx % options?.color.length] ?? '',
-        };
+          owners: item.statistical_info.number_of_owners,
+          yield_1y: item.annual_growth_info.annual_growth_1y,
+          yield_3y: item.annual_growth_info.annual_growth_3y,
+          yield_5y: item.annual_growth_info.annual_growth_5y,
+          yield_10y: item.annual_growth_info.annual_growth_10y,
+        } as FundInstrument;
       })
-      .sort((a: any, b: any) => b.id - a.id);
+      .sort((a: any, b: any) => a.id - b.id);
   });
 
   ngOnInit(): void {
@@ -192,8 +205,25 @@ export default class FundComponent extends AbstractWidgetComponent implements On
   }
   onChartInit(api: echarts.ECharts) {
     this.api.set(api);
-    api.on('mouseover', (params: any) => this.highlightGraph({ id: params.seriesId }));
-    api.on('mouseout', (params: any) => this.unhighlightGraph({ id: params.seriesId }));
+    // Highlight the series and the list item
+    api
+      .getZr()
+      .on('mouseover', (params: any) =>
+        this.highlightGraph({ id: this.getSeriesFromEventTarget(params.target)?.id }, undefined, false),
+      );
+    api
+      .getZr()
+      .on('mouseout', (params: any) => this.unhighlightGraph({ id: this.getSeriesFromEventTarget(params.target)?.id }));
+  }
+
+  private getSeriesFromEventTarget(target: any) {
+    // Hack to get the series from the zRender event
+    if (!target) return undefined;
+    const [key, value] = Object.entries(target).filter(
+      ([key, value]: [string, any]) => key.startsWith('__ec_inner') && Object.keys(value).includes('seriesIndex'),
+    )[0];
+    const idx = (value as any).seriesIndex;
+    return (this.chartOption()['series'] as any)[idx];
   }
 
   // Search to add to watch list
@@ -223,16 +253,20 @@ export default class FundComponent extends AbstractWidgetComponent implements On
 
   // Highlight graph and list item on hover over any of them
   highlightedInstrument = signal<number | undefined>(undefined);
-  highlightGraph(instrument: any, $event?: PointerEvent) {
+  highlightGraph(instrument: any, $event?: PointerEvent, emit = true) {
     this.highlightedInstrument.set(Number(instrument.id));
-    this.api()?.dispatchAction({ type: 'highlight', seriesId: instrument.id });
+    if (emit) {
+      this.api()?.dispatchAction({ type: 'highlight', seriesId: instrument.id });
+    }
     if ($event) return;
     this.document
       .querySelector('#instrument_' + instrument.id)
       ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
-  unhighlightGraph(instrument: any) {
+  unhighlightGraph(instrument = { id: this.highlightedInstrument() }, emit = true) {
+    if (emit) {
+      this.api()?.dispatchAction({ type: 'downplay', seriesId: instrument.id });
+    }
     this.highlightedInstrument.set(undefined);
-    this.api()?.dispatchAction({ type: 'downplay', seriesId: instrument.id });
   }
 }

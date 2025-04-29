@@ -58,52 +58,90 @@
             </div>
           }
         </header>
-        <ul class="list" [class]="showAll() ? 'all' : 'watchlist'">
-          @for (instrument of instruments(); track instrument.id) {
-            <li
-              class="list-item"
-              tabindex="0"
-              [id]="'instrument_' + instrument.id"
-              (click)="showAll() ? addInstrument(instrument) : removeInstrument(instrument)"
-              (keypress.delete)="removeInstrument(instrument)"
-              (pointerover)="highlightGraph(instrument, $event)"
-              (pointerout)="unhighlightGraph(instrument)"
-              [class.active]="instrument.id === highlightedInstrument()"
-              [class.selected]="showAll() && selectedInstruments().includes(instrument.id)"
-              [title]="showAll() ? 'Click to add to watchlist' : 'Click to remove from watchlist'"
-            >
-              @if (showAll()) {
-                <span class="hint material-symbols-outlined">
-                  {{ selectedInstruments().includes(instrument.id) ? 'check' : 'add' }}
-                </span>
-              } @else {
-                <span class="hint material-symbols-outlined">remove</span>
+        <div class="table">
+          <table [class]="showAll() ? 'all' : 'watchlist'">
+            <thead>
+              <tr>
+                <th class="icon">
+                  <span class="material-symbols-outlined">
+                    {{ showAll() ? 'add_box' : 'disabled_by_default' }}
+                  </span>
+                </th>
+                <th class="name">Name</th>
+                <th class="number owners">Owners</th>
+                <th class="number yield_1y">1Y</th>
+                <th class="number yield_3y">3Y</th>
+                <th class="number yield_5y">5Y</th>
+                <th class="number yield_10y">10Y</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (instrument of instruments(); track instrument.id) {
+                <tr
+                  tabindex="0"
+                  [id]="'instrument_' + instrument.id"
+                  (pointerover)="highlightGraph(instrument, $event)"
+                  (pointerout)="unhighlightGraph(instrument)"
+                  [class.active]="instrument.id === highlightedInstrument()"
+                  [class.selected]="showAll() && selectedInstruments().includes(instrument.id)"
+                >
+                  @if (showAll()) {
+                    <td class="icon" (click)="addInstrument(instrument)" title="Click to add to watchlist">
+                      <span class="hint material-symbols-outlined">
+                        {{ selectedInstruments().includes(instrument.id) ? 'check' : 'add' }}
+                      </span>
+                      <span class="bullet" style="--col: {{ instrument.color }}"></span>
+                    </td>
+                  } @else {
+                    <td
+                      class="icon"
+                      (click)="removeInstrument(instrument)"
+                      (keypress.delete)="removeInstrument(instrument)"
+                      title="Click to remove from watchlist"
+                    >
+                      <span class="hint material-symbols-outlined">remove</span>
+                      <span class="bullet" style="--col: {{ instrument.color }}"></span>
+                    </td>
+                  }
+                  <td class="name">
+                    <span>{{ instrument.id }} - {{ instrument.name }}</span>
+                  </td>
+                  <td class="number owners">
+                    <span>{{ instrument.owners | number }}</span>
+                  </td>
+                  <td class="number yield_1y">
+                    <span libColorCodeNumber>{{ instrument.yield_1y | number: '1.2-2' }}</span>
+                  </td>
+                  <td class="number yield_3y">
+                    <span libColorCodeNumber>{{ instrument.yield_3y | number: '1.2-2' }}</span>
+                  </td>
+                  <td class="number yield_5y">
+                    <span libColorCodeNumber>{{ instrument.yield_5y | number: '1.2-2' }}</span>
+                  </td>
+                  <td class="number yield_10y">
+                    <span libColorCodeNumber>{{ instrument.yield_10y | number: '1.2-2' }}</span>
+                  </td>
+                </tr>
+              } @empty {
+                @if (dataLoader.isLoading()) {
+                  <div class="list-item-empty">Loading...</div>
+                } @else if (dataLoader.error()) {
+                  <div class="list-item-empty">Error: {{ dataLoader.error() }}</div>
+                } @else if (showAll()) {
+                  <div class="list-item-empty">No instruments found.</div>
+                } @else {
+                  <div class="list-item-empty">
+                    No instruments selected.
+                    <button (click)="setDefaults()">Set defaults?</button>
+                  </div>
+                }
               }
-              @if (showAll() && selectedInstruments().includes(instrument.id)) {
-                <span class="material-symbols-outlined" style="--col: {{ instrument.color }}">check</span>
-              } @else {
-                <span class="bullet" style="--col: {{ instrument.color }}"></span>
-              }
-              <span class="content">{{ instrument.id }} - {{ instrument.name }}</span>
-            </li>
-          } @empty {
-            @if (dataLoader.isLoading()) {
-              <div class="list-item-empty">Loading...</div>
-            } @else if (dataLoader.error()) {
-              <div class="list-item-empty">Error: {{ dataLoader.error() }}</div>
-            } @else if (showAll()) {
-              <div class="list-item-empty">No instruments found.</div>
-            } @else {
-              <div class="list-item-empty">
-                No instruments selected.
-                <button (click)="setDefaults()">Set defaults?</button>
-              </div>
-            }
-          }
-        </ul>
+            </tbody>
+          </table>
+        </div>
       </div>
       <footer>
-        Data is collected from&nbsp;<a href="https://www.nordnet.se/fonder/lista" target="_blank">nordnet.se</a>
+        Data is collected from&nbsp;<a href="https://www.nordnet.no/fond/liste" target="_blank">NordNet</a>
       </footer>
     </section>
   }
