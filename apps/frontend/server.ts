@@ -63,11 +63,11 @@ async function bootstrap() {
     // but the sha's are different on every build, so we can't use them.
     const csp = `
       default-src 'self';
-      script-src  'self' 'unsafe-inline';
+      script-src  'self' 'unsafe-inline' 'unsafe-eval';
       style-src   'self' 'unsafe-inline' fonts.googleapis.com;
       img-src     'self';
       font-src    'self' fonts.gstatic.com;
-      connect-src 'self' fonts.gstatic.com;
+      connect-src 'self' fonts.gstatic.com huggingface.co raw.githubusercontent.com cdn-lfs-us-1.hf.co;
     `.replace(/\n/g, '');
     res.setHeader('Content-Security-Policy', csp);
 

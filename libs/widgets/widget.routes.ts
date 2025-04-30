@@ -31,4 +31,9 @@ export const widgetRoutes: Route[] = [
     data: { widget: true, tags: ['ai'] },
     loadComponent: () => import('@home/widgets/transcribe').then((m) => m.default),
   },
+  {
+    path: 'chat',
+    data: { widget: true, tags: ['ai'] },
+    loadComponent: () => import('@home/widgets/chat').then((m) => m.default),
+  },
 ];

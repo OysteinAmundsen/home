@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { catchError, filter, map, of } from 'rxjs';
 import { titleCase } from '../utils/string';
 import { Widget, WidgetService } from './widget.service';
 
@@ -83,6 +83,8 @@ export abstract class AbstractWidgetComponent {
     this.router.events.pipe(
       takeUntilDestroyed(this.destroyRef$),
       filter((event) => event instanceof NavigationEnd),
+      // Sometimes the router emits an error, so we need to catch it
+      catchError(() => of(true)),
       map(() => !this.widgetService.isDescendantOfDashboard(this.elementRef)),
     ),
   );

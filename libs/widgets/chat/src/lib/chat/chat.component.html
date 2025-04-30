@@ -1,0 +1,24 @@
+<lib-widget [host]="host()">
+  <main>
+    @for (message of filteredMessages(); track message.timestamp) {
+      <div class="message {{ message.role }}">{{ message.content }}</div>
+    }
+  </main>
+  <footer>
+    <form (submit)="sendMessage($event)" #form>
+      <label for="prompt">
+        <textarea
+          id="prompt"
+          [placeholder]="isInitialized() ? 'Enter to send, Shift + Enter to wrap' : 'Please wait... Loading model'"
+          [formControl]="userPrompt"
+          (keypress)="maybeSendMessage($event)"
+        ></textarea>
+        <button type="submit" [disabled]="!userPrompt.getRawValue() || !isInitialized()">
+          <span class="material-symbols-outlined">send</span>
+          <span>Send</span>
+        </button>
+      </label>
+      <small class="progress">{{ progressText() }}</small>
+    </form>
+  </footer>
+</lib-widget>

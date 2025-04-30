@@ -4,9 +4,13 @@ This repository is a proof of concept playground for building a full-stack appli
 
 ## Features
 
-- [BFF - NestJS-powered API](#backend-for-frontend)
+- [Full-stack Angular + NestJS + SQLite database](#backend-for-frontend) executed using angular SSR.
 - [Workbox service-worker](#service-worker) integrated into the development process
 - [Browser API experimentation and permission handling best practices](#utilities)
+- Push notifications
+- Offline detection
+- [Dark/Light mode styling](./apps/frontend/src/styles/_variables.scss) with modern css functions
+- View transitions
 - [Widget dashboard system](#dashboard-system) where each widget is a [self-contained library](./libs/widgets/) with both dashboard and fullscreen views:
   - [Third-party integrations](#integrations) like met.no (weather data) and nordnet.no (financial data)
   - Canvas and WebGPU experiments
@@ -39,6 +43,11 @@ sed -i.bak -e 's/bun x/npx/g' -e 's/bun /npm /g' package.json
 ```
 
 This removes the `bun` lockfile, installs dependencies with `npm`, and replaces `bun` commands in `package.json` with their `npm` equivalents.
+
+### Troubleshooting
+
+- **Launching VSCode chrome debugger prints errors in the console:**
+  VSCode launches chrome using the Default profile instead of your regular profile. This has a weird access to the browser cache storage, which does not allow the service worker to pre-cache our resources. Open the url in a "normal" browser profile to get all service worker functionality
 
 ## Backend for Frontend
 
