@@ -21,7 +21,7 @@ main {
     border: 1px solid var(--color-border);
     margin: 1rem;
     max-width: 60vw;
-    width: max-content;
+    width: fit-content;
     &.user {
       margin-left: auto;
       text-align: right;
