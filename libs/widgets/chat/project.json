@@ -1,5 +1,5 @@
 {
-  "name": "chat",
+  "name": "widgets/chat",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/widgets/chat/src",
   "prefix": "lib",
