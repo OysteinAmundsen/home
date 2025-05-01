@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 
+@ApiSchema({ name: 'WidgetResponse' })
 export class WidgetResponse {
   @ApiProperty({ description: 'The ID of the widget', type: 'string' })
   id!: string;

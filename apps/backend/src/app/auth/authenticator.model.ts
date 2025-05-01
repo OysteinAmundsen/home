@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import type { AuthenticatorTransportFuture, Base64URLString, CredentialDeviceType } from '@simplewebauthn/server';
 import { User } from './user.entity';
 
@@ -16,6 +16,7 @@ type Passkey = {
   transports?: AuthenticatorTransportFuture[];
 };
 
+@ApiSchema({ name: 'RegisterRequestCredentialResponse' })
 export class RegisterRequestCredentialResponse {
   @ApiProperty({ description: 'The attestation object', type: 'string' })
   attestationObject!: string;
@@ -30,6 +31,7 @@ export class RegisterRequestCredentialResponse {
   type!: string;
 }
 
+@ApiSchema({ name: 'RegisterRequestCredential' })
 export class RegisterRequestCredential {
   @ApiProperty({ description: 'The raw ID of the credential', type: 'string' })
   rawId!: string;
@@ -38,6 +40,7 @@ export class RegisterRequestCredential {
   response!: RegisterRequestCredentialResponse;
 }
 
+@ApiSchema({ name: 'PublicKeyCredentialUserEntityJSON' })
 export class PublicKeyCredentialUserEntityJSON {
   @ApiProperty({ description: 'The user ID as a Uint8Array', type: 'string' })
   id!: string;
@@ -49,6 +52,7 @@ export class PublicKeyCredentialUserEntityJSON {
   displayName!: string;
 }
 
+@ApiSchema({ name: 'RegisterRequestBody' })
 export class RegisterRequestBody {
   @ApiProperty({ description: 'The credential for registration', type: RegisterRequestCredential })
   credential!: RegisterRequestCredential;
@@ -57,6 +61,7 @@ export class RegisterRequestBody {
   user!: PublicKeyCredentialUserEntityJSON;
 }
 
+@ApiSchema({ name: 'AuthenticateRequestCredentialResponse' })
 export class AuthenticateRequestCredentialResponse {
   @ApiProperty({ description: 'The authenticator data', type: 'string' })
   authenticatorData!: string;
@@ -71,6 +76,7 @@ export class AuthenticateRequestCredentialResponse {
   clientDataJSON!: string;
 }
 
+@ApiSchema({ name: 'AuthenticateRequestCredential' })
 export class AuthenticateRequestCredential {
   @ApiProperty({ description: 'The raw ID of the credential', type: 'string' })
   rawId!: string;
@@ -79,11 +85,13 @@ export class AuthenticateRequestCredential {
   response!: AuthenticateRequestCredentialResponse;
 }
 
+@ApiSchema({ name: 'AuthenticateRequestBody' })
 export class AuthenticateRequestBody {
   @ApiProperty({ description: 'The credential for authentication', type: AuthenticateRequestCredential })
   credential!: AuthenticateRequestCredential;
 }
 
+@ApiSchema({ name: 'AuthSessionData' })
 export class AuthSessionData {
   @ApiProperty({ description: 'The user handle', type: 'string' })
   userHandle!: string;
@@ -95,6 +103,7 @@ export class AuthSessionData {
   challenge!: ArrayBuffer;
 }
 
+@ApiSchema({ name: 'AuthenticatorSelectionCriteriaImpl' })
 export class AuthenticatorSelectionCriteriaImpl implements AuthenticatorSelectionCriteria {
   @ApiProperty({ type: 'string', example: 'platform' })
   authenticatorAttachment?: AuthenticatorAttachment;
@@ -103,6 +112,7 @@ export class AuthenticatorSelectionCriteriaImpl implements AuthenticatorSelectio
   userVerification?: UserVerificationRequirement;
 }
 
+@ApiSchema({ name: 'RegistrationOptionsResponse' })
 export class RegistrationOptionsResponse implements PublicKeyCredentialCreationOptions {
   @ApiProperty({
     example: [{ type: 'public-key', alg: -7 }],
@@ -147,12 +157,14 @@ export class RegistrationOptionsResponse implements PublicKeyCredentialCreationO
   timeout?: number;
 }
 
+@ApiSchema({ name: 'AuthenticationOptions' })
 export class AuthenticationOptions {
   @ApiProperty({ description: 'The challenge base64 encoded', type: 'string' })
   challenge!: string;
   @ApiProperty({ description: 'The allowed credentials', type: 'array' })
   allowCredentials!: PublicKeyCredentialDescriptor[];
 }
+@ApiSchema({ name: 'AuthenticationOptionsResponse' })
 export class AuthenticationOptionsResponse {
   @ApiProperty({
     description: 'The authentication options',
@@ -161,11 +173,13 @@ export class AuthenticationOptionsResponse {
   options!: AuthenticationOptions;
 }
 
+@ApiSchema({ name: 'RegisterResponse' })
 export class RegisterResponse {
   @ApiProperty({ description: 'The status of the registration', example: 'ok', type: 'string' })
   status!: string;
 }
 
+@ApiSchema({ name: 'AuthenticateResponse' })
 export class AuthenticateResponse {
   @ApiProperty({
     description: 'The JWT token',
