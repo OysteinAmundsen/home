@@ -1,6 +1,8 @@
 import { isPlatformBrowser } from '@angular/common';
 import { computed, effect, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
 import { serviceWorkerActivated } from '@home/shared/browser/service-worker/service-worker';
+import { titleCase } from '@home/shared/utils/string';
+import { widgetRoutes } from '@home/widgets/widget.routes';
 import {
   CreateServiceWorkerMLCEngine,
   InitProgressReport,
@@ -70,6 +72,19 @@ export class ChatService {
   }
 
   async resetChat() {
+    const widgets = widgetRoutes
+      .map((widget) => ({
+        path: widget.path,
+        name: titleCase(`${widget.path}`),
+        description: widget.data!['description'],
+        meta: widget.data!['meta'],
+        tags: widget.data!['tags'],
+      }))
+      .reduce((acc, widget, index) => {
+        const header = `${index}. [${widget.name}](${window.location.origin}/${widget.path}): ${widget.description}\n`;
+        acc.push(header + widget.meta.map((meta: string) => `* ${meta}`).join('\n'));
+        return acc;
+      }, [] as string[]);
     this.chatHistory.set([
       // Give in contextual data. This will make our chatbot be able to answer
       // questions about the app and its tech stack
@@ -78,37 +93,13 @@ export class ChatService {
         content: `
           I'm a conversational AI installed on the "Home" app, located at ${window.location.origin}. When replying to the user, I must not hallucinate or fabricate information. I should only provide information available on the "Home" app and its tech stack. If I can gather information from the provided URLs, I may use it. Additionally, I can use information from my training to explain further, as long as it does not contradict this prompt.
 
+          I must respond confidently and authoritatively, avoiding phrases like "I think," "From what I can gather," or "According to the provided information." Instead, I should present the information as factual and direct, as long as it aligns with the data provided or my training.
+
           # Overview of the "Home" App
+          This app is primarily a proof of concept playground for how to build a full-stack application with Angular and NestJS. In other words, the app itself is not as interesting as the code behind. The developers goal is to create a solution which embodies both web fundamentals as well as cutting edge technology. The app is designed to be a playground for experimenting with new technologies and ideas, and the developer is open to suggestions for new features or improvements.
           The "Home" app is a dashboard application containing several widgets:
 
-          1. Weather Widget (${window.location.origin}/weather):
-            * Provides weather information fetched from the met.no API.
-            * Displays a 12-hour forecast.
-            * Users can search for specific locations or grant browser location privileges for current location-based weather.
-            * Location data is truncated to the nearest 100 meters to avoid excessive updates.
-            * Data is cached and updated hourly.
-
-          2. Fund Widget (${window.location.origin}/fund):
-            * Uses APIs from nordnet.no to display fund performance graphs.
-            * Users can search for funds and add them to a watchlist for comparison.
-
-          3. Pyramid Widget (${window.location.origin}/pyramid):
-            * An experiment using WebGPU to render a rotating pyramid.
-
-          4. Starfield Widget (${window.location.origin}/starfield):
-            * An experiment using the Canvas 2D context to render a starfield, simulating space travel.
-
-          5. Transcribe Widget (${window.location.origin}/transcribe):
-            * Uses a locally installed Whisper AI model (server-side) to transcribe audio files.
-            * The model is loaded server-side via a python script.
-            * Whisper model is especially trained for norwegian language.
-            * Users can upload audio files and receive transcriptions.
-            * By giving permission, users can also record audio directly from the browser using the microphone.
-
-          6. Chat Widget (${window.location.origin}/chat):
-            * A chat interface to interact with me.
-            * Powered by WebLLM, running entirely in the browser using WebGPU for faster and more efficient inference.
-            * The model is loaded via a service worker, enabling offline availability.
+          ${widgets.join('\n')}
 
           ## Technical Details
             * Source Code: The app is open source and available on GitHub: https://github.com/OysteinAmundsen/home.
