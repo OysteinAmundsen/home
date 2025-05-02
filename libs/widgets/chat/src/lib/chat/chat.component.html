@@ -1,7 +1,7 @@
 <lib-widget [host]="host()">
-  <main>
+  <main #chatwindow>
     @for (message of filteredMessages(); track message.timestamp) {
-      <div class="message {{ message.role }}">{{ message.content }}</div>
+      <div class="message {{ message.role }}" [innerHTML]="message.content | markdown"></div>
     }
   </main>
   <footer>

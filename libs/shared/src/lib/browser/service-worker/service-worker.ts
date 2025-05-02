@@ -1,3 +1,4 @@
+import { clear } from 'console';
 import { Workbox } from 'workbox-window';
 
 export const SERVICE_WORKER = '/sw.js';
@@ -54,4 +55,52 @@ export async function loadServiceWorker() {
   } else {
     console.log('Service worker not supported', 'App', true);
   }
+}
+
+/**
+ * Will return true when the service worker is activated and controlling the page.
+ * By default, If the service worker is not activated, it will unregister the service worker
+ * and reload the page. You can set the timeout to 0 to disable this behavior.
+ *
+ * @param timeoutMs optional timeout in milliseconds to wait for the service worker to be activated
+ *                  before unregistering and reloading the page. Default is 10 seconds.
+ *                  Set to 0 to disable timeout.
+ * @returns true when the service worker is activated and controlling the page, false otherwise.
+ */
+export async function serviceWorkerActivated(timeoutMs = 10000): Promise<boolean> {
+  if ('serviceWorker' in navigator) {
+    const registration = await navigator.serviceWorker.ready;
+
+    return await new Promise<boolean>((resolve, reject) => {
+      let timeout: NodeJS.Timeout | null = null;
+      if (timeoutMs > 0) {
+        timeout = setTimeout(async () => {
+          console.warn('Service worker activation timed out. Unregistering and reloading...');
+          await registration.unregister();
+          reject(new Error('Service worker activation timed out.'));
+          window.location.reload();
+        }, timeoutMs);
+      }
+
+      const checkIfActiveAndControlling = () => {
+        const serviceWorker = navigator.serviceWorker.controller;
+        if (registration.active?.state === 'activated' && serviceWorker) {
+          if (timeout) clearTimeout(timeout);
+          registration.active?.removeEventListener('statechange', checkIfActiveAndControlling);
+          navigator.serviceWorker.removeEventListener('controllerchange', checkIfActiveAndControlling);
+          resolve(true);
+        }
+      };
+
+      // Listen for state changes on the active service worker
+      registration.active?.addEventListener('statechange', checkIfActiveAndControlling);
+
+      // Listen for controller changes on the navigator
+      navigator.serviceWorker.addEventListener('controllerchange', checkIfActiveAndControlling);
+
+      // Check immediately in case it's already activated and controlling
+      checkIfActiveAndControlling();
+    });
+  }
+  return false;
 }

@@ -1,5 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { NotificationContent } from '@home/backend/app/subscribe/notification.model';
+import { ServiceWorkerMLCEngineHandler } from '@mlc-ai/web-llm';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { setCacheNameDetails } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
@@ -10,6 +11,8 @@ import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const self: ServiceWorkerGlobalScope | any;
+const CHATGPT_NEXT_WEB_CACHE = 'webllm/web-cache';
+let handler: ServiceWorkerMLCEngineHandler;
 
 // Typescript did not understand PushEvent, so we need to declare it
 declare type PushEvent = Event & { data: PushMessageData; waitUntil: (f: Promise<unknown>) => void };
@@ -20,6 +23,12 @@ declare type PushMessageData = {
   // bytes: () => Uint8Array;
   json: () => NotificationContent;
   // text: () => string;
+};
+
+declare type ExtendableEvent = Event & {
+  waitUntil: (f: Promise<unknown>) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  skipWaiting: () => Promise<any>;
 };
 
 const prefix = 'home';
@@ -105,15 +114,44 @@ registerRoute(
 cleanupOutdatedCaches();
 
 // Tell the active service worker to take control of the page immediately.
-self.addEventListener('activate', () => self.clients.claim());
+self.addEventListener('activate', () => {
+  self.clients.claim();
+});
 
 // Install app immediately when client is ready
 self.addEventListener('message', (event: MessageEvent) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
-});
+  if (!handler) {
+    handler = new ServiceWorkerMLCEngineHandler();
+    console.log('Service Worker: Web-LLM Engine Activated');
+  }
 
+  const msg = event.data;
+  if (msg.kind === 'checkWebGPUAvilability') {
+    console.log('Service Worker: Web-LLM Engine Activated');
+    checkGPUAvailablity().then((gpuAvailable) => {
+      console.log('Service Worker: WebGPU is ' + (gpuAvailable ? 'available' : 'unavailable'));
+      const reply = {
+        kind: 'return',
+        uuid: msg.uuid,
+        content: gpuAvailable,
+      };
+      event.source?.postMessage(reply);
+    });
+  }
+});
+self.addEventListener('install', (event: ExtendableEvent) => {
+  event.waitUntil(
+    caches.open(CHATGPT_NEXT_WEB_CACHE).then((cache: Cache) => {
+      return cache.addAll([] as string[]);
+    }),
+  );
+
+  // Always update right away
+  self.skipWaiting();
+});
 // Handle push notifications
 self.addEventListener('push', (event: PushEvent) => {
   if (!(self.Notification && self.Notification.permission === 'granted')) return;
@@ -127,3 +165,31 @@ self.addEventListener('push', (event: PushEvent) => {
     }),
   );
 });
+
+async function checkGPUAvailablity() {
+  if (!('gpu' in navigator)) {
+    console.log('Service Worker: Web-LLM Engine Activated');
+    return false;
+  }
+
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    if (!adapter) {
+      console.error('No GPU adapter available.');
+      return false;
+    }
+
+    const device = await adapter.requestDevice();
+    device.lost.then((info) => {
+      console.warn('GPU device lost:', info.message);
+      // Attempt to reinitialize with a less resource-intensive model
+      console.log('Reinitializing WebGPU...');
+      // Add logic to reinitialize here
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Error initializing WebGPU:', error);
+    return false;
+  }
+}
