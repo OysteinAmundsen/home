@@ -180,7 +180,7 @@ async function checkGPUAvailablity() {
     }
 
     const device = await adapter.requestDevice();
-    device.lost.then((info) => {
+    device.lost.then((info: any) => {
       console.warn('GPU device lost:', info.message);
       // Attempt to reinitialize with a less resource-intensive model
       console.log('Reinitializing WebGPU...');

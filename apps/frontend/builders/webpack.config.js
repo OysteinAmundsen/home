@@ -1,5 +1,7 @@
 //@ts-check
+const { logLevel } = require('kafkajs');
 const path = require('path');
+const { cwd } = require('process');
 const webpack = require('webpack');
 const { injectManifest } = require('workbox-build');
 
@@ -62,7 +64,7 @@ module.exports = {
       {
         test: /\.ts$/,
         loader: 'ts-loader',
-        options: { configFile: 'tsconfig.wb.json' },
+        options: { configFile: 'tsconfig.wb.json', logLevel: 'info' },
       },
     ],
   },
