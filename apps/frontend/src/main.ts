@@ -3,6 +3,6 @@ import { loadServiceWorker } from '@home/shared/browser/service-worker/service-w
 import { AppComponent } from './app/app.component';
 import { appConfig } from './app/app.config';
 
-bootstrapApplication(AppComponent, appConfig)
-  .then(() => loadServiceWorker())
+loadServiceWorker()
+  .then(() => bootstrapApplication(AppComponent, appConfig))
   .catch((err) => console.error(err));

@@ -1,3 +1,12 @@
 import { ChatCompletionMessageParam } from '@mlc-ai/web-llm';
 
 export type ChatMessage = { timestamp: number; stream?: boolean } & ChatCompletionMessageParam;
+
+export interface ChatModel {
+  family: string;
+  models: {
+    identifier: string;
+    quantizations: string[];
+    models: string[];
+  }[];
+}

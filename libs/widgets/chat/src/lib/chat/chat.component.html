@@ -9,11 +9,11 @@
       <label for="prompt">
         <textarea
           id="prompt"
-          [placeholder]="isInitialized() ? 'Enter to send, Shift + Enter to wrap' : 'Please wait... Loading model'"
+          [placeholder]="'Enter to send, Shift + Enter to wrap'"
           [formControl]="userPrompt"
           (keypress)="maybeSendMessage($event)"
         ></textarea>
-        <button type="submit" [disabled]="!userPrompt.getRawValue() || !isInitialized()">
+        <button type="submit" [disabled]="!userPrompt.getRawValue()">
           <span class="material-symbols-outlined">send</span>
           <span>Send</span>
         </button>

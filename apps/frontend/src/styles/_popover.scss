@@ -4,7 +4,11 @@
   $zStart: 0;
 
   position-anchor: var(--anchor);
-  position-try: most-inline-size flip-inline;
+  // position-try:
+  //   most-inline-size flip-inline,
+  //   most-height flip-block;
+  position-try-order: most-inline-size, most-height;
+  position-try-fallbacks: flip-inline, flip-block;
   bottom: unset;
   top: calc(anchor(bottom) + 0.2rem);
   left: unset;
@@ -39,5 +43,19 @@
       scale: 0.2;
       opacity: 0.3;
     }
+  }
+  &.side {
+    top: unset;
+    bottom: anchor(bottom);
+    left: anchor(right);
+    right: unset;
+  }
+  // Menus
+  &.menu button {
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    text-align: left;
   }
 }

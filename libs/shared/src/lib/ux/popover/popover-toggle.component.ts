@@ -7,11 +7,15 @@ import { PopoverComponent } from './popover.component';
   imports: [PopoverAnchorDirective],
   template: `
     <button type="button" [libPopoverAnchor]="popoverPanel()">
-      <span class="material-symbols-outlined">{{ icon() }}</span>
+      @if (icon()) {
+        <span class="material-symbols-outlined">{{ icon() }}</span>
+      } @else {
+        <ng-content></ng-content>
+      }
     </button>
   `,
 })
 export class PopoverToggleComponent {
-  icon = input<string>('more_vert');
+  icon = input<string | undefined>(undefined);
   popoverPanel = input.required<PopoverComponent>();
 }

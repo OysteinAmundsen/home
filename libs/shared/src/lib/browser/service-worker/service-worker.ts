@@ -1,4 +1,3 @@
-import { clear } from 'console';
 import { Workbox } from 'workbox-window';
 
 export const SERVICE_WORKER = '/sw.js';
@@ -10,33 +9,34 @@ export const SERVICE_WORKER = '/sw.js';
 export async function loadServiceWorker() {
   if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     try {
+      console.debug('Registering service worker...');
       const wb = new Workbox(SERVICE_WORKER, { scope: '/', updateViaCache: 'none' });
 
       // Log out events in sequence:
       // [installing -> installed -> redundant -> waiting -> activating -> controlling -> activated]
-      wb.addEventListener('installing', () => console.log('Installing service worker'));
+      wb.addEventListener('installing', () => console.debug('Installing service worker'));
       wb.addEventListener('installed', (event) => {
-        console.log('Installed!');
+        console.debug('Installed!');
         if (event.isUpdate) {
-          console.log('New service worker waiting to activate');
+          console.debug('New service worker waiting to activate');
         }
       });
-      wb.addEventListener('redundant', () => console.log('Redundant service worker found'));
+      wb.addEventListener('redundant', () => console.debug('Redundant service worker found'));
       wb.addEventListener('waiting', () => {
-        console.log('Waiting to activate service worker <- Auto skip');
+        console.debug('Waiting to activate service worker <- Auto skip');
         wb.messageSkipWaiting();
       });
-      wb.addEventListener('activating', () => console.log('Activating service worker'));
+      wb.addEventListener('activating', () => console.debug('Activating service worker'));
       wb.addEventListener('controlling', () => {
-        console.log('Service worker controlling page');
+        console.debug('Service worker controlling page');
         // Avoid redundant reloads if already controlled
-        if (!navigator.serviceWorker.controller) {
-          console.log('Reloading page to apply new service worker');
-          window.location.reload();
-        }
+        // if (!navigator.serviceWorker.controller) {
+        // console.debug('Reloading page to apply new service worker');
+        window.location.reload();
+        // }
       });
       wb.addEventListener('activated', () => {
-        console.log('New service worker activated!');
+        console.debug('New service worker activated!');
         // Notify the service worker to hot-swap pre-cached content
         if (navigator.serviceWorker.controller) {
           navigator.serviceWorker.controller.postMessage({ type: 'HOT_SWAP' });
@@ -48,12 +48,41 @@ export async function loadServiceWorker() {
       if (!reg) throw 'Service worker not registered!';
 
       // Check for updates every 10 minutes
-      setInterval(() => wb.update(), 10 * 60 * 1000);
+      await wb.update();
+      setInterval(async () => await wb.update(), 10 * 60 * 1000);
     } catch (err) {
-      console.log('WS registration failed: ', err);
+      console.error('WS registration failed: ', err);
     }
   } else {
-    console.log('Service worker not supported', 'App', true);
+    console.debug('Service worker not supported', 'App', true);
+  }
+}
+
+/**
+ * Unregister all service workers
+ * This is useful for debugging and development purposes
+ */
+export async function unregisterServiceWorkers() {
+  if ('serviceWorker' in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const registration of registrations) {
+      console.debug('Unregistering service worker', registration);
+      await registration.unregister();
+    }
+  } else {
+    console.debug('Service worker not supported', 'App', true);
+  }
+}
+
+export async function emptyCache() {
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    for (const cacheName of cacheNames) {
+      console.debug('Deleting cache', cacheName);
+      await caches.delete(cacheName);
+    }
+  } else {
+    console.debug('Cache not supported', 'App', true);
   }
 }
 
@@ -63,22 +92,27 @@ export async function loadServiceWorker() {
  * and reload the page. You can set the timeout to 0 to disable this behavior.
  *
  * @param timeoutMs optional timeout in milliseconds to wait for the service worker to be activated
- *                  before unregistering and reloading the page. Default is 10 seconds.
- *                  Set to 0 to disable timeout.
+ *                  before failing. Default is 10 seconds. Set to 0 to disable timeout.
  * @returns true when the service worker is activated and controlling the page, false otherwise.
  */
-export async function serviceWorkerActivated(timeoutMs = 10000): Promise<boolean> {
+export async function serviceWorkerActivated(timeoutMs = 5000, reloadOnTimeout = true): Promise<boolean> {
   if ('serviceWorker' in navigator) {
     const registration = await navigator.serviceWorker.ready;
 
-    return await new Promise<boolean>((resolve, reject) => {
+    return await new Promise<boolean>((resolve) => {
       let timeout: NodeJS.Timeout | null = null;
       if (timeoutMs > 0) {
         timeout = setTimeout(async () => {
-          console.warn('Service worker activation timed out. Unregistering and reloading...');
-          await registration.unregister();
-          reject(new Error('Service worker activation timed out.'));
-          window.location.reload();
+          console.warn('Service worker activation timed out');
+          if (reloadOnTimeout) {
+            console.debug('Unregistering service worker and reloading page...');
+            await unregisterServiceWorkers();
+            // Delete the precache cache to force a reload of the app shell
+            await caches.delete('home-precache-v1');
+            // Reload the page to apply changes
+            window.location.reload();
+          }
+          resolve(false);
         }, timeoutMs);
       }
 

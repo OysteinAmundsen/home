@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarkdownPipe } from '@home/shared/pipes/markdown.pipe';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
@@ -12,7 +12,7 @@ import { ChatService } from './chat.service';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-export default class ChatComponent extends AbstractWidgetComponent {
+export default class ChatComponent extends AbstractWidgetComponent implements OnInit {
   private readonly chatService = inject(ChatService);
 
   id = signal('chat');
@@ -35,9 +35,14 @@ export default class ChatComponent extends AbstractWidgetComponent {
     }
   });
 
+  async ngOnInit() {
+    await this.chatService.loadModel();
+    await this.chatService.resetChat();
+  }
+
   // Submit on enter
   maybeSendMessage($event: KeyboardEvent) {
-    if ($event.key === 'Enter' && !$event.shiftKey && this.isInitialized()) {
+    if ($event.key === 'Enter') {
       $event.preventDefault();
       this.sendMessage();
     }

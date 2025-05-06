@@ -14,20 +14,19 @@ export function markdownToHtml(markdown: string): string {
     // Convert inline code
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     // Convert bold text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>')
     // Convert italic text
-    .replace(/_(.*?)_/g, '<em>$1</em>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/(_|\*)(.*?)\1/g, '<em>$2</em>')
     // Convert strikethrough text
     .replace(/~~(.*?)~~/g, '<del>$1</del>')
-    // Convert blockquotes
-    .replace(/^\s*>\s*(.*)$/gm, '<blockquote>$1</blockquote>')
-    // Convert unordered and ordered lists
-    .replace(/^(\s*(\d+\.\s+|[-*]\s+).*(?:\n\s*(\d+\.\s+|[-*]\s+).*)*)/gm, (match: string) => levelizeList(match))
     // Convert images
     .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">')
     // Convert links
-    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
+    // Convert blockquotes (supports nesting)
+    .replace(/^\s*((?:>\s*)+)(.*)$/gm, nestedBlocks)
+    // Convert unordered and ordered lists
+    .replace(/^(\s*(\d+\.\s+|[-*]\s+).*(?:\n\s*(\d+\.\s+|[-*]\s+).*)*)/gm, nestedList);
 
   // Wrap each line in <p> tags
   let inBlock = false;
@@ -56,7 +55,17 @@ export function markdownToHtml(markdown: string): string {
   return markdown;
 }
 
-function levelizeList(match: string): string {
+function nestedBlocks(match: string, markers: string, content: string) {
+  // Count the number of '>' markers (ignoring spaces)
+  const depth = (markers.match(/>/g) || []).length;
+  let html = content.trim();
+  for (let i = 0; i < depth; i++) {
+    html = `<blockquote>${html}</blockquote>`;
+  }
+  return html;
+}
+
+function nestedList(match: string): string {
   const lines = match.split(/\n/);
   let result = '';
 

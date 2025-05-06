@@ -11,7 +11,7 @@
 <nav>
   <lib-popover-toggle [popoverPanel]="filterPopover" [icon]="'filter_alt'" class="filter"></lib-popover-toggle>
   <ng-container *ngTemplateOutlet="filterMenu"></ng-container>
-  <lib-popover-toggle [popoverPanel]="popoverPanel" class="settings"></lib-popover-toggle>
+  <lib-popover-toggle [popoverPanel]="popoverPanel" [icon]="'more_vert'" class="settings"></lib-popover-toggle>
 </nav>
 
 <lib-popover #filterPopover [hideOn]="'click'">
