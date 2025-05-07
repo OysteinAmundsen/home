@@ -21,16 +21,24 @@ import { IconPipe } from '@home/shared/pipes/icon.pipe';
 import { cache, Cache } from '@home/shared/rxjs/cache';
 import { PopoverAnchorDirective } from '@home/shared/ux/popover/popover-anchor.directive';
 import { PopoverComponent } from '@home/shared/ux/popover/popover.component';
+import { SpinnerComponent } from '@home/shared/ux/spinner/spinner.component';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
 import { firstValueFrom } from 'rxjs';
-
 /**
  * A widget integrating with the yr.no weather API
  */
 @Component({
   selector: 'lib-widget-weather',
-  imports: [CommonModule, ReactiveFormsModule, IconPipe, WidgetComponent, PopoverAnchorDirective, PopoverComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    IconPipe,
+    WidgetComponent,
+    PopoverAnchorDirective,
+    PopoverComponent,
+    SpinnerComponent,
+  ],
   templateUrl: './weather.component.html',
   styleUrl: './weather.component.scss',
 })

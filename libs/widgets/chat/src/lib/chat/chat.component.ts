@@ -1,14 +1,17 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarkdownPipe } from '@home/shared/pipes/markdown.pipe';
+import { SpinnerComponent } from '@home/shared/ux/spinner/spinner.component';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
+import { map, Observable, switchMap, timer } from 'rxjs';
 import { ChatService } from './chat.service';
 
 @Component({
   selector: 'lib-chat',
-  imports: [CommonModule, ReactiveFormsModule, WidgetComponent, MarkdownPipe],
+  imports: [CommonModule, ReactiveFormsModule, WidgetComponent, MarkdownPipe, SpinnerComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
@@ -16,28 +19,58 @@ export default class ChatComponent extends AbstractWidgetComponent implements On
   private readonly chatService = inject(ChatService);
 
   id = signal('chat');
-  form = viewChild<ElementRef<HTMLFormElement>>('form');
+  chatBox = viewChild<ElementRef<HTMLTextAreaElement>>('chatBox');
   chatwindow = viewChild<ElementRef<HTMLDivElement>>('chatwindow');
 
   selectedModel = this.chatService.selectedModel;
   progressText = this.chatService.progressText;
   isInitialized = this.chatService.isInitialized;
 
+  private now$: Observable<number> = timer(1000 - new Date().getMilliseconds(), 1000).pipe(
+    switchMap(() => timer(0, 1000)),
+    map(() => Date.now()),
+  );
+  // The current time as a signal
+  now = toSignal(this.now$, { initialValue: Date.now() });
+
   userPrompt = new FormControl('');
 
+  welcomeMessage = `
+  **This is a WebLLM experiment.**
+
+  It loads and runs a language-model entirely in the client, which may have some implications on memory and performance depending on the selected model.
+  The model currently in use is '${this.selectedModel()}'
+
+  Start typing in the box below to begin a conversation.
+  `;
+
+  status = this.chatService.status;
   messages = this.chatService.chatHistory;
   filteredMessages = computed(() => this.messages().filter((message) => ['assistant', 'user'].includes(message.role)));
   onMessage = effect(() => {
     const messages = this.filteredMessages();
-    const window = this.chatwindow()?.nativeElement;
-    if (window) {
-      window.scrollTop = window.scrollHeight;
-    }
+    this.autoScroll();
   });
 
   async ngOnInit() {
     await this.chatService.loadModel();
     await this.chatService.resetChat();
+    if (isPlatformBrowser(this.platformId)) {
+      this.autoScroll();
+      this.autoFocus();
+    }
+  }
+
+  autoScroll() {
+    const window = this.chatwindow()?.nativeElement;
+    if (window) {
+      window.scrollTop = window.scrollHeight;
+    }
+  }
+
+  autoFocus() {
+    this.chatBox()?.nativeElement.focus();
+    this.chatBox()?.nativeElement.click();
   }
 
   // Submit on enter
@@ -57,8 +90,7 @@ export default class ChatComponent extends AbstractWidgetComponent implements On
     // Update chat history
     const message = this.userPrompt.getRawValue();
     this.userPrompt.setValue('');
-    this.userPrompt.disable();
     const reply = await this.chatService.sendMessage(`${message}`);
-    this.userPrompt.enable();
+    this.autoFocus();
   }
 }

@@ -293,22 +293,32 @@ function luminance(r: number, g: number, b: number): number {
  * @param property the css property to get
  * @returns the computed css property
  */
-export function getComputedStyle(element: HTMLElement, property: string, type = 'color'): string {
+export function getComputedStyle(element: HTMLElement): CSSStyleDeclaration;
+export function getComputedStyle(element: HTMLElement, property: string): string;
+export function getComputedStyle(
+  element: HTMLElement,
+  property?: string,
+  type = 'color',
+): string | CSSStyleDeclaration {
   try {
     const document = element.ownerDocument;
     const window = document.defaultView;
     if (!window) throw new Error('Window not found');
 
-    if (property.startsWith('--') && type === 'color') {
-      // Get computed color from css variable
-      const tmp = document.createElement('div');
-      tmp.style.setProperty(type, `var(${property})`);
-      document.body.appendChild(tmp);
-      const style = window.getComputedStyle(tmp).getPropertyValue(type);
-      document.body.removeChild(tmp);
-      return style;
+    if (property) {
+      if (property.startsWith('--') && type === 'color') {
+        // Get computed color from css variable
+        const tmp = document.createElement('div');
+        tmp.style.setProperty(type, `var(${property})`);
+        document.body.appendChild(tmp);
+        const style = window.getComputedStyle(tmp).getPropertyValue(type);
+        document.body.removeChild(tmp);
+        return style;
+      }
+      return window.getComputedStyle(element).getPropertyValue(property);
+    } else {
+      return window.getComputedStyle(element);
     }
-    return window.getComputedStyle(element).getPropertyValue(property);
   } catch (error) {
     console.error('Error getting computed style', error);
     return '';

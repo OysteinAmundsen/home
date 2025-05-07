@@ -1,8 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { distinctUntilChanged, map, switchMap, timer } from 'rxjs';
-import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
 import { AppSettingsService } from '@home/shared/app.settings';
+import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
+import { distinctUntilChanged, map, switchMap, timer } from 'rxjs';
 
 /**
  * Renders a date and time component

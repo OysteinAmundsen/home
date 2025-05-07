@@ -1,13 +1,36 @@
 <lib-widget [host]="host()">
   <main #chatwindow>
     @for (message of filteredMessages(); track message.timestamp) {
-      <div class="message {{ message.role }}" [innerHTML]="message.content | markdown"></div>
+      <div class="message-container {{ message.role }}">
+        @if (message.content === '') {
+          <div class="message">
+            <span class="status">{{ status() }}...</span>
+          </div>
+        } @else {
+          <div class="message">
+            <div [innerHTML]="message.content | markdown"></div>
+          </div>
+        }
+        <div class="timestamp">
+          @if (status() !== '' && message.role === 'assistant' && message.stream) {
+            {{ (now() - message.timestamp) / 1000 | number: '1.0-0' }}s elapsed
+            <lib-spinner [spin]="true"></lib-spinner>
+          } @else {
+            {{ message.timestamp | date: 'short' }}
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="message-container empty">
+        <div class="message" [innerHTML]="welcomeMessage | markdown"></div>
+      </div>
     }
   </main>
   <footer>
-    <form (submit)="sendMessage($event)" #form>
+    <form (submit)="sendMessage($event)">
       <label for="prompt">
         <textarea
+          #chatBox
           id="prompt"
           [placeholder]="'Enter to send, Shift + Enter to wrap'"
           [formControl]="userPrompt"

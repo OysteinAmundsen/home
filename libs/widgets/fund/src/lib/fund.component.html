@@ -124,7 +124,9 @@
                 </tr>
               } @empty {
                 @if (dataLoader.isLoading()) {
-                  <div class="list-item-empty">Loading...</div>
+                  <div class="list-item-empty">
+                    <lib-spinner [spin]="true"></lib-spinner>
+                  </div>
                 } @else if (dataLoader.error()) {
                   <div class="list-item-empty">Error: {{ dataLoader.error() }}</div>
                 } @else if (showAll()) {

@@ -31,8 +31,8 @@ export function markdownToHtml(markdown: string): string {
   // Wrap each line in <p> tags
   let inBlock = false;
   markdown = markdown
-    .split(/\n+/) // Split by one or more newlines
-    .reduce((acc: string[], line: string) => {
+    .split(/\n/) // Split by one or more newlines
+    .reduce((acc: string[], line: string, idx: number, arr: string[]) => {
       // Track whether we are inside a blockquote or pre block
       if (/^<(blockquote|pre)/.test(line.trim())) {
         inBlock = true;
@@ -44,13 +44,15 @@ export function markdownToHtml(markdown: string): string {
         acc.push(line + '\n'); // Add the line as-is
       } else if (/^<(h[1-6]|ul|ol)>/.test(line.trim())) {
         acc.push(line); // Add the line as-is
-      } else {
+      } else if (line.trim() !== '') {
         acc.push(`<p>${line}</p>`); // Wrap in <p> tags
+      } else if (arr.length > 1 && line.trim() === '') {
+        // If the line is empty, add a <br/> tag
+        acc.push('<br/>');
       }
       return acc;
     }, [])
-    .join('')
-    .replace(/<p><\/p>/gm, '<br/>'); // Remove empty <p> tags
+    .join('');
 
   return markdown;
 }

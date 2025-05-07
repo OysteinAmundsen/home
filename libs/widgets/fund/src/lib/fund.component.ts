@@ -4,6 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AppSettingsService } from '@home/shared/app.settings';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
 import { deepMerge } from '@home/shared/utils/object';
+import { SpinnerComponent } from '@home/shared/ux/spinner/spinner.component';
 import { TypeaheadComponent } from '@home/shared/ux/typeahead/typeahead.component';
 import { AbstractWidgetComponent } from '@home/shared/widget/abstract-widget.component';
 import { WidgetComponent } from '@home/shared/widget/widget.component';
@@ -30,6 +31,7 @@ if (typeof window !== 'undefined') {
     NgxEchartsDirective,
     TypeaheadComponent,
     ColorCodeNumberDirective,
+    SpinnerComponent,
   ],
   templateUrl: './fund.component.html',
   styleUrl: './fund.component.scss',

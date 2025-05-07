@@ -26,7 +26,9 @@
     <lib-widget-loader [data]="widget"> </lib-widget-loader>
   } @empty {
     @if (isLoading()) {
-      <span class="loading">Loading...</span>
+      <span class="loading">
+        <lib-spinner [spin]="true"></lib-spinner>
+      </span>
     } @else if (error()) {
       <span class="error">{{ error() }}</span>
     }

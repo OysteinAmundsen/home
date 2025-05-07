@@ -1,5 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
-import { inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
+import { computed, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { serviceWorkerActivated } from '@home/shared/browser/service-worker/service-worker';
 import { titleCase } from '@home/shared/utils/string';
 import { widgetRoutes } from '@home/widgets/widget.routes';
@@ -14,17 +15,27 @@ import {
 import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
 import { ChatMessage, ChatModel } from './chat.model';
 
+export enum ChatStatus {
+  IDLE = '',
+  ENGINE = 'Loading engine',
+  MODEL = 'Loading model',
+  TYPING = 'Typing',
+}
+
 @Injectable({ providedIn: 'root' })
 export class ChatService {
   private readonly platformId = inject(PLATFORM_ID);
 
   private engine?: MLCEngineInterface;
   selectedModel = linkedSignal(() => {
-    // Rather large model (4Gb) with 8B params. Takes a while to load and respond.
-    return 'Llama-3.1-8B-Instruct-q4f32_1-MLC';
+    // Large model (4Gb - 8B params). Takes a while to load and respond.
+    // return 'Llama-3.1-8B-Instruct-q4f32_1-MLC';
+    // Smaller model (2Gb - 3B params). Loads faster and responds faster.
+    return 'Llama-3.2-3B-Instruct-q4f32_1-MLC';
   });
   loadedModel: string | undefined = undefined;
 
+  status = signal<string>('');
   onProgress = (report: any) => this.progress.set(report);
   private progress = signal<InitProgressReport | undefined>(undefined);
   progressText = linkedSignal(() => {
@@ -37,8 +48,10 @@ export class ChatService {
     return progress?.progress === 1;
   });
   modelLoaded$ = new BehaviorSubject<boolean>(false);
+  modelLoaded = toSignal(this.modelLoaded$, { initialValue: false });
 
-  chatHistory = linkedSignal<ChatMessage[]>(() => [...this.getInitialChat(), ...this.messageQueue()]);
+  private chat = signal<ChatMessage[]>([...this.getInitialChat()]);
+  chatHistory = computed<ChatMessage[]>(() => [...this.chat(), ...this.messageQueue()]);
   private messageQueue = signal<ChatMessage[]>([]);
   private processingQueue = false;
 
@@ -51,6 +64,10 @@ export class ChatService {
     },
   };
 
+  setStatus(status: ChatStatus) {
+    this.status.set(status);
+  }
+
   /**
    * Initializes the LLM engine
    */
@@ -59,6 +76,7 @@ export class ChatService {
     if (this.engine) return this.engine;
 
     console.debug('Initializing chat service...');
+    this.setStatus(ChatStatus.ENGINE);
     this.loadedModel = undefined;
     let engine: MLCEngineInterface | undefined = undefined;
     if ('serviceWorker' in navigator) {
@@ -75,6 +93,7 @@ export class ChatService {
       );
     }
     this.engine = engine;
+    this.setStatus(ChatStatus.IDLE);
     return this.engine;
   }
 
@@ -84,12 +103,14 @@ export class ChatService {
   async loadModel() {
     if (!isPlatformBrowser(this.platformId)) return undefined;
 
+    this.setStatus(ChatStatus.MODEL);
     this.modelLoaded$.next(false);
     const model = this.selectedModel();
     const engine = await this.getEngine();
 
     if (model && engine && this.loadedModel !== model) {
       console.debug('WebLLM: Loading model...', this.selectedModel());
+      this.setStatus(ChatStatus.MODEL);
       this.loadedModel = model;
       try {
         await engine.unload();
@@ -98,6 +119,8 @@ export class ChatService {
       } catch (e) {
         this.progressText.set('Error loading model: ' + e);
         await engine.unload();
+      } finally {
+        this.setStatus(ChatStatus.IDLE);
       }
     }
   }
@@ -167,7 +190,7 @@ export class ChatService {
    */
   async resetChat() {
     if (!isPlatformBrowser(this.platformId)) {
-      this.chatHistory.set(this.getInitialChat());
+      this.chat.set(this.getInitialChat());
       if (this.engine) {
         await this.engine.resetChat();
       }
@@ -193,40 +216,52 @@ export class ChatService {
 
     if (this.engine == null) {
       console.debug('WebLLM: Engine not initialized. Cannot send message.');
-      return '';
+      return;
     }
 
-    // Wait for the model to be loaded
-    await firstValueFrom(this.modelLoaded$.pipe(filter((loaded) => loaded)));
-
-    // Then process messages from queue
+    // Process messages from queue
     const messages = this.messageQueue();
     this.messageQueue.set([]);
-    this.chatHistory.update((history) => [...history, ...messages]);
+    this.chat.update((history) => [
+      ...history,
+      ...messages,
+      // Put a response placeholder in chat history
+      {
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now() + 10,
+        stream: true,
+      } as ChatMessage,
+    ]);
+
+    // Wait for the model to be loaded
+    if (!this.modelLoaded()) {
+      // Do not call loadModel() if we are already loading the model
+      if (this.status() !== ChatStatus.MODEL) {
+        this.loadModel();
+      }
+      await firstValueFrom(this.modelLoaded$.pipe(filter((loaded) => loaded)));
+      console.debug('WebLLM: Model loaded. Processing queue...');
+    }
+
     try {
       // Create payload
+      this.setStatus(ChatStatus.TYPING);
       const chunks = await this.engine.chat.completions.create({
         stream: true,
-        messages: this.chatHistory(),
+        messages: this.chatHistory().filter((msg) => !msg.stream),
         temperature: 1,
         stream_options: { include_usage: true },
       });
       let reply = '';
+
       console.debug('WebLLM: Waiting for reply');
       for await (const chunk of chunks) {
-        this.chatHistory.update((history) => {
-          const lastMessage =
-            history.find((msg) => msg.stream) ||
-            ({
-              role: 'assistant',
-              content: '',
-              timestamp: Date.now(),
-              stream: true,
-            } as ChatMessage);
+        this.chat.update((history) => {
+          const lastMessage = history.find((msg) => msg.stream);
           history = history.filter((msg) => msg.stream !== true);
           if (lastMessage) {
             lastMessage.content += chunk.choices[0]?.delta.content ?? '';
-            lastMessage.timestamp = Date.now();
           }
           return [...history, lastMessage!];
         });
@@ -238,16 +273,19 @@ export class ChatService {
       }
 
       const message = await this.engine!.getMessage();
-      this.chatHistory.update((history) => {
+      this.chat.update((history) => {
         history = history.filter((msg) => msg.stream !== true);
         return [...history, { role: 'assistant', content: message, timestamp: Date.now() }];
       });
-      return message;
+
+      this.processingQueue = false;
+      this.setStatus(ChatStatus.IDLE);
+      if (this.messageQueue().length > 0) {
+        this.prosessQueue();
+      }
     } catch (ex) {
       console.error('WebLLM: Error initializing chat:', ex);
     }
-
-    return '';
   }
 
   getAvailableModels() {

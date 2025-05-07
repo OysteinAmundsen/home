@@ -12,6 +12,7 @@ import { WidgetLoaderComponent } from '@home/shared/widget/widget-loader.compone
 import { Widget, WidgetService } from '@home/shared/widget/widget.service';
 import { filter } from 'rxjs';
 import { dashboardAnimation } from './dashboard.animation';
+import { SpinnerComponent } from '@home/shared/ux/spinner/spinner.component';
 
 /**
  * The dashboard component
@@ -26,6 +27,7 @@ import { dashboardAnimation } from './dashboard.animation';
     PopoverToggleComponent,
     PopoverComponent,
     SettingsFormComponent,
+    SpinnerComponent,
     NgTemplateOutlet,
   ],
   templateUrl: './dashboard.component.html',
