@@ -1,6 +1,15 @@
 :host {
   min-width: 320px;
-  &:not(.fullscreen) {
+  &:not(.fullscreen) ::ng-deep .widget-content {
+    padding: 0;
+    main {
+      padding: 1rem;
+      margin-bottom: 0;
+    }
+    footer {
+      padding: 1rem;
+      margin: 0 0 0.8rem 0;
+    }
   }
   ::ng-deep .widget-content {
     display: grid;
@@ -15,8 +24,9 @@
 main {
   grid-area: main;
   overflow: auto;
+  margin-bottom: 0.5rem;
   .message-container {
-    margin: 1rem;
+    // margin: 1rem;
     max-width: 60vw;
     width: fit-content;
     &.user {

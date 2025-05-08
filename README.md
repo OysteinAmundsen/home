@@ -250,3 +250,9 @@ The transcription process involves:
 1. A [Python script](./apps/whisper/transcribe.py) for transcription
 2. A [backend controller](./apps/backend/src/app/transcribe/transcribe.controller.ts) to handle file uploads
 3. A [widget](./libs/widgets/transcribe/) for audio input - via microphone (_requires permission_) or file upload
+
+### WebLLM
+
+The WebLLM chat experiment loads and runs a language model entirely in the browser. This utilizes the GPU for performance. There are small models which could be cheap to run on low performance graphics systems, but here I'm using a medium model which performs best on high-performance GPU's like nvidia or amd. It can be a bit sluggish on low-end GPU's like intel.
+
+Most systems have more than one GPU on their system. One integrated on the motherboard and a second more powerful GPU mounted as an expansion card. The integrated one will on most systems struggle a bit to run the selected model here, so for best performance - open your OS graphics settings, select advanced settings, choose your browser and enable "High-performance" graphics processor for that program.

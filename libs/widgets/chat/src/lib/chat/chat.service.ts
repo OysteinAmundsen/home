@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { computed, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { serviceWorkerActivated } from '@home/shared/browser/service-worker/service-worker';
 import { titleCase } from '@home/shared/utils/string';
@@ -13,13 +13,14 @@ import {
   WebWorkerMLCEngine,
 } from '@mlc-ai/web-llm';
 import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
-import { ChatMessage, ChatModel } from './chat.model';
+import { ChatMessage, ChatModel, ChatSystemInfo } from './chat.model';
 
 export enum ChatStatus {
   IDLE = '',
   ENGINE = 'Loading engine',
   MODEL = 'Loading model',
   TYPING = 'Typing',
+  ERROR = 'Error',
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,6 +28,8 @@ export class ChatService {
   private readonly platformId = inject(PLATFORM_ID);
 
   private engine?: MLCEngineInterface;
+  private enginePromise?: Promise<MLCEngineInterface>;
+  private adapter?: GPUAdapter;
   selectedModel = linkedSignal(() => {
     // Large model (4Gb - 8B params). Takes a while to load and respond.
     // return 'Llama-3.1-8B-Instruct-q4f32_1-MLC';
@@ -68,33 +71,62 @@ export class ChatService {
     this.status.set(status);
   }
 
+  systemInfo = signal<ChatSystemInfo>({} as ChatSystemInfo);
+  onStatusChange = effect(async () => {
+    const status = this.status(); // Trigger re-evaluation when status changes
+
+    let engine: MLCEngineInterface | undefined = undefined;
+    let bufferSize = 0;
+    let gpuVendor = '';
+    engine = await this.getEngine();
+    if (engine) {
+      bufferSize = await engine.getMaxStorageBufferBindingSize();
+      gpuVendor = await engine.getGPUVendor();
+    }
+    this.systemInfo.set({
+      model: this.selectedModel(),
+      bufferSize,
+      gpuVendor,
+    });
+  });
+
   /**
    * Initializes the LLM engine
    */
   async getEngine(): Promise<MLCEngineInterface | undefined> {
+    // Do not run in SSR
     if (!isPlatformBrowser(this.platformId)) return undefined;
+    // If the engine is already initialized, return it
     if (this.engine) return this.engine;
+    // If the engine is already being initialized, wait for it to finish
+    if (this.enginePromise) return await this.enginePromise;
 
-    console.debug('Initializing chat service...');
-    this.setStatus(ChatStatus.ENGINE);
-    this.loadedModel = undefined;
-    let engine: MLCEngineInterface | undefined = undefined;
-    if ('serviceWorker' in navigator) {
-      if (await serviceWorkerActivated()) {
-        console.debug('WebLLM: Creating service-worker engine...');
-        engine = new ServiceWorkerMLCEngine(this.engineConfig, 5000);
+    // Create a new engine
+    const createEngine = async () => {
+      this.setStatus(ChatStatus.ENGINE);
+      console.debug('Initializing chat service...');
+      this.adapter = (await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' })) || undefined;
+      this.loadedModel = undefined;
+      let engine: MLCEngineInterface | undefined = undefined;
+      if ('serviceWorker' in navigator) {
+        if (await serviceWorkerActivated()) {
+          console.debug('WebLLM: Creating service-worker engine...');
+          engine = new ServiceWorkerMLCEngine(this.engineConfig, 5000);
+        }
       }
-    }
-    if (!engine) {
-      console.debug('WebLLM: Creating web-worker engine...');
-      engine = new WebWorkerMLCEngine(
-        new Worker(new URL('./chat.worker.ts', import.meta.url), { type: 'module' }),
-        this.engineConfig,
-      );
-    }
-    this.engine = engine;
-    this.setStatus(ChatStatus.IDLE);
-    return this.engine;
+      if (!engine) {
+        console.debug('WebLLM: Creating web-worker engine...');
+        engine = new WebWorkerMLCEngine(
+          new Worker(new URL('./chat.worker.ts', import.meta.url), { type: 'module' }),
+          this.engineConfig,
+        );
+      }
+      this.engine = engine;
+      this.setStatus(ChatStatus.IDLE);
+      return this.engine;
+    };
+    this.enginePromise = createEngine();
+    return await this.enginePromise;
   }
 
   /**
@@ -103,20 +135,20 @@ export class ChatService {
   async loadModel() {
     if (!isPlatformBrowser(this.platformId)) return undefined;
 
-    this.setStatus(ChatStatus.MODEL);
-    this.modelLoaded$.next(false);
     const model = this.selectedModel();
     const engine = await this.getEngine();
 
     if (model && engine && this.loadedModel !== model) {
-      console.debug('WebLLM: Loading model...', this.selectedModel());
-      this.setStatus(ChatStatus.MODEL);
-      this.loadedModel = model;
       try {
+        this.modelLoaded$.next(false);
+        this.setStatus(ChatStatus.MODEL);
+        console.debug('WebLLM: Loading model...', this.selectedModel());
+        this.loadedModel = model;
         await engine.unload();
         await engine.reload(model);
         this.modelLoaded$.next(true);
       } catch (e) {
+        this.loadedModel = undefined;
         this.progressText.set('Error loading model: ' + e);
         await engine.unload();
       } finally {
@@ -205,6 +237,7 @@ export class ChatService {
    * @returns The AI's response as a string.
    */
   sendMessage(userPrompt: string) {
+    if (userPrompt.length === 0) return;
     const message = { role: 'user', content: userPrompt, timestamp: Date.now() } as ChatMessage;
     this.messageQueue.update((queue) => [...queue, message]);
     this.prosessQueue();
@@ -257,34 +290,54 @@ export class ChatService {
 
       console.debug('WebLLM: Waiting for reply');
       for await (const chunk of chunks) {
+        // Append the chunk to the reply
+        reply += chunk.choices[0]?.delta.content ?? '';
+        // Update the chat with the chunk
         this.chat.update((history) => {
           const lastMessage = history.find((msg) => msg.stream);
           history = history.filter((msg) => msg.stream !== true);
           if (lastMessage) {
-            lastMessage.content += chunk.choices[0]?.delta.content ?? '';
+            lastMessage.content = reply;
           }
           return [...history, lastMessage!];
         });
 
-        reply += chunk.choices[0]?.delta.content ?? '';
         if (chunk.usage) {
-          console.debug(chunk.usage);
+          // Message done
+          console.debug('WebLLM: Reply done!', chunk.usage);
         }
       }
 
+      // Replace the last message with the final reply
       const message = await this.engine!.getMessage();
       this.chat.update((history) => {
         history = history.filter((msg) => msg.stream !== true);
         return [...history, { role: 'assistant', content: message, timestamp: Date.now() }];
       });
 
+      // Clean up and make ready for next message
       this.processingQueue = false;
       this.setStatus(ChatStatus.IDLE);
       if (this.messageQueue().length > 0) {
         this.prosessQueue();
       }
-    } catch (ex) {
-      console.error('WebLLM: Error initializing chat:', ex);
+    } catch (ex: any) {
+      // Make sure that the chat is not stuck in processing mode
+      console.error('WebLLM: Error:', ex);
+      this.setStatus(ChatStatus.ERROR);
+      this.processingQueue = false;
+      this.chat.update((history) => {
+        const lastMessage = history.find((msg) => msg.stream);
+        history = history.filter((msg) => msg.stream !== true);
+        return [
+          ...history,
+          {
+            role: 'assistant',
+            content: `Error: ${ex}`,
+            timestamp: Date.now(),
+          },
+        ];
+      });
     }
   }
 

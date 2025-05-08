@@ -25,6 +25,7 @@ export default class ChatComponent extends AbstractWidgetComponent implements On
   selectedModel = this.chatService.selectedModel;
   progressText = this.chatService.progressText;
   isInitialized = this.chatService.isInitialized;
+  sysInfo = this.chatService.systemInfo;
 
   private now$: Observable<number> = timer(1000 - new Date().getMilliseconds(), 1000).pipe(
     switchMap(() => timer(0, 1000)),
@@ -35,14 +36,10 @@ export default class ChatComponent extends AbstractWidgetComponent implements On
 
   userPrompt = new FormControl('');
 
-  welcomeMessage = `
-  **This is a WebLLM experiment.**
+  welcomeMessage = `### WebLLM experiment.
 
-  It loads and runs a language-model entirely in the client, which may have some implications on memory and performance depending on the selected model.
-  The model currently in use is '${this.selectedModel()}'
-
-  Start typing in the box below to begin a conversation.
-  `;
+  Loads and runs entirely in the client. May have implications on memory and performance depending on selected model.
+  > '${this.selectedModel()}'`;
 
   status = this.chatService.status;
   messages = this.chatService.chatHistory;

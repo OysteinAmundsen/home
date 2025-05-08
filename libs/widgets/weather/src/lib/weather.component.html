@@ -24,7 +24,7 @@
   </header>
 
   @if (weather.isLoading()) {
-    <section>
+    <section class="loader">
       <lib-spinner [spin]="true"></lib-spinner>
     </section>
   } @else if (weather.error()) {

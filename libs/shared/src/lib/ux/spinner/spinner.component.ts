@@ -1,4 +1,15 @@
-import { Component, computed, effect, ElementRef, inject, input, OnDestroy, viewChild } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  OnDestroy,
+  PLATFORM_ID,
+  viewChild,
+} from '@angular/core';
 import { getComputedStyle } from '../../utils/color';
 
 @Component({
@@ -7,10 +18,13 @@ import { getComputedStyle } from '../../utils/color';
   styles: ``,
 })
 export class SpinnerComponent implements OnDestroy {
-  private el = inject(ElementRef);
-  private canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
-  private ctx = computed<CanvasRenderingContext2D | undefined>(
-    () => this.canvas()?.nativeElement.getContext('2d') ?? undefined,
+  private readonly el = inject(ElementRef);
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+  private ctx = computed<CanvasRenderingContext2D | undefined>(() =>
+    isPlatformBrowser(this.platformId) && this.canvas()
+      ? (this.canvas()?.nativeElement.getContext('2d') ?? undefined)
+      : undefined,
   );
 
   spin = input<boolean>(false);
@@ -82,7 +96,7 @@ export class SpinnerComponent implements OnDestroy {
   }
 
   animate(time?: number) {
-    if (!this.spin()) return;
+    if (!this.spin() || !isPlatformBrowser(this.platformId)) return;
     this.computeStyle();
 
     const now = time ?? performance.now();

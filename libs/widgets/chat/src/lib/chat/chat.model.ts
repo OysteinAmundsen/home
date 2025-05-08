@@ -10,3 +10,9 @@ export interface ChatModel {
     models: string[];
   }[];
 }
+
+export interface ChatSystemInfo {
+  model?: string;
+  bufferSize?: number;
+  gpuVendor?: string;
+}

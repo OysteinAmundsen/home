@@ -23,6 +23,10 @@ section {
       text-align: right;
     }
   }
+  &.loader {
+    display: flex;
+    place-content: center;
+  }
 }
 footer {
   padding-top: 0.5rem;
