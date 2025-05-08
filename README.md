@@ -223,12 +223,17 @@ Object.entries(proxyRoutes).forEach(([path, config]) => {
 });
 ```
 
+Two widgets demonstrate integrations with third-party apis:
+
+- [Weather](./libs/widgets/weather/) - integrates with https://api.met.no/weatherapi
+- [Fund](./libs/widgets/fund/) - integrates with [https://public.nordnet.no](https://www.nordnet.se/externalapi/docs/api)
+
 ### Canvas and WebGPU Experiments
 
 Two widgets demonstrate canvas and WebGPU effects:
 
-- [Starfield Animation](./libs/widgets/starfield/)
-- [Rotating Pyramid](./libs/widgets/pyramid/)
+- [Starfield Animation](./libs/widgets/starfield/) - uses 2d canvas
+- [Rotating Pyramid](./libs/widgets/pyramid/) - uses [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API)
 
 These are simple experiments to explore some new (for me) technologies and techniques.
 
@@ -243,7 +248,7 @@ pip install faster-whisper
 python -c "from faster_whisper import WhisperModel; WhisperModel('NbAiLab/nb-whisper-small', device='cpu', compute_type='int8')"
 ```
 
-This installs Python and the Whisper AI model. After setup, `bun start` enables audio transcription (currently Norwegian only).
+This installs Python and the [Whisper AI](https://openai.com/index/whisper/) [model](https://huggingface.co/NbAiLab/nb-whisper-small-beta). After setup, `bun start` enables audio transcription (currently Norwegian only).
 
 The transcription process involves:
 
@@ -253,6 +258,6 @@ The transcription process involves:
 
 ### WebLLM
 
-The WebLLM chat experiment loads and runs a language model entirely in the browser. This utilizes the GPU for performance. There are small models which could be cheap to run on low performance graphics systems, but here I'm using a medium model which performs best on high-performance GPU's like nvidia or amd. It can be a bit sluggish on low-end GPU's like intel.
+The [WebLLM](https://webllm.mlc.ai/) chat experiment loads and runs a language model entirely in the browser. This utilizes the GPU for performance. There are small models which could be cheap to run on low performance graphics systems, but here I'm using a medium model which performs best on high-performance GPU's like nvidia or amd. It can be a bit sluggish on low-end GPU's like intel.
 
 Most systems have more than one GPU on their system. One integrated on the motherboard and a second more powerful GPU mounted as an expansion card. The integrated one will on most systems struggle a bit to run the selected model here, so for best performance - open your OS graphics settings, select advanced settings, choose your browser and enable "High-performance" graphics processor for that program.
