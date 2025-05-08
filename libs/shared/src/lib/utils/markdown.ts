@@ -92,8 +92,9 @@ function nestedList(match: string): string {
       result += `</${levels.get(lastLevel)}>`;
       levels.delete(lastLevel);
     }
-
-    result += `<li>${content}</li>`;
+    if (content.trim().length > 0) {
+      result += `<li>${content}</li>`;
+    }
   });
 
   // Close any remaining open lists
