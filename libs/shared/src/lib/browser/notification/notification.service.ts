@@ -1,6 +1,7 @@
 import { isPlatformServer } from '@angular/common';
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { urlBase64ToUint8Array } from '../../utils/object';
+import { logMsg } from '../logger/logger';
 import { SERVICE_WORKER } from '../service-worker/service-worker';
 
 @Injectable({ providedIn: 'root' })
@@ -64,7 +65,7 @@ export class NotificationService {
         // the issue might be with a stricter browser policy. Brave does not want to
         // show notifications on localhost at all, for example. You can try running it
         // on chrome, which should work.
-        console.error('Failed to subscribe.', e);
+        console.error(...logMsg('error', 'Notification', 'Failed to subscribe.', e));
       }
     }
     return subscription || undefined;

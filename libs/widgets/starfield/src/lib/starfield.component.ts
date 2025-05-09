@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppSettingsService } from '@home/shared/app.settings';
+import { logMsg } from '@home/shared/browser/logger/logger';
 import { ResizeDirective } from '@home/shared/browser/resize/resize.directive';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
 import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
@@ -156,7 +157,7 @@ export default class StarFieldComponent extends AbstractWidgetComponent implemen
           star.setCurrentColor(color);
           star.draw();
         } catch (e) {
-          console.error(e);
+          console.error(...logMsg('error', 'Starfield', e));
         }
       }
 

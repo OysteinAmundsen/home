@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, ElementRef, inject, Injectable, Injector, NgModuleFactory, resource, signal } from '@angular/core';
 import { Route } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { logMsg } from '../browser/logger/logger';
 import { cache } from '../rxjs/cache';
 import { WIDGET_ROUTES_TOKEN } from './widget-routes.token';
 
@@ -122,7 +123,7 @@ export class WidgetService {
         }
         return moduleOrComponent;
       } catch (error) {
-        console.error(error);
+        console.error(...logMsg('error', 'Widget', error));
       }
     }
     return (await import('./not-found.component')).default;

@@ -1,5 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { NotificationContent } from '@home/backend/app/subscribe/notification.model';
+import { logMsg } from '@home/shared/browser/logger/logger';
 import { ServiceWorkerMLCEngineHandler } from '@mlc-ai/web-llm';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { setCacheNameDetails } from 'workbox-core';
@@ -21,7 +22,7 @@ declare type PushMessageData = {
   // blob: () => Blob;
   // bytes: () => Uint8Array;
   json: () => NotificationContent;
-  // text: () => string;
+  text: () => string;
 };
 
 declare type ExtendableEvent = Event & {
@@ -112,6 +113,10 @@ registerRoute(
 // will only run once per activation of the service worker.
 cleanupOutdatedCaches();
 
+self.addEventListener('install', (event: ExtendableEvent) => {
+  console.debug(...logMsg('debug', 'SW', 'Installing service worker'));
+});
+
 // Tell the active service worker to take control of the page immediately.
 self.addEventListener('activate', () => {
   self.clients.claim();
@@ -119,41 +124,45 @@ self.addEventListener('activate', () => {
   if (!llmHandler) {
     // Activate the web-llm engine
     llmHandler = new ServiceWorkerMLCEngineHandler();
-    console.debug('Service Worker: Web-LLM Engine Activated');
+    console.debug(...logMsg('debug', 'SW', 'Web-LLM Engine Activated'));
   }
 });
 
-// Install app immediately when client is ready
-self.addEventListener('message', (event: MessageEvent) => {
+self.addEventListener('message', async (event: MessageEvent) => {
+  // Install app when client is ready
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.debug(...logMsg('debug', 'SW', 'Skip waiting message received'));
     self.skipWaiting();
   }
   if (!llmHandler) {
     // Activate the web-llm engine
     llmHandler = new ServiceWorkerMLCEngineHandler();
-    console.debug('Service Worker: Web-LLM Engine Activated');
+    console.debug(...logMsg('debug', 'SW', 'Web-LLM Engine Activated'));
   }
 });
-self.addEventListener('install', (event: ExtendableEvent) => {
-  // Always update right away
-  self.skipWaiting();
 
-  // event.waitUntil(
-  //   caches.open(CHATGPT_NEXT_WEB_CACHE).then((cache: Cache) => {
-  //     return cache.addAll([] as string[]);
-  //   }),
-  // );
-});
 // Handle push notifications
 self.addEventListener('push', (event: PushEvent) => {
   if (!(self.Notification && self.Notification.permission === 'granted')) return;
 
-  const data = event.data?.json() ?? {};
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'Title', {
-      body: data.body || 'Message',
-      tag: data.tag || 'home-notification',
-      icon: `images/${data.type}.png`,
-    }),
-  );
+  console.debug(...logMsg('debug', 'SW', 'Notification event received', event.data));
+  const notification: NotificationContent = {
+    title: 'Home',
+    body: 'Message',
+    tag: 'home-notification',
+    icon: `images/info.png`,
+    type: 'info',
+  };
+  try {
+    const json = event.data?.json();
+    if (json) {
+      Object.assign(notification, json as NotificationContent, {
+        icon: `images/${json.type || notification.type}.png`,
+      });
+    }
+  } catch (error) {
+    const text = event.data?.text();
+    Object.assign(notification, { body: text });
+  }
+  event.waitUntil(self.registration.showNotification(notification.title || 'Title', notification));
 });

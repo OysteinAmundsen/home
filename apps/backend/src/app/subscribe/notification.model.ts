@@ -7,6 +7,7 @@ export interface NotificationContent {
   body: string;
   type: NotificationContentType;
   tag?: string;
+  icon?: string;
 }
 
 @ApiSchema({ name: 'PublicKeyResponse' })

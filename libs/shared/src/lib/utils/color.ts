@@ -1,3 +1,5 @@
+import { logMsg } from '../browser/logger/logger';
+
 // We currently support the following color types
 export type RGB = [number, number, number];
 export type RGBA = [number, number, number, number];
@@ -320,7 +322,7 @@ export function getComputedStyle(
       return window.getComputedStyle(element);
     }
   } catch (error) {
-    console.error('Error getting computed style', error);
+    console.error(...logMsg('error', 'Color', 'Error getting computed style', error));
     return '';
   }
 }

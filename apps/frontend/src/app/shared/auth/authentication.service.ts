@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
+import { logMsg } from '@home/shared/browser/logger/logger';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { StorageService } from '@home/shared/browser/storage/storage.service';
 import { base64ToBuffer, bufferToBase64 } from '@home/shared/utils/object';
@@ -83,7 +84,7 @@ export class AuthenticationService {
       // Step 4: Send the credential to the server
       await this.postCredentials(credential, user);
     } catch (ex) {
-      console.error('Failed to register', ex);
+      console.error(...logMsg('error', 'Auth', 'Failed to register', ex));
     }
   }
 
@@ -135,7 +136,7 @@ export class AuthenticationService {
         this.doAuthentication(credential);
       }
     } catch (ex) {
-      console.error('failed to authenticate', ex);
+      console.error(...logMsg('error', 'Auth', 'failed to authenticate', ex));
     }
   }
 
@@ -170,7 +171,7 @@ export class AuthenticationService {
         ),
       );
     } catch (e) {
-      console.error('authentication failed', e);
+      console.error(...logMsg('error', 'Auth', 'authentication failed', e));
       return null;
     }
   }
@@ -200,7 +201,7 @@ export class AuthenticationService {
       // Stored credentials not working for some reason.
       // Fallback to removing the registration to allow user
       // to re-register.
-      console.error('failed to get credentials', ex);
+      console.error(...logMsg('error', 'Auth', 'failed to get credentials', ex));
       this.removeCredentials();
       return null;
     }

@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppSettingsService } from '@home/shared/app.settings';
+import { logMsg } from '@home/shared/browser/logger/logger';
 import { ResizeDirective } from '@home/shared/browser/resize/resize.directive';
 import { ThemeService } from '@home/shared/browser/theme/theme.service';
 import { VisibilityService } from '@home/shared/browser/visibility/visibility.service';
@@ -115,7 +116,7 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
     if (!adapter) throw new Error('No GPU adapter found');
     const device = await adapter?.requestDevice();
     if (!device) throw new Error('No GPU device found');
-    device.lost.then(() => console.error('GPU device lost'));
+    device.lost.then(() => console.error(...logMsg('error', 'Pyramid', 'GPU device lost')));
     this.device = device;
 
     // Configure the context
@@ -285,7 +286,7 @@ export default class PyramidComponent extends AbstractWidgetComponent implements
       // request the next frame
       this.animationFrame = requestAnimationFrame(this.animate.bind(this));
     } catch (error) {
-      console.error(error);
+      console.error(...logMsg('error', 'Pyramid', error));
     }
   }
 

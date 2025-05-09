@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { computed, effect, inject, Injectable, linkedSignal, PLATFORM_ID, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { logMsg } from '@home/shared/browser/logger/logger';
 import { serviceWorkerActivated } from '@home/shared/browser/service-worker/service-worker';
 import { titleCase } from '@home/shared/utils/string';
 import { widgetRoutes } from '@home/widgets/widget.routes';
@@ -104,18 +105,18 @@ export class ChatService {
     // Create a new engine
     const createEngine = async () => {
       this.setStatus(ChatStatus.ENGINE);
-      console.debug('Initializing chat service...');
+      console.debug(...logMsg('debug', 'WebLLM', 'Initializing chat service...'));
       this.adapter = (await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' })) || undefined;
       this.loadedModel = undefined;
       let engine: MLCEngineInterface | undefined = undefined;
       if ('serviceWorker' in navigator) {
         if (await serviceWorkerActivated()) {
-          console.debug('WebLLM: Creating service-worker engine...');
+          console.debug(...logMsg('debug', 'WebLLM', 'Creating service-worker engine...'));
           engine = new ServiceWorkerMLCEngine(this.engineConfig, 5000);
         }
       }
       if (!engine) {
-        console.debug('WebLLM: Creating web-worker engine...');
+        console.debug(...logMsg('debug', 'WebLLM', 'Creating web-worker engine...'));
         engine = new WebWorkerMLCEngine(
           new Worker(new URL('./chat.worker.ts', import.meta.url), { type: 'module' }),
           this.engineConfig,
@@ -142,7 +143,7 @@ export class ChatService {
       try {
         this.modelLoaded$.next(false);
         this.setStatus(ChatStatus.MODEL);
-        console.debug('WebLLM: Loading model...', this.selectedModel());
+        console.debug(...logMsg('debug', 'WebLLM', 'Loading model...', this.selectedModel()));
         this.loadedModel = model;
         await engine.unload();
         await engine.reload(model);
@@ -248,7 +249,7 @@ export class ChatService {
     this.processingQueue = true;
 
     if (this.engine == null) {
-      console.debug('WebLLM: Engine not initialized. Cannot send message.');
+      console.debug(...logMsg('debug', 'WebLLM', 'Engine not initialized. Cannot send message.'));
       return;
     }
 
@@ -274,7 +275,7 @@ export class ChatService {
         this.loadModel();
       }
       await firstValueFrom(this.modelLoaded$.pipe(filter((loaded) => loaded)));
-      console.debug('WebLLM: Model loaded. Processing queue...');
+      console.debug(...logMsg('debug', 'WebLLM', 'Model loaded. Processing queue...'));
     }
 
     try {
@@ -288,7 +289,7 @@ export class ChatService {
       });
       let reply = '';
 
-      console.debug('WebLLM: Waiting for reply');
+      console.debug(...logMsg('debug', 'WebLLM', 'Waiting for reply'));
       for await (const chunk of chunks) {
         // Append the chunk to the reply
         reply += chunk.choices[0]?.delta.content ?? '';
@@ -304,7 +305,7 @@ export class ChatService {
 
         if (chunk.usage) {
           // Message done
-          console.debug('WebLLM: Reply done!', chunk.usage);
+          console.debug(...logMsg('debug', 'WebLLM', 'Reply done!', chunk.usage));
         }
       }
 
@@ -323,7 +324,7 @@ export class ChatService {
       }
     } catch (ex: any) {
       // Make sure that the chat is not stuck in processing mode
-      console.error('WebLLM: Error:', ex);
+      console.error(...logMsg('error', 'WebLLM', 'Error:', ex));
       this.setStatus(ChatStatus.ERROR);
       this.processingQueue = false;
       this.chat.update((history) => {

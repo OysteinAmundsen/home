@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, input, resource, viewChild, ViewContainerRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { logMsg } from '../browser/logger/logger';
 import { Widget, WidgetService } from './widget.service';
 
 /**
@@ -55,7 +56,7 @@ export class WidgetLoaderComponent {
         const componentRef = container?.createComponent(component);
         componentRef?.setInput('data', this.data());
       } catch (error) {
-        console.error('Error creating component:', error);
+        console.error(...logMsg('error', 'Widget', 'Error creating component:', error));
       }
     }
   });

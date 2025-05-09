@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { logMsg } from '../logger/logger';
 import { NotificationService } from './notification.service';
 
 @Component({
@@ -32,7 +33,7 @@ export class NotifyComponent implements OnInit {
       this.canSubscribe.set(await this.notification.canSubscribe());
       this.hasSubscription.set(await this.notification.hasSubscription());
     } catch (e) {
-      console.error('Failed to check subscription', e);
+      console.error(...logMsg('error', 'Notification', 'Failed to check subscription', e));
     }
   }
 

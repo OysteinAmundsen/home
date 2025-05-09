@@ -1,6 +1,7 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { deepMerge, objToString } from '../../utils/object';
+import { logMsg } from '../logger/logger';
 
 const STORAGE_KEY = 'storage';
 
@@ -82,7 +83,7 @@ export class StorageService {
    */
   get(key: string, defaultValue?: unknown): unknown | null {
     if (!key || typeof key !== 'string') {
-      console.error('Invalid key provided for "get".');
+      console.error(...logMsg('error', 'Storage', 'Invalid key provided for "get".'));
       return null;
     }
 
@@ -101,7 +102,7 @@ export class StorageService {
    */
   remove(key: string): void {
     if (!key || typeof key !== 'string') {
-      console.error('Invalid key provided for "remove".');
+      console.error(...logMsg('error', 'Storage', 'Invalid key provided for "remove".'));
       return;
     }
 
@@ -121,12 +122,12 @@ export class StorageService {
    */
   set(key: string, value: unknown): void {
     if (!key || typeof key !== 'string') {
-      console.error('Invalid key provided for "set".');
+      console.error(...logMsg('error', 'Storage', 'Invalid key provided for "set".'));
       return;
     }
 
     if (value === undefined || value === null) {
-      console.error('Invalid value provided for "set". Cannot store null or undefined.');
+      console.error(logMsg('error', 'Storage', 'Invalid value provided for "set". Cannot store null or undefined.'));
       return;
     }
 
@@ -159,7 +160,7 @@ export class StorageService {
       }
       this.storeValues();
     } else {
-      console.error(`Failed to resolve key path for "${key}".`);
+      console.error(...logMsg('error', 'Storage', `Failed to resolve key path for "${key}".`));
     }
   }
 
