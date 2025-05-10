@@ -1,6 +1,7 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { NotificationContent } from '@home/backend/app/subscribe/notification.model';
 import { logMsg } from '@home/shared/browser/logger/logger';
+// import { logMsg } from '../../../libs/shared/src/lib/browser/logger/logger';
 import { ServiceWorkerMLCEngineHandler } from '@mlc-ai/web-llm';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { setCacheNameDetails } from 'workbox-core';

@@ -1,10 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
-    "target": "ES2022",
-    "useDefineForClassFields": false
+    "outDir": "../../dist/out-tsc"
   },
-  "include": ["src/**/*.d.ts", "../../node_modules/@webgpu/types/**/*.d.ts"],
+  "files": ["src/sw.ts"],
+  "include": ["src/**/*.d.ts"],
   "exclude": ["jest.config.ts", "**/*.test.ts", "**/*.spec.ts"]
 }

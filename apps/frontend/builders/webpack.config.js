@@ -1,9 +1,8 @@
 //@ts-check
-const { logLevel } = require('kafkajs');
 const path = require('path');
-const { cwd } = require('process');
 const webpack = require('webpack');
 const { injectManifest } = require('workbox-build');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const PLUGIN_NAME = 'generate-manifest-and-inject';
 
@@ -71,6 +70,11 @@ module.exports = {
   resolve: {
     modules: ['./apps/frontend/src', 'node_modules'],
     extensions: ['.ts', '.js'],
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: path.resolve('./tsconfig.base.json'), // Ensure this points to your base tsconfig
+      }),
+    ],
   },
   plugins: [new GenerateManifestAndInject()],
 };
