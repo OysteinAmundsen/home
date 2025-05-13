@@ -4,6 +4,12 @@ import { urlBase64ToUint8Array } from '../../utils/object';
 import { logMsg } from '../logger/logger';
 import { SERVICE_WORKER } from '../service-worker/service-worker';
 
+/**
+ * Service to handle push notifications
+ *
+ * Communicates with [backend](./apps/backend/src/app/subscribe/notification.controller.ts)
+ * to register and unregister the subscription.
+ */
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private readonly platformId = inject(PLATFORM_ID);

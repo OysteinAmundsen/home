@@ -30,7 +30,14 @@ bun install
 bun start
 ```
 
-This installs dependencies and starts the development server.
+This installs dependencies and starts the development server. You can also start the backend and frontend separately:
+
+```bash
+# in one shell:
+bun run back
+# and in another shell
+bun run front
+```
 
 ### Using npm Instead
 
@@ -78,12 +85,11 @@ server.use('*splat', (req, res, next) => {
       cookies: req.headers.cookie,
     })
     .then((response) => {
-      // If the Angular app returned a response, write it to the Express response
-      if (response) {
-        return writeResponseToNodeResponse(response, res);
-      }
-      // If not, this is not an Angular route, so continue to the next middleware
-      return next();
+      return response
+        ? // If the Angular app returned a response, write it to the Express response
+          writeResponseToNodeResponse(response, res)
+        : // If not, this is not an Angular route, so continue to the next middleware
+          next();
     })
     .catch(next);
 });
@@ -109,32 +115,37 @@ This produces an environment which has an api, a database and a frontend fully b
 
 ### Database
 
-One weakness of running the entire app in one single instance here, is that it compiles to ESM - which is not so great for auto detecting entities. This is why we reference the entities directly in an array instead:
+Entities are autodetected using the `.forFeature` function in `TypeOrmModule`
 
 ```typescript
+@Module({
+  imports: [
+    MyModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: resolve(process.cwd(), 'db', 'home.db'),
-      entities: [User, Subscription], // Would love for this to be auto detected though
+      autoLoadEntities: true,
       synchronize: true,
       logging: true,
     }),
+  ],
+})
+export class ApiModule {}
 ```
 
-I spent a long time trying to get the default `entities: [resolve(__dirname, 'app/**/*.entity{.ts,.js}')]` working until I realized that there is no directory structure to traverse in ESM. The autodetect works great if you are running the backend separately though.
+Then include entities in your sub modules:
 
-```bash
-# in one shell:
-bun run back
-# and in another shell
-bun run front
+```typescript
+@Module({
+  imports: [TypeOrmModule.forFeature([MyEntity])],
+  ...
+})
+export class MyModule {}
 ```
-
-This is because the backend will then compile to commonJS format, which does have support for directory traversal.
 
 ## Service Worker
 
-This app is a PWA, requiring a [web manifest](./apps/frontend/public/manifest.webmanifest) and a [service worker script](./apps/frontend/src/sw.ts) registered at startup.
+This app is a PWA, requiring a [web manifest](./apps/frontend/public/manifest.webmanifest) and a [service worker script](./apps/frontend/src/sw.ts) registered at [startup](./libs/shared/src/lib/browser/service-worker/service-worker.ts).
 
 One of the things a service worker does is preloading and caching static resources like JavaScript, CSS, and `index.html` in the client. Angular's built-in [ngsw](https://angular.dev/ecosystem/service-workers/config) generates a generic service worker at build time. However, for more control, this project uses [WorkBox](https://developer.chrome.com/docs/workbox). But WorkBox is not quite compatible with Angulars build process yet.
 
@@ -147,8 +158,8 @@ One of the things a service worker does is preloading and caching static resourc
 
 This project uses two custom plugins:
 
-1. **Custom esbuild plugin**: Runs during `nx serve` to hook into esbuild's `onEnd` event. It generates a partial pre-cache list but cannot include CSS files.
-2. **Custom webpack plugin**: Runs during `nx build` to generate a complete pre-cache list from files written to disk.
+1. [**Custom esbuild plugin**](./apps/frontend/builders/custom-esbuild.ts): Runs during `nx serve` to hook into esbuild's `onEnd` event. It generates a partial pre-cache list but cannot include CSS files.
+2. [**Custom webpack plugin**](./apps/frontend/builders/webpack.config.js): Runs during `nx build` to generate a complete pre-cache list from files written to disk.
 
 The esbuild plugin is configured in [project.json](./apps/frontend/project.json):
 
@@ -258,6 +269,6 @@ The transcription process involves:
 
 ### WebLLM
 
-The [WebLLM](https://webllm.mlc.ai/) chat experiment loads and runs a language model entirely in the browser. This utilizes the GPU for performance. There are small models which could be cheap to run on low performance graphics systems, but here I'm using a medium model which performs best on high-performance GPU's like nvidia or amd. It can be a bit sluggish on low-end GPU's like intel.
+The [WebLLM](https://webllm.mlc.ai/) [chat experiment](./libs/widgets/chat/) loads and runs a language model entirely in the browser. This utilizes WebGPU for performance. There are small models which could be cheap to run on low performance graphics systems, but here I'm using a medium model which performs best on high-performance GPU's like nvidia or amd. It can be a bit sluggish on low-end GPU's like intel.
 
 Most systems have more than one GPU on their system. One integrated on the motherboard and a second more powerful GPU mounted as an expansion card. The integrated one will on most systems struggle a bit to run the selected model here, so for best performance - open your OS graphics settings, select advanced settings, choose your browser and enable "High-performance" graphics processor for that program.

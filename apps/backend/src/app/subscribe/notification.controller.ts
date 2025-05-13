@@ -1,6 +1,5 @@
 import { Body, Controller, forwardRef, Get, Inject, Post } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { PushSubscription } from 'web-push';
 import { PublicKeyResponse, PushSubscriptionRequest } from './notification.model';
 import { NotificationService } from './notification.service';
 
@@ -8,6 +7,8 @@ import { NotificationService } from './notification.service';
  * The controller for the /api/notification route.
  *
  * This is the controller used to handle the notification subscription.
+ * You must register your [VAPID](https://vapidkeys.com/) keys to use
+ * this service.
  *
  * @param server
  */

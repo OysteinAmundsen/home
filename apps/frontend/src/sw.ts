@@ -1,7 +1,6 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { NotificationContent } from '@home/backend/app/subscribe/notification.model';
 import { logMsg } from '@home/shared/browser/logger/logger';
-// import { logMsg } from '../../../libs/shared/src/lib/browser/logger/logger';
 import { ServiceWorkerMLCEngineHandler } from '@mlc-ai/web-llm';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { setCacheNameDetails } from 'workbox-core';
@@ -13,7 +12,9 @@ import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const self: ServiceWorkerGlobalScope | any;
-let llmHandler: ServiceWorkerMLCEngineHandler;
+
+// This will create a new `onMessage` handler for the service worker
+const llmHandler = new ServiceWorkerMLCEngineHandler();
 
 // Typescript did not understand PushEvent, so we need to declare it
 declare type PushEvent = Event & { data: PushMessageData; waitUntil: (f: Promise<unknown>) => void };
@@ -34,7 +35,6 @@ declare type ExtendableEvent = Event & {
 
 const prefix = 'home';
 const version = 'v1';
-
 setDefaultHandler(new NetworkOnly());
 
 /**
@@ -114,14 +114,6 @@ registerRoute(
 // will only run once per activation of the service worker.
 cleanupOutdatedCaches();
 
-const llmHandlerReady = () => {
-  if (!llmHandler) {
-    // Activate the web-llm engine
-    llmHandler = new ServiceWorkerMLCEngineHandler();
-    console.debug(...logMsg('debug', 'SW', 'Web-LLM Engine Activated'));
-  }
-};
-
 self.addEventListener('install', (event: ExtendableEvent) => {
   console.debug(...logMsg('debug', 'SW', 'Installing service worker'));
 });
@@ -129,7 +121,6 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 // Tell the active service worker to take control of the page immediately.
 self.addEventListener('activate', () => {
   self.clients.claim();
-  llmHandlerReady();
 });
 
 self.addEventListener('message', async (event: MessageEvent) => {
@@ -138,7 +129,6 @@ self.addEventListener('message', async (event: MessageEvent) => {
     console.debug(...logMsg('debug', 'SW', 'Skip waiting message received'));
     self.skipWaiting();
   }
-  llmHandlerReady();
 });
 
 // Handle push notifications
