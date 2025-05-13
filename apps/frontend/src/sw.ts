@@ -114,6 +114,14 @@ registerRoute(
 // will only run once per activation of the service worker.
 cleanupOutdatedCaches();
 
+const llmHandlerReady = () => {
+  if (!llmHandler) {
+    // Activate the web-llm engine
+    llmHandler = new ServiceWorkerMLCEngineHandler();
+    console.debug(...logMsg('debug', 'SW', 'Web-LLM Engine Activated'));
+  }
+};
+
 self.addEventListener('install', (event: ExtendableEvent) => {
   console.debug(...logMsg('debug', 'SW', 'Installing service worker'));
 });
@@ -121,12 +129,7 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 // Tell the active service worker to take control of the page immediately.
 self.addEventListener('activate', () => {
   self.clients.claim();
-
-  if (!llmHandler) {
-    // Activate the web-llm engine
-    llmHandler = new ServiceWorkerMLCEngineHandler();
-    console.debug(...logMsg('debug', 'SW', 'Web-LLM Engine Activated'));
-  }
+  llmHandlerReady();
 });
 
 self.addEventListener('message', async (event: MessageEvent) => {
@@ -135,11 +138,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
     console.debug(...logMsg('debug', 'SW', 'Skip waiting message received'));
     self.skipWaiting();
   }
-  if (!llmHandler) {
-    // Activate the web-llm engine
-    llmHandler = new ServiceWorkerMLCEngineHandler();
-    console.debug(...logMsg('debug', 'SW', 'Web-LLM Engine Activated'));
-  }
+  llmHandlerReady();
 });
 
 // Handle push notifications

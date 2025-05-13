@@ -52,7 +52,7 @@ class GenerateManifestAndInject {
 }
 
 module.exports = {
-  mode: 'production',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './apps/frontend/src/sw.ts',
   output: {
     filename: 'sw.js',

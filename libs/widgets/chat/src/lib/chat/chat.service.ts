@@ -61,7 +61,7 @@ export class ChatService {
 
   engineConfig: MLCEngineConfig = {
     initProgressCallback: this.onProgress,
-    logLevel: 'INFO',
+    logLevel: 'WARN',
     appConfig: {
       ...prebuiltAppConfig,
       useIndexedDBCache: true,

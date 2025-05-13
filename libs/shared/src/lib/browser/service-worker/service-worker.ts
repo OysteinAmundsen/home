@@ -50,7 +50,7 @@ export async function loadServiceWorker() {
         console.debug(...logMsg('debug', 'SW', 'New service worker is controlling page'));
       });
       // New worker is activated but may not be controlling the page
-      wb.addEventListener('activated', () => {
+      wb.addEventListener('activated', async () => {
         console.debug(...logMsg('debug', 'SW', 'New service worker activated! <- Reloading page'));
         window.location.reload(); // Force reload the page to apply changes
       });
@@ -59,6 +59,11 @@ export async function loadServiceWorker() {
       const reg = await wb.register({ immediate: true });
       if (!reg) throw 'SW: Service worker not registered!';
       reg.update(); // Check for updates immediately
+
+      reg.addEventListener('updatefound', async () => {
+        console.debug(...logMsg('debug', 'SW', 'Update found!'));
+        await caches.delete('home-precache-v1');
+      });
 
       // Check for updates every 10 minutes
       setInterval(async () => await wb.update(), 1 * 60 * 1000);
@@ -118,8 +123,7 @@ export async function serviceWorkerActivated(timeoutMs = 5000, reloadOnTimeout =
         timeout = setTimeout(async () => {
           console.warn(...logMsg('warn', 'SW', 'Service worker activation timed out'));
           if (reloadOnTimeout) {
-            console.debug(...logMsg('debug', 'SW', 'Unregistering service worker and reloading page...'));
-            await unregisterServiceWorkers();
+            console.debug(...logMsg('debug', 'SW', 'Reloading page...'));
             // Delete the precache cache to force a reload of the app shell
             await caches.delete('home-precache-v1');
             // Reload the page to apply changes
