@@ -176,3 +176,16 @@ export function removeNonWord(str: string): string {
   if (!str || typeof str !== 'string') return str;
   return str.replace(/[^0-9a-zA-Z\xC0-\xFF\s]/gm, ' ').trim();
 }
+
+/**
+ * Interpolate data into a string.
+ *
+ * @example
+ * ```ts
+ * interpolate('Hello {{name}}', { name: 'World' }) // 'Hello World'
+ */
+export function interpolate(str: string, data: Record<string, string>) {
+  return str.replace(/{{\s*(\w+)\s*}}/g, (match, key) => {
+    return typeof data[key] !== 'undefined' ? data[key] : match;
+  });
+}

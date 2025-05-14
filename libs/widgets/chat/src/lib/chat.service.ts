@@ -3,7 +3,7 @@ import { computed, effect, inject, Injectable, linkedSignal, PLATFORM_ID, signal
 import { toSignal } from '@angular/core/rxjs-interop';
 import { logMsg } from '@home/shared/browser/logger/logger';
 import { serviceWorkerActivated } from '@home/shared/browser/service-worker/service-worker';
-import { titleCase } from '@home/shared/utils/string';
+import { interpolate, titleCase } from '@home/shared/utils/string';
 import { widgetRoutes } from '@home/widgets/widget.routes';
 import {
   InitProgressReport,
@@ -15,6 +15,7 @@ import {
 } from '@mlc-ai/web-llm';
 import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
 import { ChatMessage, ChatModel, ChatSystemInfo } from './chat.model';
+import systemPrompt from './system-prompt.md';
 
 export enum ChatStatus {
   IDLE = '',
@@ -160,66 +161,43 @@ export class ChatService {
 
   getInitialChat(): ChatMessage[] {
     if (!isPlatformBrowser(this.platformId)) return [];
-    const widgets = widgetRoutes
-      .map((widget) => ({
-        path: widget.path,
-        name: titleCase(`${widget.path}`),
-        description: widget.data!['description'],
-        meta: widget.data!['meta'],
-        tags: widget.data!['tags'],
-      }))
-      .reduce((acc, widget, index) => {
-        acc.push(`
-  ${index + 1}. Name: ${widget.name}
-    Path: ${window.location.origin}/${widget.path}
-    Description: ${widget.description}
-    ${widget.tags ? `Tags: [${widget.tags.map((t: string) => `"${titleCase(t)}"`).join(', ')}]` : ''}
-${widget.meta.map((meta: string) => `      * ${meta}`).join('\n')}\n`);
-        return acc;
-      }, [] as string[]);
+
+    // Collect data from the widgetRoutes registry
+    const widgetData = widgetRoutes.map((widget) => ({
+      path: widget.path,
+      name: titleCase(`${widget.path}`),
+      description: widget.data!['description'],
+      meta: widget.data!['meta'],
+      tags: widget.data!['tags'],
+    }));
+
+    // Compose the `{{ widgets }}` section
+    const widgets = widgetData
+      .map((widget, index) => {
+        return `
+${index + 1}. Name: [${widget.name}](${window.location.origin}/${widget.path})
+   Code path: './libs/widgets/${widget.path}'
+   ${widget.tags ? `Tags: [${widget.tags.map((t: string) => `"${titleCase(t)}"`).join(', ')}]` : ''}
+   Description: ${widget.description}
+   Metadata: \n${widget.meta.map((meta: string) => `     * ${meta}`).join('\n')}\n`;
+      })
+      .join('');
+
+    // Compose the `{{ widgetReadme }}` section
+    const widgetReadme = widgetData
+      .map(
+        (widget) =>
+          `    + [${widget.name}](https://raw.githubusercontent.com/OysteinAmundsen/home/refs/heads/master/libs/widgets/${widget.path}/README.md)`,
+      )
+      .join('\n')
+      .trimStart();
+
+    const content = interpolate(systemPrompt, { widgets, widgetReadme, location: window.location.origin });
 
     return [
       // Give in contextual data. This will make our chatbot be able to answer
       // questions about the app and its tech stack
-      {
-        role: 'system',
-        content: `
-You are an expert AI assistant integrated into the "Home" app at ${window.location.origin}. Your responses must be accurate, concise, and based solely on the app's actual features, codebase, and documentation. Do not invent or speculate; if you do not know the answer, state so clearly.
-
-# About the "Home" App
-- "Home" is an open-source dashboard app built as a proof of concept for full-stack development with Angular (frontend) and NestJS (backend).
-- The app is a playground for experimenting with web fundamentals and modern technologies.
-- The dashboard contains different mini-applications (widgets) that are available in the app.
-- Each widget is an isolated experiment and has its own path and description.
-- Source code: https://github.com/OysteinAmundsen/home
-- Preferred environment: bun (not Node.js).
-- SQLite is used for storage.
-- Service worker is integrated using WorkBox.
-- Development setup includes devContainer.json and scripts for running, building, and deploying with bun or Docker.
-
-## Available Widgets
-${widgets.join('\n')}
-
-## Developer
-- Created by Øystein Amundsen, consultant at Bouvet, Norway.
-
-# Usage Guidelines
-- Only answer questions about the app, its widgets, or its tech stack.
-- Use information from the provided widget list and technical details above.
-- If a question is outside your scope, respond: "I do not have information about that."
-- Always be factual, direct, and avoid hedging language.
-- When asked about you, the assistant, refer to the "Chat" WebLLM widget and provide guidance.
-
-# Formatting
-- Use markdown formatting for all responses.
-- Use the following format for widget names: [Name](Path). Example: [Starfield](https://localhost:4200/starfield).
-
-# Enforcement
-- The response will consistently apply the markdown link format for all widgets throughout the conversation.
-- Any response that fails to follow this format will be considered non-compliant.
-`,
-        timestamp: Date.now() - 1,
-      },
+      { role: 'system', content, timestamp: Date.now() - 1 },
     ];
   }
 

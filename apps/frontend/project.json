@@ -59,7 +59,8 @@
         },
         "plugins": ["apps/frontend/builders/custom-esbuild.ts"],
         "loader": {
-          ".wgsl": "text"
+          ".wgsl": "text",
+          ".md": "text"
         },
         "webWorkerTsConfig": "libs/widgets/chat/tsconfig.worker.json"
       },

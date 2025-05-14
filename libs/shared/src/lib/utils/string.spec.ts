@@ -1,6 +1,7 @@
 import {
   camelCase,
   hyphenate,
+  interpolate,
   kebabCase,
   pascalCase,
   removeNonWord,
@@ -73,6 +74,14 @@ describe('string', () => {
   describe('removeNonWord', () => {
     it('should remove all non-word characters', () => {
       expect(removeNonWord('This_is-a_test')).toEqual('This is a test');
+    });
+  });
+
+  describe('interpolate', () => {
+    it('should interpolate all data into the string', () => {
+      expect(interpolate('Hello {{ name }}, this is a {{test}}', { name: 'World', test: 'test' })).toEqual(
+        'Hello World, this is a test',
+      );
     });
   });
 });

@@ -74,6 +74,7 @@ export const widgetRoutes: Route[] = [
         'Whisper model is especially trained for norwegian language',
         'Upload audio files to transcribe',
         'Record audio using microphone if granted access by user',
+        'No files are stored on the server. The audio file is processed in memory and discarded after processing',
       ],
     },
     loadComponent: () => import('@home/widgets/transcribe').then((m) => m.default),
