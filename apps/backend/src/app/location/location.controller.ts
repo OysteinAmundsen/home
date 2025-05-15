@@ -1,4 +1,3 @@
-import { A } from '@angular/core/weak_ref.d-DOjz-6fK';
 import { GeoLocationItem } from '@home/shared/browser/geo-location/location.model';
 import { Controller, Get, Logger, NotFoundException, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
