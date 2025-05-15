@@ -1,4 +1,5 @@
 {
   "eslint.validate": ["json"],
-  "angular.enable-strict-mode-prompt": false
+  "angular.enable-strict-mode-prompt": false,
+  "nxConsole.generateAiAgentRules": true
 }

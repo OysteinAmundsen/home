@@ -171,11 +171,12 @@ export class ChatService {
       tags: widget.data!['tags'],
     }));
 
+    const origin = window.location.origin;
+
     // Compose the `{{ widgets }}` section
     const widgets = widgetData
       .map((widget, index) => {
-        return `
-${index + 1}. Name: [${widget.name}](${window.location.origin}/${widget.path})
+        return `${index + 1}. Name: [${widget.name}](${origin}/${widget.path})
    Code path: './libs/widgets/${widget.path}'
    ${widget.tags ? `Tags: [${widget.tags.map((t: string) => `"${titleCase(t)}"`).join(', ')}]` : ''}
    Description: ${widget.description}
@@ -192,7 +193,7 @@ ${index + 1}. Name: [${widget.name}](${window.location.origin}/${widget.path})
       .join('\n')
       .trimStart();
 
-    const content = interpolate(systemPrompt, { widgets, widgetReadme, location: window.location.origin });
+    const content = interpolate(systemPrompt, { widgets, widgetReadme, origin });
 
     return [
       // Give in contextual data. This will make our chatbot be able to answer

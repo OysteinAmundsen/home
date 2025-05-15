@@ -41,7 +41,6 @@ main {
     }
     &.assistant {
       .message {
-        white-space: pre-wrap;
         background-color: hsl(from var(--color-primary) h 10% l / 70%);
       }
       .timestamp {

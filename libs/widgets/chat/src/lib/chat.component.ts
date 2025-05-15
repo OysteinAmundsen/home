@@ -36,7 +36,7 @@ export default class ChatComponent extends AbstractWidgetComponent implements On
 
   userPrompt = new FormControl('');
 
-  welcomeMessage = `### WebLLM experiment.
+  welcomeMessage = `# WebLLM experiment.
 
   Loads and runs entirely in the client. May have implications on memory and performance depending on selected model.
   > '${this.selectedModel()}'`;
@@ -72,7 +72,7 @@ export default class ChatComponent extends AbstractWidgetComponent implements On
 
   // Submit on enter
   maybeSendMessage($event: KeyboardEvent) {
-    if ($event.key === 'Enter') {
+    if ($event.key === 'Enter' && $event.shiftKey === false) {
       $event.preventDefault();
       this.sendMessage();
     }

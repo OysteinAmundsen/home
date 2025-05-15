@@ -1,5 +1,6 @@
 import { ElementRef, inject, Pipe, PipeTransform } from '@angular/core';
-import { markdownToHtml } from '../utils/markdown';
+import { marked } from 'marked';
+// import { markdownToHtml } from '../utils/markdown';
 
 @Pipe({ name: 'markdown', pure: true })
 export class MarkdownPipe implements PipeTransform {
@@ -13,6 +14,6 @@ export class MarkdownPipe implements PipeTransform {
     if (markdown === null || markdown === undefined) return markdown;
     if (typeof markdown !== 'string') markdown = `${markdown}`;
 
-    return markdownToHtml(markdown);
+    return marked.parse(markdown, { async: false });
   }
 }
