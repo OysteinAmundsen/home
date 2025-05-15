@@ -20,12 +20,12 @@
     "typeRoots": ["./node_modules/@types"],
     "types": ["node", "express", "multer"],
     "paths": {
+      "//": ["Only widgets below here"],
       "@home/backend*": ["apps/backend/src/*"],
       "@home/builder": ["tools/builder/src/index.ts"],
       "@home/shared": ["libs/shared/src/index.ts"],
       "@home/shared/*": ["libs/shared/src/lib/*"],
       "@home/widgets/*": ["libs/widgets/*"],
-      "//": ["Only widgets below here"],
       "@home/widgets/chat": ["libs/widgets/chat/src/index.ts"],
       "@home/widgets/fund": ["libs/widgets/fund/src/index.ts"],
       "@home/widgets/pyramid": ["libs/widgets/pyramid/src/index.ts"],
