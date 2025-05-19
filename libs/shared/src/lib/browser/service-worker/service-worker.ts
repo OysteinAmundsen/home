@@ -2,6 +2,10 @@ import { Workbox } from 'workbox-window';
 import { logMsg } from '../logger/logger';
 
 export const SERVICE_WORKER = '/sw.js';
+export const SW_CACHE_PREFIX = 'home';
+export const SW_CACHE_VERSION = 'v1';
+export const SW_CACHE_PRECACHE = 'precache';
+const precacheName = `${SW_CACHE_PREFIX}-${SW_CACHE_PRECACHE}-${SW_CACHE_VERSION}`;
 
 /**
  * Load service worker
@@ -21,7 +25,7 @@ export async function loadServiceWorker() {
     try {
       console.debug(...logMsg('debug', 'SW', 'Registering service worker...'));
       const wb = new Workbox(SERVICE_WORKER, { scope: '/', updateViaCache: 'none' });
-      await wb.update(); // Check for updates immediately
+      await updateServiceWorker(wb); // Check for updates immediately
 
       // New worker is being installed.
       wb.addEventListener('installing', () => {
@@ -62,16 +66,28 @@ export async function loadServiceWorker() {
 
       reg.addEventListener('updatefound', async () => {
         console.debug(...logMsg('debug', 'SW', 'Update found!'));
-        await caches.delete('home-precache-v1');
+        await emptyCache([precacheName]); // Delete the precache cache to force a reload of the app shell
       });
 
       // Check for updates every 10 minutes
-      setInterval(async () => await wb.update(), 1 * 60 * 1000);
+      setInterval(async () => await updateServiceWorker(wb), 1 * 60 * 1000);
     } catch (err) {
       console.error(...logMsg('error', 'SW', 'Registration failed: ', err));
     }
   } else {
     console.debug(...logMsg('debug', 'SW', 'Service worker not supported', 'App', true));
+  }
+}
+
+async function updateServiceWorker(wb: Workbox) {
+  try {
+    await wb.update();
+  } catch (err) {
+    if (err instanceof Error && err.name === 'InvalidStateError') {
+      unregisterServiceWorkers();
+    } else {
+      console.error(...logMsg('error', 'SW', 'Failed to update service worker: ', err));
+    }
   }
 }
 
@@ -91,9 +107,9 @@ export async function unregisterServiceWorkers() {
   }
 }
 
-export async function emptyCache() {
+export async function emptyCache(cacheNames?: string[]) {
   if ('caches' in window) {
-    const cacheNames = await caches.keys();
+    cacheNames = cacheNames || (await caches.keys());
     for (const cacheName of cacheNames) {
       console.debug(...logMsg('debug', 'SW', 'Deleting cache', cacheName));
       await caches.delete(cacheName);
@@ -101,6 +117,14 @@ export async function emptyCache() {
   } else {
     console.debug(...logMsg('debug', 'SW', 'Cache not supported', 'App', true));
   }
+}
+
+export async function getServiceWorkerRegistration() {
+  if ('serviceWorker' in navigator) {
+    await serviceWorkerActivated(100, false);
+    return await navigator.serviceWorker.getRegistration(SERVICE_WORKER);
+  }
+  return undefined;
 }
 
 /**
@@ -113,9 +137,19 @@ export async function emptyCache() {
  *                  before failing. Default is 10 seconds. Set to 0 to disable timeout.
  * @returns true when the service worker is activated and controlling the page, false otherwise.
  */
-export async function serviceWorkerActivated(timeoutMs = 5000, reloadOnTimeout = true): Promise<boolean> {
+export async function serviceWorkerActivated(timeoutMs = 1000, reloadOnTimeout = true): Promise<boolean> {
   if ('serviceWorker' in navigator) {
-    const registration = await navigator.serviceWorker.ready;
+    // On browsers using default profile, the service worker will error on loading the precache
+    // and will never activate.
+    // Error is `InvalidAccessError: Failed to execute 'put' on 'Cache': Entry already exists.`
+    const registration = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), timeoutMs)),
+    ]);
+    if (!registration) {
+      console.warn(...logMsg('warn', 'SW', 'Service worker not ready'));
+      return false;
+    }
 
     return await new Promise<boolean>((resolve) => {
       let timeout: NodeJS.Timeout | null = null;
@@ -125,7 +159,7 @@ export async function serviceWorkerActivated(timeoutMs = 5000, reloadOnTimeout =
           if (reloadOnTimeout) {
             console.debug(...logMsg('debug', 'SW', 'Reloading page...'));
             // Delete the precache cache to force a reload of the app shell
-            await caches.delete('home-precache-v1');
+            await emptyCache([precacheName]);
             // Reload the page to apply changes
             window.location.reload();
           }

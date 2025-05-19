@@ -26,6 +26,7 @@ export default class ChatComponent extends AbstractWidgetComponent implements On
   progressText = this.chatService.progressText;
   isInitialized = this.chatService.isInitialized;
   sysInfo = this.chatService.systemInfo;
+  isReplying = this.chatService.isReplying;
 
   private now$: Observable<number> = timer(1000 - new Date().getMilliseconds(), 1000).pipe(
     switchMap(() => timer(0, 1000)),
@@ -89,5 +90,9 @@ export default class ChatComponent extends AbstractWidgetComponent implements On
     this.userPrompt.setValue('');
     const reply = await this.chatService.sendMessage(`${message}`);
     this.autoFocus();
+  }
+
+  stopReply() {
+    this.chatService.stopMessage();
   }
 }

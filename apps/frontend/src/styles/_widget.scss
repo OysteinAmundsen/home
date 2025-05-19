@@ -12,6 +12,7 @@
   max-height: 25rem;
   .widget-wrapper {
     overflow: hidden;
+    border-radius: var(--border-radius);
   }
   &:has(~ .widget-loader),
   + .widget-loader {
@@ -43,7 +44,6 @@
     grid-template:
       'header' auto
       'content' 1fr / 1fr;
-    border-radius: var(--border-radius);
     // overflow: hidden;
 
     > .widget-header {

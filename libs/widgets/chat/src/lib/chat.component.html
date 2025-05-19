@@ -3,11 +3,15 @@
     @for (message of filteredMessages(); track message.timestamp) {
       <div class="message-container {{ message.role }}">
         @if (message.content === '') {
-          <div class="message">
+          <div class="message streaming" [style]="'view-transition-name: chat-message-id-' + message.timestamp">
             <span class="status">{{ status() }}...</span>
           </div>
         } @else {
-          <div class="message">
+          <div
+            class="message"
+            [ngClass]="{ aborted: message.aborted, streaming: message.stream }"
+            [style]="'view-transition-name: chat-message-id-' + message.timestamp"
+          >
             <div [innerHTML]="message.content | markdown"></div>
           </div>
         }
@@ -17,12 +21,19 @@
             <lib-spinner [spin]="true"></lib-spinner>
           } @else {
             {{ message.timestamp | date: 'short' }}
+            @if (message.aborted) {
+              <span class="material-symbols-outlined">block</span>
+            }
           }
         </div>
       </div>
     } @empty {
       <div class="message-container assistant">
-        <div class="message" [innerHTML]="welcomeMessage | markdown"></div>
+        <div
+          class="message"
+          style="view-transition-name: chat-message-id-welcome"
+          [innerHTML]="welcomeMessage | markdown"
+        ></div>
       </div>
     }
   </main>
@@ -36,10 +47,17 @@
           [formControl]="userPrompt"
           (keypress)="maybeSendMessage($event)"
         ></textarea>
-        <button type="submit" [disabled]="!userPrompt.getRawValue()">
-          <span class="material-symbols-outlined">send</span>
-          <span>Send</span>
-        </button>
+        @if (!isReplying()) {
+          <button type="submit" [disabled]="!userPrompt.getRawValue()">
+            <span class="material-symbols-outlined">send</span>
+            <span>Send</span>
+          </button>
+        } @else {
+          <button type="button" (click)="stopReply()">
+            <span class="material-symbols-outlined">pause</span>
+            <span>Stop</span>
+          </button>
+        }
       </label>
       <small class="progress">{{ progressText() }}</small>
     </form>

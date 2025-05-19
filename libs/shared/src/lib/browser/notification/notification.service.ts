@@ -2,7 +2,7 @@ import { isPlatformServer } from '@angular/common';
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { urlBase64ToUint8Array } from '../../utils/object';
 import { logMsg } from '../logger/logger';
-import { SERVICE_WORKER } from '../service-worker/service-worker';
+import { getServiceWorkerRegistration } from '../service-worker/service-worker';
 
 /**
  * Service to handle push notifications
@@ -19,7 +19,7 @@ export class NotificationService {
     if (isPlatformServer(this.platformId)) return undefined;
 
     // Setup notification
-    return await navigator.serviceWorker.getRegistration(SERVICE_WORKER);
+    return await getServiceWorkerRegistration();
   }
 
   async canSubscribe(): Promise<boolean> {
@@ -44,7 +44,7 @@ export class NotificationService {
     if (isPlatformServer(this.platformId)) return undefined;
 
     // Setup notification
-    const reg = await navigator.serviceWorker.getRegistration(SERVICE_WORKER);
+    const reg = await getServiceWorkerRegistration();
     if (!reg) throw new Error('Service worker not registered');
 
     // Check if we already have a subscription

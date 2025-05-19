@@ -56,8 +56,14 @@ export class ChatService {
   modelLoaded = toSignal(this.modelLoaded$, { initialValue: false });
 
   private chat = signal<ChatMessage[]>([...this.getInitialChat()]);
-  chatHistory = computed<ChatMessage[]>(() => [...this.chat(), ...this.messageQueue()]);
-  private messageQueue = signal<ChatMessage[]>([]);
+  chatHistory = computed<ChatMessage[]>(() => [...this.chat(), ...this.promptQueue()]);
+  private promptQueue = signal<ChatMessage[]>([]);
+  private messageHistory = computed(() => this.chat().filter((msg) => msg != null && !msg.stream));
+  private currentReply = computed<ChatMessage | undefined>(() => {
+    const messages = this.chat();
+    return messages.find((msg) => msg.stream);
+  });
+  isReplying = computed(() => this.currentReply() !== undefined);
   private processingQueue = false;
 
   engineConfig: MLCEngineConfig = {
@@ -110,11 +116,9 @@ export class ChatService {
       this.adapter = (await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' })) || undefined;
       this.loadedModel = undefined;
       let engine: MLCEngineInterface | undefined = undefined;
-      if ('serviceWorker' in navigator) {
-        if (await serviceWorkerActivated()) {
-          console.debug(...logMsg('debug', 'WebLLM', 'Creating service-worker engine...'));
-          engine = new ServiceWorkerMLCEngine(this.engineConfig, 5000);
-        }
+      if (await serviceWorkerActivated()) {
+        console.debug(...logMsg('debug', 'WebLLM', 'Creating service-worker engine...'));
+        engine = new ServiceWorkerMLCEngine(this.engineConfig, 5000);
       }
       if (!engine) {
         console.debug(...logMsg('debug', 'WebLLM', 'Creating web-worker engine...'));
@@ -217,6 +221,27 @@ export class ChatService {
     }
   }
 
+  stopMessage() {
+    if (this.engine) {
+      this.engine.interruptGenerate();
+    }
+    this.chat.update(() => {
+      const lastMessage = this.currentReply();
+      if (lastMessage) {
+        lastMessage.aborted = true;
+        return [...this.messageHistory(), lastMessage];
+      }
+      return [...this.messageHistory()];
+    });
+    // Only halt the queue if it has not yet begun responding
+    // Otherwise, let the `sendMessage` handle the message abortion.
+    if (this.processingQueue && this.status() !== ChatStatus.TYPING) {
+      this.promptQueue.set([]);
+      this.processingQueue = false;
+      this.setStatus(ChatStatus.IDLE);
+    }
+  }
+
   /**
    * Sends a message to the chat engine.
    *
@@ -227,12 +252,12 @@ export class ChatService {
   sendMessage(userPrompt: string) {
     if (userPrompt.length === 0) return;
     const message = { role: 'user', content: userPrompt, timestamp: Date.now() } as ChatMessage;
-    this.messageQueue.update((queue) => [...queue, message]);
+    this.promptQueue.update((queue) => [...queue, message]);
     this.prosessQueue();
   }
 
   private async prosessQueue() {
-    if (this.processingQueue || this.messageQueue().length === 0) return;
+    if (this.processingQueue || this.promptQueue().length === 0) return;
     this.processingQueue = true;
 
     if (this.engine == null) {
@@ -241,10 +266,10 @@ export class ChatService {
     }
 
     // Process messages from queue
-    const messages = this.messageQueue();
-    this.messageQueue.set([]);
-    this.chat.update((history) => [
-      ...history,
+    const messages = this.promptQueue();
+    this.promptQueue.set([]);
+    this.chat.update(() => [
+      ...this.messageHistory(),
       ...messages,
       // Put a response placeholder in chat history
       {
@@ -265,12 +290,14 @@ export class ChatService {
       console.debug(...logMsg('debug', 'WebLLM', 'Model loaded. Processing queue...'));
     }
 
+    // If the queue has been aborted, do not process it
+    if (!this.processingQueue) return;
     try {
       // Create payload
       this.setStatus(ChatStatus.TYPING);
       const chunks = await this.engine.chat.completions.create({
         stream: true,
-        messages: this.chatHistory().filter((msg) => !msg.stream),
+        messages: this.messageHistory(),
         temperature: 1,
         stream_options: { include_usage: true },
       });
@@ -281,13 +308,13 @@ export class ChatService {
         // Append the chunk to the reply
         reply += chunk.choices[0]?.delta.content ?? '';
         // Update the chat with the chunk
-        this.chat.update((history) => {
-          const lastMessage = history.find((msg) => msg.stream);
-          history = history.filter((msg) => msg.stream !== true);
+        this.chat.update(() => {
+          const lastMessage = this.currentReply();
           if (lastMessage) {
             lastMessage.content = reply;
+            return [...this.messageHistory(), lastMessage];
           }
-          return [...history, lastMessage!];
+          return [...this.messageHistory()];
         });
 
         if (chunk.usage) {
@@ -298,15 +325,26 @@ export class ChatService {
 
       // Replace the last message with the final reply
       const message = await this.engine!.getMessage();
-      this.chat.update((history) => {
-        history = history.filter((msg) => msg.stream !== true);
-        return [...history, { role: 'assistant', content: message, timestamp: Date.now() }];
-      });
+      if (message != null) {
+        this.chat.update(() => {
+          const lastMessage = this.currentReply();
+          const isAborted = lastMessage?.aborted;
+          return [
+            ...this.messageHistory(),
+            {
+              role: 'assistant',
+              content: message + (isAborted ? '...' : '') || '...',
+              timestamp: Date.now(),
+              aborted: isAborted,
+            },
+          ];
+        });
+      }
 
       // Clean up and make ready for next message
       this.processingQueue = false;
       this.setStatus(ChatStatus.IDLE);
-      if (this.messageQueue().length > 0) {
+      if (this.promptQueue().length > 0) {
         this.prosessQueue();
       }
     } catch (ex: any) {
@@ -314,18 +352,14 @@ export class ChatService {
       console.error(...logMsg('error', 'WebLLM', 'Error:', ex));
       this.setStatus(ChatStatus.ERROR);
       this.processingQueue = false;
-      this.chat.update((history) => {
-        const lastMessage = history.find((msg) => msg.stream);
-        history = history.filter((msg) => msg.stream !== true);
-        return [
-          ...history,
-          {
-            role: 'assistant',
-            content: `Error: ${ex}`,
-            timestamp: Date.now(),
-          },
-        ];
-      });
+      this.chat.update(() => [
+        ...this.messageHistory(),
+        {
+          role: 'assistant',
+          content: `Error: ${ex}`,
+          timestamp: Date.now(),
+        },
+      ]);
     }
   }
 

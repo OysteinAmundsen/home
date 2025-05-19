@@ -1,6 +1,11 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { NotificationContent } from '@home/backend/app/subscribe/notification.model';
 import { logMsg } from '@home/shared/browser/logger/logger';
+import {
+  SW_CACHE_PRECACHE,
+  SW_CACHE_PREFIX,
+  SW_CACHE_VERSION,
+} from '@home/shared/browser/service-worker/service-worker';
 import { ServiceWorkerMLCEngineHandler } from '@mlc-ai/web-llm';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { setCacheNameDetails } from 'workbox-core';
@@ -33,8 +38,6 @@ declare type ExtendableEvent = Event & {
   skipWaiting: () => Promise<any>;
 };
 
-const prefix = 'home';
-const version = 'v1';
 setDefaultHandler(new NetworkOnly());
 
 /**
@@ -43,9 +46,9 @@ setDefaultHandler(new NetworkOnly());
  * See https://goo.gl/S9QRab
  */
 setCacheNameDetails({
-  prefix: prefix,
-  suffix: version,
-  precache: 'precache',
+  prefix: SW_CACHE_PREFIX,
+  suffix: SW_CACHE_VERSION,
+  precache: SW_CACHE_PRECACHE,
 });
 const manifest = self.__WB_MANIFEST;
 precacheAndRoute(manifest);
@@ -77,13 +80,13 @@ registerRoute(
 
 // #region Cache and routes
 // Cache the Google Fonts stylesheets with a stale-while-revalidate strategy.
-googleFontsCache({ cachePrefix: `${prefix}-fonts` });
+googleFontsCache({ cachePrefix: `${SW_CACHE_PREFIX}-fonts` });
 
 // Cache any external images for 30 days
 registerRoute(
   /\.(png|gif|jpg|jpeg|svg|ico)$/,
   new CacheFirst({
-    cacheName: `${prefix}-images-${version}`,
+    cacheName: `${SW_CACHE_PREFIX}-images-${SW_CACHE_VERSION}`,
     plugins: [
       new CacheableResponsePlugin({ statuses: [200] }),
       new ExpirationPlugin({
@@ -98,7 +101,7 @@ registerRoute(
 registerRoute(
   ({ url }) => url.pathname.startsWith('/api'),
   new NetworkFirst({
-    cacheName: `${prefix}-api-${version}`,
+    cacheName: `${SW_CACHE_PREFIX}-api-${SW_CACHE_VERSION}`,
     plugins: [
       new CacheableResponsePlugin({ statuses: [200] }),
       new ExpirationPlugin({ maxAgeSeconds: 60 * 60 * 24 * 1 }),
