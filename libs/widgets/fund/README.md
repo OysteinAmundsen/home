@@ -1,7 +1,5 @@
 # widgets/fund
 
-This library was generated with [Nx](https://nx.dev).
+The project is an integration to nordnet.no and is an experiment using apache echarts. Its purpose is to compare the performance of a selection of fund instruments.
 
-## Running unit tests
-
-Run `nx test widgets/fund` to execute the unit tests.
+Fund details can be found at https://www.nordnet.no/fond/liste.

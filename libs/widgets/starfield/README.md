@@ -1,7 +1,3 @@
 # starfield
 
-This library was generated with [Nx](https://nx.dev).
-
-## Running unit tests
-
-Run `nx test starfield` to execute the unit tests.
+Inspired by the demo scene in the early 90s, this is a simple experiment using canvas and 2D context animating a starfield.
