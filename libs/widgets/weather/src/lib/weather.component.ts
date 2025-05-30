@@ -101,19 +101,19 @@ export default class WeatherComponent extends AbstractWidgetComponent implements
   /** Fetch weather data for current position using yr.no api */
   weather = resource({
     // Triggers
-    request: () => ({
+    params: () => ({
       url: this.url(),
       error: this.locationService.error(),
     }),
     // Actions
-    loader: async ({ request }) => {
+    loader: async ({ params }) => {
       // Present error if location gave an error
-      if (request.error) throw request.error;
+      if (params.error) throw params.error;
       // Die if location is not available
-      if (request.url == null) return undefined;
+      if (params.url == null) return undefined;
       // Fetch weather data for location
       return await firstValueFrom(
-        cache(() => this.http.get<any>(`${request.url}`), request.url, {
+        cache(() => this.http.get<any>(`${params.url}`), params.url, {
           expirationTime: this.cacheExpirationTime() - 2 * 60 * 1000,
         }),
       );

@@ -37,9 +37,9 @@ export class WidgetLoaderComponent {
    */
   private innerComponentLoader = resource({
     // Triggers
-    request: () => this.data()?.componentName,
+    params: () => this.data()?.componentName,
     // Actions
-    loader: async ({ request }) => this.widgetService.loadWidget(request),
+    loader: async ({ params }) => this.widgetService.loadWidget(params),
   });
 
   /**

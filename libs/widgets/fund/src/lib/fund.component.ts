@@ -101,18 +101,18 @@ export default class FundComponent extends AbstractWidgetComponent implements On
 
   // Load data
   dataLoader = resource({
-    request: () => ({
+    params: () => ({
       // Triggers
       instruments: this.settings.watchInstruments(),
       timeslot: this.selectedTimeslot(),
       showAll: this.showAll(),
       offset: this.currentPage(),
     }),
-    loader: async ({ request }) => {
+    loader: async ({ params }) => {
       // Load instrument data
-      if (!request.showAll && request.instruments.length === 0) return [];
-      const instruments = request.showAll ? [] : request.instruments;
-      const response = await firstValueFrom(this.fundService.getFundData(instruments, request.offset * 20));
+      if (!params.showAll && params.instruments.length === 0) return [];
+      const instruments = params.showAll ? [] : params.instruments;
+      const response = await firstValueFrom(this.fundService.getFundData(instruments, params.offset * 20));
       const data = response.results || [];
       this.totalInstruments.update(() => response.total_hits || 0);
 
@@ -120,7 +120,7 @@ export default class FundComponent extends AbstractWidgetComponent implements On
       await Promise.allSettled(
         data.map(async (item: any) => {
           const id = item.instrument_info.instrument_id;
-          const res = await firstValueFrom(this.fundService.getTimeSeries(id, request.timeslot));
+          const res = await firstValueFrom(this.fundService.getTimeSeries(id, params.timeslot));
           item.timeSeries = res;
         }),
       );

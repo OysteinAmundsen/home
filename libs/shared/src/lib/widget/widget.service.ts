@@ -31,12 +31,12 @@ export class WidgetService {
   private widgetsCache = [] as Widget[];
   private widgetsLoader = resource({
     // Triggers
-    request: () => this.url(),
+    params: () => this.url(),
     // Actions
-    loader: async ({ request }) => {
+    loader: async ({ params }) => {
       // Cannot use fetch directly because Angular's SSR does not support it.
       // I get a `TypeError: Failed to parse URL` from SSR when using fetch.
-      const widgets = await firstValueFrom(cache(() => this.http.get<Widget[]>(request), request));
+      const widgets = await firstValueFrom(cache(() => this.http.get<Widget[]>(params), params));
 
       // Remove old widgets from the cache
       this.widgetsCache = this.widgetsCache.filter((widget) => widgets.find((w) => w.id === widget.id));
