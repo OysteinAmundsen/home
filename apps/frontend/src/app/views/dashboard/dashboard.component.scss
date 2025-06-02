@@ -65,6 +65,10 @@ lib-popover menu {
   height: auto;
   flex: 1;
   view-transition-name: widget-container;
+  view-transition-group: contain;
+}
+::view-transition-group(.widget-area) {
+  overflow: clip;
 }
 footer div {
   text-align: right;

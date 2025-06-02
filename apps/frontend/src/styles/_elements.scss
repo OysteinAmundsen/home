@@ -1,3 +1,7 @@
+:root {
+  // Allows transitions between fixed and intrinsic sizes
+  interpolate-size: allow-keywords;
+}
 html {
   height: 100dvh;
 }
@@ -6,6 +10,9 @@ body {
 }
 * {
   box-sizing: border-box;
+}
+@view-transition {
+  navigation: auto;
 }
 ::view-transition-group(*) {
   animation-duration: var(--animation-duration);
@@ -44,6 +51,12 @@ a:visited {
 a:not(.button):has(> .material-symbols-outlined),
 a:not(.button):has(> .material-symbols-outlined):visited {
   color: inherit;
+}
+// Enables styling of the select element
+// Baseline newly available later 2025, available in Chrome 134
+select,
+::picker(select) {
+  appearance: base-select;
 }
 
 .spacer {
