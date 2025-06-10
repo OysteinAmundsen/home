@@ -1,27 +1,27 @@
 {
-  "name": "frontend",
+  "name": "dash",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "app",
-  "sourceRoot": "apps/frontend/src",
+  "sourceRoot": "apps/dash/src",
   "tags": [],
   "targets": {
     "pwa": {
       "executor": "@home/builder:application",
       "options": {
-        "buildTarget": "frontend:build",
-        "serviceWorker": "apps/frontend/src/sw.ts",
-        "tsConfig": "apps/frontend/tsconfig.wb.json"
+        "buildTarget": "dash:build",
+        "serviceWorker": "apps/dash/src/sw.ts",
+        "tsConfig": "apps/dash/tsconfig.wb.json"
       }
     },
     "build": {
       "executor": "@nx/angular:application",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/frontend",
-        "index": "apps/frontend/src/index.html",
-        "browser": "apps/frontend/src/main.ts",
-        "tsConfig": "apps/frontend/tsconfig.app.json",
+        "outputPath": "dist/apps/dash",
+        "index": "apps/dash/src/index.html",
+        "browser": "apps/dash/src/main.ts",
+        "tsConfig": "apps/dash/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "outputMode": "server",
         "externalDependencies": [
@@ -43,7 +43,7 @@
         "assets": [
           {
             "glob": "**/*",
-            "input": "apps/frontend/public"
+            "input": "apps/dash/public"
           },
           {
             "glob": "**/{swagger-ui.css,swagger-ui-bundle.js,swagger-ui-standalone-preset.js,favicon-32x32.png,favicon-16x16.png}",
@@ -51,13 +51,13 @@
             "output": "./api/api"
           }
         ],
-        "styles": ["apps/frontend/src/styles.scss"],
+        "styles": ["apps/dash/src/styles.scss"],
         "scripts": [],
-        "server": "apps/frontend/src/main.server.ts",
+        "server": "apps/dash/src/main.server.ts",
         "ssr": {
-          "entry": "apps/frontend/server.ts"
+          "entry": "apps/dash/server.ts"
         },
-        "plugins": ["apps/frontend/builders/custom-esbuild.ts"],
+        "plugins": ["apps/dash/builders/custom-esbuild.ts"],
         "loader": {
           ".wgsl": "text",
           ".md": "text"
@@ -93,10 +93,10 @@
       "executor": "@nx/angular:dev-server",
       "configurations": {
         "production": {
-          "buildTarget": "frontend:build:production"
+          "buildTarget": "dash:build:production"
         },
         "development": {
-          "buildTarget": "frontend:build:development"
+          "buildTarget": "dash:build:development"
         }
       },
       "defaultConfiguration": "development",
@@ -105,7 +105,7 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "buildTarget": "frontend:build"
+        "buildTarget": "dash:build"
       }
     },
     "lint": {
@@ -115,16 +115,16 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/frontend/jest.config.ts",
+        "jestConfig": "apps/dash/jest.config.ts",
         "webWorkerTsConfig": "libs/widgets/chat/tsconfig.worker.json"
       }
     },
     "serve-static": {
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "frontend:build",
+        "buildTarget": "dash:build",
         "port": 4200,
-        "staticFilePath": "dist/apps/frontend/browser",
+        "staticFilePath": "dist/apps/dash/browser",
         "spa": true
       }
     }

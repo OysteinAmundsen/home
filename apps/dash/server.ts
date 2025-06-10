@@ -5,7 +5,7 @@ import {
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
-import { createServer } from '@home/backend/';
+import { createServer } from '@home/dash-api/';
 import { Logger } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import express, { NextFunction, Request, Response } from 'express';

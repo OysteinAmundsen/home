@@ -53,10 +53,10 @@ class GenerateManifestAndInject {
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-  entry: './apps/frontend/src/sw.ts',
+  entry: './apps/dash/src/sw.ts',
   output: {
     filename: 'sw.js',
-    path: path.resolve('./dist/apps/frontend/browser'),
+    path: path.resolve('./dist/apps/dash/browser'),
   },
   module: {
     rules: [
@@ -68,7 +68,7 @@ module.exports = {
     ],
   },
   resolve: {
-    modules: ['./apps/frontend/src', 'node_modules'],
+    modules: ['./apps/dash/src', 'node_modules'],
     extensions: ['.ts', '.js'],
     plugins: [
       new TsconfigPathsPlugin({

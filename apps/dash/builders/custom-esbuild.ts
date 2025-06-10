@@ -11,7 +11,7 @@ export interface ManifestEntry {
 
 const MATCH_FILES = /^.+\.(js|css|svg|img|html|txt|webmanifest)$/i;
 const manifest: Map<string, ManifestEntry> = new Map();
-const appRoot = 'apps/frontend';
+const appRoot = 'apps/dash';
 const CACHE_BUST = /-[A-Z0-9]{8}\./;
 
 /**

@@ -20,8 +20,7 @@
     "typeRoots": ["./node_modules/@types"],
     "types": ["node", "express", "multer"],
     "paths": {
-      "//": ["Only widgets below here"],
-      "@home/backend*": ["apps/backend/src/*"],
+      "@home/dash-api*": ["apps/dash-api/src/*"],
       "@home/builder": ["tools/builder/src/index.ts"],
       "@home/shared": ["libs/shared/src/index.ts"],
       "@home/shared/*": ["libs/shared/src/lib/*"],

@@ -1,0 +1,10 @@
+{
+  "name": "dash-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/dash-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["dash"],
+  "// targets": "to see all targets run: nx show project dash-e2e --web",
+  "targets": {}
+}

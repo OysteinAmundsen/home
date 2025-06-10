@@ -51,8 +51,8 @@ export async function createServer(ssrMode = false): Promise<NestExpressApplicat
   app.use(compression());
 
   const config = new DocumentBuilder()
-    .setTitle('Home')
-    .setDescription('Documentation for the Home API')
+    .setTitle('Dashboard API')
+    .setDescription('Documentation for the Dashboard API')
     .setVersion('1.0')
     .build();
   const documentBuilder = () => SwaggerModule.createDocument(app, config);

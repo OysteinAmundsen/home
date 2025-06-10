@@ -35,8 +35,8 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [4200, 3000],
   "portsAttributes": {
-    "4200": { "label": "Frontend" },
-    "3000": { "label": "Backend" }
+    "4200": { "label": "dash" },
+    "3000": { "label": "dash-api" }
   },
   "runArgs": ["--network=host"]
 }

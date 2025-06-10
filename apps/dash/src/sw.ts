@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { NotificationContent } from '@home/backend/app/subscribe/notification.model';
+import { NotificationContent } from '@home/dash-api/app/subscribe/notification.model';
 import { logMsg } from '@home/shared/browser/logger/logger';
 import {
   SW_CACHE_PRECACHE,

@@ -9,7 +9,7 @@ This repository is a proof of concept playground for building a full-stack appli
 - [Browser API experimentation and permission handling best practices](#utilities)
 - Push notifications
 - Offline detection
-- [Dark/Light mode styling](./apps/frontend/src/styles/_variables.scss) with modern css functions
+- [Dark/Light mode styling](./apps/dash/src/styles/_variables.scss) with modern css functions
 - View transitions
 - [Widget dashboard system](#dashboard-system) where each widget is a [self-contained library](./libs/widgets/) with both dashboard and fullscreen views:
   - [Third-party integrations](#integrations) like met.no (weather data) and nordnet.no (financial data)
@@ -19,7 +19,7 @@ This repository is a proof of concept playground for building a full-stack appli
 This is a personal feature playground. It is not intended for production use.
 
 ![NX Graph](./docs/nx-graph.png)
-![Screenshot](./apps/frontend/public/screenshots/dashboard.png)
+![Screenshot](./apps/dash/public/screenshots/dashboard.png)
 
 ## How to Build and Run
 
@@ -34,9 +34,9 @@ This installs dependencies and starts the development server. You can also start
 
 ```bash
 # in one shell:
-bun run back
+bun run dash-api
 # and in another shell
-bun run front
+bun run dash
 ```
 
 ### Using npm Instead
@@ -60,7 +60,7 @@ This removes the `bun` lockfile, installs dependencies with `npm`, and replaces 
 
 Angular supports using an Express HTTP server for server-side rendering (SSR). This project extends that capability by integrating NestJS as a backend framework.
 
-In [server.ts](./apps/frontend/server.ts), a `NestExpressApplication` is created:
+In [server.ts](./apps/dash/server.ts), a `NestExpressApplication` is created:
 
 ```typescript
 const app = await NestFactory.create<NestExpressApplication>(ApiModule);
@@ -145,7 +145,7 @@ export class MyModule {}
 
 ## Service Worker
 
-This app is a PWA, requiring a [web manifest](./apps/frontend/public/manifest.webmanifest) and a [service worker script](./apps/frontend/src/sw.ts) registered at [startup](./libs/shared/src/lib/browser/service-worker/service-worker.ts).
+This app is a PWA, requiring a [web manifest](./apps/dash/public/manifest.webmanifest) and a [service worker script](./apps/dash/src/sw.ts) registered at [startup](./libs/shared/src/lib/browser/service-worker/service-worker.ts).
 
 One of the things a service worker does is preloading and caching static resources like JavaScript, CSS, and `index.html` in the client. Angular's built-in [ngsw](https://angular.dev/ecosystem/service-workers/config) generates a generic service worker at build time. However, for more control, this project uses [WorkBox](https://developer.chrome.com/docs/workbox). But WorkBox is not quite compatible with Angulars build process yet.
 
@@ -158,24 +158,24 @@ One of the things a service worker does is preloading and caching static resourc
 
 This project uses two custom plugins:
 
-1. [**Custom esbuild plugin**](./apps/frontend/builders/custom-esbuild.ts): Runs during `nx serve` to hook into esbuild's `onEnd` event. It generates a partial pre-cache list but cannot include CSS files.
-2. [**Custom webpack plugin**](./apps/frontend/builders/webpack.config.js): Runs during `nx build` to generate a complete pre-cache list from files written to disk.
+1. [**Custom esbuild plugin**](./apps/dash/builders/custom-esbuild.ts): Runs during `nx serve` to hook into esbuild's `onEnd` event. It generates a partial pre-cache list but cannot include CSS files.
+2. [**Custom webpack plugin**](./apps/dash/builders/webpack.config.js): Runs during `nx build` to generate a complete pre-cache list from files written to disk.
 
-The esbuild plugin is configured in [project.json](./apps/frontend/project.json):
+The esbuild plugin is configured in [project.json](./apps/dash/project.json):
 
 ```json
   "targets": {
     "build": {
       "executor": "@nx/angular:application",
       "options": {
-        "plugins": ["apps/frontend/builders/custom-esbuild.ts"],
+        "plugins": ["apps/dash/builders/custom-esbuild.ts"],
 ```
 
 For production builds, the pre-cache is overwritten using:
 
 ```bash
 nx build
-bun x webpack --config ./apps/frontend/builders/webpack.config.js
+bun x webpack --config ./apps/dash/builders/webpack.config.js
 ```
 
 This ensures an active service worker during both development and production, enabling testing of service worker-specific code without requiring production builds.
@@ -192,7 +192,7 @@ This repository includes reusable utilities. Feel free to use anything you find 
 - [ResizeObserver Directive](./libs/shared/src/lib/browser/resize/resize.directive.ts): Observes DOM element size changes
 - [Service Worker Initializer](./libs/shared/src/lib/browser/service-worker/service-worker.ts)
 - [LocalStorage Abstraction](./libs/shared/src/lib/browser/storage/storage.service.ts): Stores complex JSON structures in `localStorage`
-- [Theme Service](./libs/shared/src/lib/browser/theme/theme.service.ts): Manages dark/light mode using [CSS variables](./apps/frontend/src/styles/_variables.scss)
+- [Theme Service](./libs/shared/src/lib/browser/theme/theme.service.ts): Manages dark/light mode using [CSS variables](./apps/dash/src/styles/_variables.scss)
 - [Active Tab Listener](./libs/shared/src/lib/browser/visibility/visibility.service.ts): Detects if the browser tab is active, helping optimize background tasks
 
 ### rxjs Utilities
@@ -213,7 +213,7 @@ This repository includes reusable utilities. Feel free to use anything you find 
 
 This app features a dashboard of mini-applications (widgets), each lazily loaded. While individual routes can use Angular's `loadChildren`, displaying multiple widgets in a single view (dashboard) requires additional logic.
 
-The [dashboard view](./apps/frontend/src/app/views/dashboard/) uses a [widget-loader](./libs/shared/src/lib/widget/widget-loader.component.ts) to load widgets dynamically. Widgets are only loaded when instructed, minimizing client-side resource usage.
+The [dashboard view](./apps/dash/src/app/views/dashboard/) uses a [widget-loader](./libs/shared/src/lib/widget/widget-loader.component.ts) to load widgets dynamically. Widgets are only loaded when instructed, minimizing client-side resource usage.
 
 The [widget service](./libs/shared/src/lib/widget/widget.service.ts) references [widget routes](./libs/widgets/widget.routes.ts) to determine available widgets and their loading mechanisms. The dashboard view fetches a configuration from the backend (an array of widget names) and creates one widget-loader per widget. This approach also supports fullscreen widget routes.
 
@@ -223,7 +223,7 @@ This system allows for multiple dashboard configurations tailored to different n
 
 ### Integrations
 
-Third-party integrations use a [reverse proxy](./apps/frontend/proxy.routes.ts) configured in the [SSR Express server](./apps/frontend/server.ts):
+Third-party integrations use a [reverse proxy](./apps/dash/proxy.routes.ts) configured in the [SSR Express server](./apps/dash/server.ts):
 
 ```typescript
 import { createProxyMiddleware } from 'http-proxy-middleware';

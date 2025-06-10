@@ -54,7 +54,7 @@ COPY --from=installer /temp/dev/node_modules ./node_modules
 COPY . .
 
 RUN export NX_DAEMON=false NX_ISOLATE_PLUGINS=false && \
-    bun run nx run frontend:build:production --skip-nx-cache && \
+    bun run nx run dash:build:production --skip-nx-cache && \
     bun run build:wb
 
 ###########################################
@@ -73,4 +73,4 @@ COPY --from=builder /usr/src/app/package.json .
 
 # run the app
 EXPOSE 4200/tcp
-ENTRYPOINT [ "bun", "apps/frontend/server/server.mjs" ]
+ENTRYPOINT [ "bun", "apps/dash/server/server.mjs" ]

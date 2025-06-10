@@ -25,11 +25,11 @@ const externalWidgets = widgetFiles
 
 esbuild
   .build({
-    entryPoints: ['apps/backend/src/main.ts'], // Adjust the entry point as needed
+    entryPoints: ['apps/dash-api/src/main.ts'], // Adjust the entry point as needed
     bundle: true,
-    tsconfig: 'apps/backend/tsconfig.app.json',
+    tsconfig: 'apps/dash-api/tsconfig.app.json',
     platform: 'node',
-    outdir: 'dist/apps/backend',
+    outdir: 'dist/apps/dash-api',
     external: ['class-transformer', ...externalWidgets],
     sourcemap: !isProduction,
     minify: isProduction,
