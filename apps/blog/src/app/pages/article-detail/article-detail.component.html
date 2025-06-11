@@ -1,0 +1,36 @@
+@if (loading()) {
+  <lib-loading-spinner message="Loading article..."></lib-loading-spinner>
+} @else if (error()) {
+  <div class="error-container">
+    <h1>Article Not Found</h1>
+    <p>{{ error() }}</p>
+    <a [routerLink]="['/articles']" class="button">Go Back</a>
+  </div>
+} @else if (article()) {
+  <article>
+    @if (article()!.featuredImage) {
+      <div class="featured-image">
+        <img [src]="article()!.featuredImage" [alt]="article()!.title" />
+      </div>
+    }
+
+    <div class="container">
+      <header>
+        <h1 class="article-title">{{ article()!.title }}</h1>
+        <div class="article-meta">
+          <time [dateTime]="formatDateForAttribute(article()!.createdAt)">
+            {{ formatDate(article()!.createdAt) }}
+          </time>
+          <span class="reading-time">{{ getReadingTime() }} min read</span>
+        </div>
+      </header>
+      <div class="article-content">
+        <div class="content-renderer" [innerHTML]="article()!.content | markdown"></div>
+      </div>
+
+      <footer>
+        <a [routerLink]="['/articles']" class="button primary">← Back to Articles</a>
+      </footer>
+    </div>
+  </article>
+}

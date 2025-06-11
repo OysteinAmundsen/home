@@ -1,0 +1,36 @@
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.card-hover {
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+.featured-image {
+  width: 100%;
+  max-height: 400px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-2xl);
+  aspect-ratio: 16/9;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}

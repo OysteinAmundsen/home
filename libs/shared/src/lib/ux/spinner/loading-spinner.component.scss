@@ -1,0 +1,85 @@
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+
+  .spinner {
+    border: 3px solid var(--spinner-bg, #f3f3f3);
+    border-top: 3px solid var(--spinner-color, var(--color-primary, #007bff));
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .loading-message {
+    margin: 0;
+    color: var(--text-color, var(--color-text-secondary, #666));
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  // Size variations
+  &[data-size='small'] {
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border-width: 2px;
+    }
+
+    .loading-message {
+      font-size: 0.8rem;
+    }
+  }
+
+  &[data-size='medium'] {
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border-width: 3px;
+    }
+
+    .loading-message {
+      font-size: 0.9rem;
+    }
+  }
+
+  &[data-size='large'] {
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border-width: 4px;
+    }
+
+    .loading-message {
+      font-size: 1rem;
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Alternative pulse animation for accessibility
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner-container .spinner {
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

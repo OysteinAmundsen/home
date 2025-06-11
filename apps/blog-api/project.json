@@ -1,0 +1,50 @@
+{
+  "name": "blog-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/blog-api/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'Building blog api'"
+      },
+      "configurations": {
+        "development": {
+          "command": "cross-env NODE_ENV=development node apps/blog-api/esbuild.config.js",
+          "sourceMap": true,
+          "watch": true
+        },
+        "production": {
+          "command": "cross-env NODE_ENV=production node apps/blog-api/esbuild.config.js",
+          "bundle": true,
+          "minify": true
+        }
+      }
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "blog-api:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "blog-api:build:development"
+        },
+        "production": {
+          "buildTarget": "blog-api:build:production"
+        }
+      }
+    },
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    }
+  }
+}

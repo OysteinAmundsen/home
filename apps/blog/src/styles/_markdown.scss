@@ -1,0 +1,62 @@
+.markdown {
+  line-height: var(
+    --mat-form-field-container-text-line-height,
+    var(--mat-sys-body-large-line-height)
+  );
+  font-size: var(
+    --mat-form-field-container-text-size,
+    var(--mat-sys-body-large-size)
+  );
+  letter-spacing: var(
+    --mat-form-field-container-text-tracking,
+    var(--mat-sys-body-large-tracking)
+  );
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 8px;
+    margin-bottom: 14px;
+  }
+
+  p {
+    margin-bottom: 8px;
+    &:has(+ h1, + h2, + h3, + h4, + h5, + h6) {
+      margin-bottom: 32px;
+    }
+  }
+
+  ul,
+  ol {
+    margin-bottom: 8px;
+    padding-left: 20px;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--mat-sys-primary);
+    margin-left: 5px;
+    padding-left: 11px;
+    color: var(--mat-sys-secondary);
+  }
+
+  code {
+    background: var(--mat-sys-background);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', monospace;
+  }
+
+  pre {
+    background: var(--mat-sys-background);
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+  }
+}

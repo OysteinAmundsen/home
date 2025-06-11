@@ -1,0 +1,56 @@
+[
+  {
+    "id": "welcome-to-my-blog",
+    "title": "Welcome to My Blog",
+    "slug": "welcome-to-my-blog",
+    "content": "## Hello and Welcome!\n\nWelcome to my personal blog! This is a modern blog built with Angular 20 SSR and NestJS, featuring infinite scroll, dynamic content management, and a sleek admin interface.\n\n## What You'll Find Here\n![image](/article-images/angular-nest-nx.webp)\n\nI'll be sharing thoughts on web development, technology trends, and various projects I'm working on. Each article is crafted with care and attention to detail.\n\nThe blog supports rich content including images, code snippets, and various formatting options to make each post engaging and informative.",
+    "tags": [
+      "welcome",
+      "introduction",
+      "blog"
+    ],
+    "status": "published",
+    "publishedAt": "2024-12-14T10:00:00.000Z",
+    "createdAt": "2024-12-14T10:00:00.000Z",
+    "updatedAt": "2025-06-06T11:26:06.411Z",
+    "authorId": "admin",
+    "featuredImage": "/article-images/1749209166393-642134177.jpeg"
+  },
+  {
+    "id": "building-modern-web-apps",
+    "title": "Building Modern Web Applications with Angular and NestJS",
+    "slug": "building-modern-web-apps",
+    "content": "## The Power of Full-Stack TypeScript\n\nUsing TypeScript across your entire application stack brings numerous benefits including better code maintainability, improved developer experience, and reduced runtime errors.\n\n## Angular 19 SSR Benefits\n\nServer-Side Rendering (SSR) with Angular 19 provides excellent SEO capabilities, faster initial page loads, and better user experience on slower devices and networks.\n\nThe new control flow syntax and improved hydration make Angular 19 a compelling choice for modern web applications.\n\n## NestJS for Robust APIs\n\nNestJS provides a solid foundation for building scalable APIs with its decorator-based architecture, built-in dependency injection, and extensive ecosystem of modules.",
+    "tags": [
+      "angular",
+      "nestjs",
+      "typescript",
+      "ssr",
+      "web-development"
+    ],
+    "status": "published",
+    "publishedAt": "2024-12-13T14:30:00.000Z",
+    "createdAt": "2024-12-13T14:30:00.000Z",
+    "updatedAt": "2025-06-06T11:33:51.990Z",
+    "authorId": "admin",
+    "featuredImage": "/article-images/1749209631969-275891454.jpeg"
+  },
+  {
+    "id": "nx-monorepo-best-practices",
+    "title": "NX Monorepo Best Practices for Scalable Development",
+    "slug": "nx-monorepo-best-practices",
+    "content": "## Why Choose NX?\n\nNX is a powerful toolkit for managing monorepos that provides intelligent build caching, dependency graph visualization, and code generation tools that scale with your team.\n\n## Project Structure\n\nA well-organized NX workspace separates applications, libraries, and tools into logical boundaries. This separation makes code sharing easier and maintains clear architectural boundaries.\n\nLibraries should be focused on specific domains or functionality, making them reusable across multiple applications in your workspace.\n\n## Development Workflow\n\nNX's affected commands ensure you only build, test, and lint what has changed, significantly reducing CI/CD times and improving developer productivity.",
+    "tags": [
+      "nx",
+      "monorepo",
+      "development",
+      "architecture",
+      "best-practices"
+    ],
+    "status": "published",
+    "createdAt": "2024-12-12T09:15:00.000Z",
+    "updatedAt": "2025-06-06T11:27:17.634Z",
+    "authorId": "admin",
+    "featuredImage": "/article-images/1749209237612-534770738.jpeg"
+  }
+]

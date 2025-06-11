@@ -1,0 +1,37 @@
+<header>
+  <div class="container">
+    <h1 class="hero-title">Welcome to My Personal Blog</h1>
+    <p class="hero-subtitle">Sharing thoughts, experiences, and insights on technology, development, and life.</p>
+  </div>
+</header>
+
+<div class="container">
+  <section class="articles-section">
+    <h2 class="section-title">Latest Articles</h2>
+
+    @if (articleService.error()) {
+      <div class="error-message">
+        <p>{{ articleService.error() }}</p>
+        <button (click)="retry()" class="retry-button">Try Again</button>
+      </div>
+    }
+    @if (articleService.articles().length > 0) {
+      <div class="articles-grid">
+        @for (article of articleService.articles(); track article.id) {
+          <!-- @defer (on viewport) { -->
+          <app-article-card [article]="article"></app-article-card>
+          <!-- } @placeholder {
+            <div class="article-placeholder">Loading article...</div>
+          } -->
+        }
+      </div>
+    } @else if (!articleService.loading()) {
+      <div class="empty-state">
+        <p>No articles found. Check back later for new content!</p>
+      </div>
+    }
+    @if (articleService.loading()) {
+      <lib-loading-spinner message="Loading articles..."></lib-loading-spinner>
+    }
+  </section>
+</div>

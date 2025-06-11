@@ -1,0 +1,92 @@
+:root {
+  // Color Palette
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+
+  // Grayscale (only used colors)
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+
+  // Semantic Colors
+  --color-white: #ffffff;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #e1e5e9;
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+
+  // Status Colors
+  --color-error: #dc2626;
+  --color-error-dark: #b91c1c;
+  --color-error-light: #fef2f2;
+  --color-error-border: #fecaca;
+
+  // Gradient
+  --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  // Typography
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+  --font-size-4xl: 2.5rem;
+  --font-size-5xl: 3rem;
+
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.4;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.8;
+
+  // Spacing
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
+
+  // Border Radius
+  --radius-md: 0.5rem;
+
+  // Shadows
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  // Transitions
+  --transition-normal: 0.2s;
+
+  // Layout
+  --container-xl: 1280px;
+  --container-article: 800px;
+
+  // Z-index
+  --z-sticky: 20;
+
+  // Breakpoints (for use in media queries)
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+
+  // Component-specific sizing
+  --header-height: 4rem;
+  --nav-gap: 2rem;
+  --nav-gap-mobile: 1rem;
+
+  // Article specific
+  --article-max-width: 800px;
+  --article-grid-min-width: 350px;
+  --article-grid-gap: 2rem;
+  --article-grid-gap-mobile: 1.5rem;
+
+  // Content padding
+  --content-padding: 3rem;
+  --content-padding-mobile: 2rem;
+  --card-padding: 1.5rem;
+}

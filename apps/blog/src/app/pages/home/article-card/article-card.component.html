@@ -1,0 +1,22 @@
+<article class="card card-hover">
+  @if (article().featuredImage) {
+    <div class="featured-image">
+      <img [src]="article().featuredImage" [alt]="article().title" loading="lazy" />
+    </div>
+  }
+  <div class="card-content">
+    <h2 class="card-title">
+      <a [routerLink]="['/articles', article().slug]">{{ article().title }}</a>
+    </h2>
+    <div class="card-meta">
+      <time [dateTime]="formatDateForAttribute()">
+        {{ formatDate() }}
+      </time>
+      <span class="reading-time">{{ readingTime() }} min read</span>
+    </div>
+    <div class="card-excerpt">
+      {{ excerpt() }}
+    </div>
+    <a [routerLink]="['/articles', article().slug]" class="read-more primary"> Read more → </a>
+  </div>
+</article>

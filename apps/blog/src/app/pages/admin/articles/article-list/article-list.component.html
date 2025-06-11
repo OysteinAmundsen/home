@@ -1,0 +1,136 @@
+<div class="article-list">
+  <div class="header">
+    <h1>Articles</h1>
+    <button class="primary" routerLink="/admin/articles/new">
+      <span class="material-icons">add</span>
+      New Article
+    </button>
+  </div>
+
+  <section class="card filters-card">
+    <div class="filters">
+      <div class="form-field">
+        <label for="search">Search</label>
+        <input id="search" [(ngModel)]="searchTerm" (input)="onSearchChange()" placeholder="Search articles..." />
+        <span class="material-icons" matSuffix>search</span>
+      </div>
+
+      <div class="form-field">
+        <label for="status">Status</label>
+        <select id="status" [(ngModel)]="selectedStatus" (selectionChange)="onFilterChange()">
+          <option value="">All</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+    </div>
+  </section>
+  <section class="card table-card">
+    <div class="table-container">
+      <table class="articles-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Published</th>
+            <th>Last Updated</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td [attr.colspan]="displayedColumns.length" class="loading-cell">
+                <div class="loading-content">
+                  <span class="material-icons">refresh</span>
+                  Loading articles...
+                </div>
+              </td>
+            </tr>
+          } @else if (articles().length === 0) {
+            <tr>
+              <td [attr.colspan]="displayedColumns.length" class="no-data-cell">
+                <div class="no-data">
+                  <span class="material-icons">article</span>
+                  <h3>No articles found</h3>
+                  <p>Get started by creating your first article.</p>
+                  <button class="primary" routerLink="/articles/new">Create Article</button>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (article of articles(); track article.id) {
+              <tr>
+                <td>
+                  <div class="thumbnail-container">
+                    @if (article.featuredImage) {
+                      <img [src]="article.featuredImage" [alt]="article.title" class="article-thumbnail" />
+                    } @else {
+                      &nbsp;
+                    }
+                  </div>
+                </td>
+                <td>
+                  <a class="title-cell" [routerLink]="['/admin/articles/edit', article.slug]" matTooltip="Edit">
+                    <strong>{{ article.title }}</strong>
+                    <small>{{ article.slug }}</small>
+                  </a>
+                </td>
+                <td>
+                  <span class="status-chip" [ngClass]="getStatusColor(article.status)">
+                    {{ article.status }}
+                  </span>
+                </td>
+                <td>
+                  {{ article.publishedAt ? (article.publishedAt | date: 'short') : 'Not published' }}
+                </td>
+                <td>
+                  {{ article.updatedAt | date: 'short' }}
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="icon-button warn" (click)="deleteArticle(article)" matTooltip="Delete">
+                      <span class="material-icons">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (articles().length > 0) {
+      <nav class="paginator">
+        <button [disabled]="currentPage() === 1" (click)="onPageChange({ pageIndex: 0, pageSize: pageSize })">
+          « First
+        </button>
+        <button
+          [disabled]="currentPage() === 1"
+          (click)="onPageChange({ pageIndex: currentPage() - 2, pageSize: pageSize })"
+        >
+          ‹ Prev
+        </button>
+        <span> Page {{ currentPage() }} of {{ totalPages() }} </span>
+        <button
+          [disabled]="currentPage() === totalPages()"
+          (click)="onPageChange({ pageIndex: currentPage(), pageSize: pageSize })"
+        >
+          Next ›
+        </button>
+        <button
+          [disabled]="currentPage() === totalPages()"
+          (click)="onPageChange({ pageIndex: totalPages() - 1, pageSize: pageSize })"
+        >
+          Last »
+        </button>
+        <select [(ngModel)]="pageSize" (change)="onPageChange({ pageIndex: 0, pageSize: pageSize })">
+          <option *ngFor="let size of [5, 10, 25, 50]" [value]="size">{{ size }}</option>
+        </select>
+        <span>per page</span>
+      </nav>
+    }
+  </section>
+</div>

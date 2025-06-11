@@ -1,0 +1,38 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="'navigation'" [mode]="'side'" [opened]="true">
+    <section class="toolbar">Admin Panel</section>
+    <ul class="nav-list">
+      <li>
+        <a routerLink="/admin/dashboard" routerLinkActive="active">
+          <span class="material-icons">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/admin/articles" routerLinkActive="active">
+          <span class="material-icons">article</span>
+          <span>Articles</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/admin/articles/new">
+          <span class="material-icons">add</span>
+          <span>New Article</span>
+        </a>
+      </li>
+    </ul>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <section class="toolbar">
+      <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
+        <span class="material-icons" aria-label="Side nav toggle icon">menu</span>
+      </button>
+      <span>Blog Admin</span>
+    </section>
+
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

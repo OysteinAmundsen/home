@@ -1,0 +1,6 @@
+<div class="loading-spinner-container" [attr.data-size]="size()">
+  <div class="spinner"></div>
+  @if (showMessage() && message()) {
+  <p class="loading-message">{{ message() }}</p>
+  }
+</div>

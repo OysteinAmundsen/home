@@ -1,0 +1,39 @@
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 200px;
+}
+
+.sidenav .mat-toolbar {
+  background: inherit;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.mat-sidenav-content {
+  display: flex;
+  flex-direction: column;
+}
+.content {
+  padding: 20px;
+  flex: 1;
+  background-color: var(--mat-sys-inverse-on-surface);
+}
+
+.mat-nav-list .mat-list-item.active {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.mat-nav-list .mat-list-item mat-icon {
+  margin-right: 16px;
+}

@@ -1,0 +1,130 @@
+/* eslint-disable @nx/enforce-module-boundaries */
+import {
+  AngularNodeAppEngine,
+  createNodeRequestHandler,
+  isMainModule,
+  writeResponseToNodeResponse,
+} from '@angular/ssr/node';
+import { createServer } from '@home/blog-api/';
+import { Logger } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import express, { NextFunction, Request, Response } from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import net from 'node:net';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { proxyRoutes } from './proxy.routes';
+
+async function bootstrap() {
+  let app: NestExpressApplication | undefined;
+  let server: express.Express;
+
+  // Check if the blog-api server is already running
+  // If it is, we just start an express server for the Angular SSR
+  // If not, we create the NestJS application and start it
+  // Check if port 3001 is actively listening
+  const blogApiExists = await new Promise((resolve) => {
+    const tester = net
+      .createServer()
+      .once('error', () => resolve(true))
+      .once('listening', () => tester.close(() => resolve(false)))
+      .listen(3001);
+  });
+  if (blogApiExists) {
+    Logger.log('Blog API already up and running. Starting just Angular SSR.');
+    server = express();
+  } else {
+    // Create the NestJS application
+    app = await createServer();
+    server = app.getHttpAdapter().getInstance();
+  }
+
+  // Setup reverse proxy routes
+  Object.entries(proxyRoutes).forEach(([path, config]) => {
+    server.use(path, createProxyMiddleware(config));
+  });
+  if (blogApiExists) {
+    // Setup reverse proxy for the blog api
+    server.use(
+      '/api',
+      createProxyMiddleware({
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        pathRewrite: (path) => '/api' + path.replace(/^\/api/, ''),
+      }),
+    );
+  }
+
+  server.use((req: Request, res: Response, next: NextFunction) => {
+    // ADD SECURITY HEADERS
+    // The 'unsafe-inline' are for the inline scripts in the Angular app
+    // They are included inline by the framework and are responsible for
+    // "jsaction" event replay. We tried to use sha's here to avoid unsafe-inline,
+    // but the sha's are different on every build, so we can't use them.
+    const csp = `
+    default-src 'self';
+      script-src  'self' 'unsafe-inline' 'unsafe-eval';
+      style-src   'self' 'unsafe-inline' fonts.googleapis.com;
+      img-src     'self' data:;
+      font-src    'self' fonts.gstatic.com;
+      connect-src 'self' fonts.gstatic.com huggingface.co raw.githubusercontent.com cdn-lfs-us-1.hf.co;
+      `.replace(/\n/g, '');
+    res.setHeader('Content-Security-Policy', csp);
+
+    const permissions = ['geolocation=(self)', 'microphone=(self)'];
+    res.setHeader('Permissions-Policy', permissions.join(', '));
+    next();
+  });
+
+  // Serve static files from the browser distribution folder
+  const distFolder = dirname(fileURLToPath(import.meta.url));
+  const webRootFolder = resolve(distFolder, '../browser');
+  server.use(
+    '*splat',
+    express.static(webRootFolder, {
+      maxAge: '1y',
+      index: false, // Don't serve index.html for non-existing files
+    }),
+  );
+
+  // SSR middleware: Render out the angular application server-side
+  const angularNodeAppEngine = new AngularNodeAppEngine();
+  server.use('*splat', (req, res, next) => {
+    // If the request is for an API route, skip SSR and continue to the next middleware
+    if (req.baseUrl.startsWith('/api')) {
+      return next();
+    }
+    // Otherwise try SSR the Angular application
+    angularNodeAppEngine
+      .handle(req, {
+        server: 'express',
+        request: req,
+        response: res,
+        cookies: req.headers.cookie,
+      })
+      .then((response) => {
+        // If the Angular app returned a response, write it to the Express response
+        if (response) {
+          return writeResponseToNodeResponse(response, res);
+        }
+        // If not, this is not an Angular route, so continue to the next middleware
+        return next();
+      })
+      .catch(next);
+  });
+
+  // Initialize the NestJS application and return the server
+  if (app != null) app.init();
+  return server;
+}
+
+const server = await bootstrap();
+if (isMainModule(import.meta.url)) {
+  const port = process.env.PORT || 4201;
+  server.listen(port, () => {
+    Logger.log(`SSR server listening on http://localhost:${port}`);
+  });
+}
+
+// This exposes the RequestHandler
+export const reqHandler = createNodeRequestHandler(server);
