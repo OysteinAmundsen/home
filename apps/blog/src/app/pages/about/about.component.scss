@@ -1,5 +1,4 @@
 :host {
-  min-height: 80vh;
   padding: var(--content-padding) 0;
 
   @media (max-width: #{var(--breakpoint-md)}) {

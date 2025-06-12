@@ -105,7 +105,7 @@ Wrap up your article here.
   onArticleError = effect(() => {
     if (this.article.error()) {
       console.error('Error loading article:', this.article.error());
-      this.snackBar.open('Error loading article', 'Close', { duration: 5000 });
+      this.snackBar.open('Error loading article', 'error', { duration: 5000 });
       this.router.navigate(['/admin/articles']);
       return;
     }
@@ -131,14 +131,14 @@ Wrap up your article here.
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
-        this.snackBar.open('Only image files are allowed (JPEG, PNG, WebP, GIF)', 'Close', { duration: 5000 });
+        this.snackBar.open('Only image files are allowed (JPEG, PNG, WebP, GIF)', 'warn', { duration: 5000 });
         return;
       }
 
       // Validate file size (5MB max)
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        this.snackBar.open('File size must be less than 5MB', 'Close', { duration: 5000 });
+        this.snackBar.open('File size must be less than 5MB', 'warn', { duration: 5000 });
         return;
       }
 
@@ -172,7 +172,7 @@ Wrap up your article here.
   }
   private async saveArticle(status: ArticleStatus) {
     if (this.articleForm.invalid) {
-      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 5000 });
+      this.snackBar.open('Please fill in all required fields', 'warn', { duration: 5000 });
       return;
     }
 
@@ -198,17 +198,17 @@ Wrap up your article here.
 
       if (this.isEditMode()) {
         await this.articleService.updateArticle(articleData.id, articleData);
-        this.snackBar.open('Article updated successfully!', 'Close', { duration: 3000 });
+        this.snackBar.open('Article updated successfully!', 'info', { duration: 5000 });
       } else {
         await this.articleService.createArticle(articleData);
-        this.snackBar.open('Article created successfully!', 'Close', { duration: 3000 });
+        this.snackBar.open('Article created successfully!', 'info', { duration: 5000 });
       }
       // Update initial form value after successful save
       this.initialFormValue = this.articleForm.value;
       this.router.navigate(['/admin/articles']);
     } catch (error) {
       console.error('Error saving article:', error);
-      this.snackBar.open('Error saving article. Please try again.', 'Close', { duration: 5000 });
+      this.snackBar.open('Error saving article. Please try again.', 'error', { duration: 5000 });
     } finally {
       this.isSaving.set(false);
     }

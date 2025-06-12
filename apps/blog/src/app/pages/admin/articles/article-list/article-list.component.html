@@ -17,7 +17,7 @@
 
       <div class="form-field">
         <label for="status">Status</label>
-        <select id="status" [(ngModel)]="selectedStatus" (selectionChange)="onFilterChange()">
+        <select id="status" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
           <option value="">All</option>
           <option value="published">Published</option>
           <option value="draft">Draft</option>

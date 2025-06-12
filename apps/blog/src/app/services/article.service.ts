@@ -1,11 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable, linkedSignal, resource, signal } from '@angular/core';
+import { ArticleStatus } from '@home/shared/blog/enums';
 import { Article, PaginatedResponse } from '@home/shared/blog/interfaces';
 import { firstValueFrom, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiService } from './api.service';
 import { ArticleQueryParams, CreateArticleDto } from './article.types';
-import { ArticleStatus } from '@home/shared/blog/enums';
 
 @Injectable({
   providedIn: 'root',
@@ -69,21 +69,6 @@ export class ArticleService {
   readonly currentPage = computed(() => this.articlesResource.value()?.page || 1);
   readonly totalPages = computed(() => this.articlesResource.value()?.totalPages || 1);
 
-  // Published articles view (status: 'published')
-  readonly publishedArticles = computed(() =>
-    this._query().status === ArticleStatus.PUBLISHED && !this._query().all ? this.articles() : [],
-  );
-
-  // Admin articles view (all or status != 'published')
-  readonly adminArticles = computed(() =>
-    this._query().all || this._query().status !== ArticleStatus.PUBLISHED ? this.articles() : [],
-  );
-  readonly adminLoading = this.loading;
-  readonly adminError = this.error;
-  readonly adminTotalArticles = this.totalArticles;
-  readonly adminCurrentPage = this.currentPage;
-  readonly adminTotalPages = this.totalPages;
-
   // Methods to update query parameters for different views
   loadArticles(params?: ArticleQueryParams): void {
     // Published view: status 'published', all false
@@ -125,11 +110,6 @@ export class ArticleService {
     this._articleSlug.set(slug);
   }
 
-  reset(): void {
-    this._query.set({ page: 1, limit: 10, status: ArticleStatus.PUBLISHED, all: false, search: undefined });
-    this._articleSlug.set('');
-  }
-
   getAdminArticles(params: ArticleQueryParams = {}): Observable<PaginatedResponse<Article>> {
     let httpParams = new HttpParams();
 
@@ -145,10 +125,6 @@ export class ArticleService {
 
   async getArticleById(id: string): Promise<Article> {
     return await firstValueFrom(this.http.get<Article>(`${this.apiUrl}/${id}`));
-  }
-
-  async getAdminArticleBySlug(slug: string): Promise<Article> {
-    return await firstValueFrom(this.http.get<Article>(`${this.apiUrl}/${slug}`));
   }
 
   async createArticle(article: CreateArticleDto): Promise<Article> {

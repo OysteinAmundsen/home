@@ -8,6 +8,11 @@
   margin: 0;
 }
 
+:root {
+  // Allows transitions between fixed and intrinsic sizes
+  interpolate-size: allow-keywords;
+}
+
 html {
   height: 100%;
   line-height: var(--line-height-normal);
@@ -35,6 +40,13 @@ button,
 textarea,
 select {
   font: inherit;
+}
+select {
+  /* opt into customizing select */
+  &,
+  &::picker(select) {
+    appearance: base-select;
+  }
 }
 
 p,

@@ -13,18 +13,18 @@ import { ArticleService } from '../../../services/article.service';
 })
 export class DashboardComponent implements OnInit {
   private readonly articleService = inject(ArticleService); // Computed signals derived from the article service
-  readonly totalArticles = computed(() => this.articleService.adminArticles().length);
+  readonly totalArticles = computed(() => this.articleService.articles().length);
   readonly publishedArticles = computed(
-    () => this.articleService.adminArticles().filter((a: Article) => a.status === ArticleStatus.PUBLISHED).length,
+    () => this.articleService.articles().filter((a: Article) => a.status === ArticleStatus.PUBLISHED).length,
   );
   readonly draftArticles = computed(
-    () => this.articleService.adminArticles().filter((a: Article) => a.status === ArticleStatus.DRAFT).length,
+    () => this.articleService.articles().filter((a: Article) => a.status === ArticleStatus.DRAFT).length,
   );
 
   constructor() {
     // Effect to handle errors
     effect(() => {
-      const error = this.articleService.adminError();
+      const error = this.articleService.error();
       if (error) {
         console.error('Error loading articles for stats:', error);
       }

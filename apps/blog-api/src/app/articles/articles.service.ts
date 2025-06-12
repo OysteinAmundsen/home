@@ -82,7 +82,7 @@ export class ArticlesService {
    * This is used for static page generation
    */
   async findBySlug(slug: string): Promise<ArticleResponseDto> {
-    const article = (await this.loadAllArticles()).find((a) => a.slug === slug && a.status === ArticleStatus.PUBLISHED);
+    const article = (await this.loadAllArticles()).find((a) => a.slug === slug);
 
     if (!article) {
       throw new NotFoundException(`Published article with slug "${slug}" not found`);

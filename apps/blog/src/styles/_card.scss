@@ -3,6 +3,9 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  header {
+    display: flex;
+  }
 }
 
 .card-hover {

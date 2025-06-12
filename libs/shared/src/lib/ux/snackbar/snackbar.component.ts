@@ -4,15 +4,12 @@ import { Component, ElementRef, OnDestroy, signal, viewChild } from '@angular/co
   selector: 'lib-snackbar',
   template: `
     <!-- Always visible anchor element -->
-    <div #anchor class="snackbar-anchor"></div>
+    <div #anchor class="snackbar-anchor" popovertarget="snackbar"></div>
 
     <!-- Popover content using native Popover API -->
-    <div #popover class="snackbar-popover" popover="manual" role="alert" aria-live="polite">
+    <div id="snackbar" #popover class="snackbar-popover {{ type() }}" popover="manual" role="alert" aria-live="polite">
       <div class="snackbar-content">
         <span class="snackbar-message">{{ message() }}</span>
-        <button type="button" class="snackbar-close" (click)="close()" aria-label="Close notification">
-          {{ action() }}
-        </button>
       </div>
     </div>
   `,
@@ -26,6 +23,7 @@ import { Component, ElementRef, OnDestroy, signal, viewChild } from '@angular/co
     }
 
     .snackbar-anchor {
+      anchor-name: --snackbarAnchor;
       width: 1px;
       height: 1px;
       position: absolute;
@@ -37,8 +35,6 @@ import { Component, ElementRef, OnDestroy, signal, viewChild } from '@angular/co
       /* Let the Popover API handle z-index and backdrop behavior */
       min-width: 300px;
       max-width: 600px;
-      background: var(--snackbar-bg, #323232);
-      color: var(--snackbar-color, white);
       border: none;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -46,8 +42,9 @@ import { Component, ElementRef, OnDestroy, signal, viewChild } from '@angular/co
       padding: 0;
 
       /* Position at bottom center */
-      position: fixed;
-      bottom: 20px;
+      position-anchor: --snackbarAnchor;
+      top: unset;
+      bottom: calc(anchor(bottom) + 0.2rem);
       left: 50%;
       transform: translateX(-50%) translateY(100%);
 
@@ -60,6 +57,23 @@ import { Component, ElementRef, OnDestroy, signal, viewChild } from '@angular/co
 
       /* Starting state (hidden) */
       opacity: 0;
+      &.info {
+        background: var(--snackbar-bg, #323232);
+        color: var(--snackbar-color, white);
+      }
+      &.warn {
+        background: var(--snackbar-bg, #ff9800);
+        color: var(--snackbar-color, white);
+      }
+      &.error {
+        background: var(--snackbar-bg, #f44336);
+        color: var(--snackbar-color, white);
+      }
+
+      @starting-style {
+        transform: translateX(-50%) translateY(100%);
+        opacity: 0;
+      }
     }
 
     .snackbar-popover:popover-open {
@@ -81,28 +95,6 @@ import { Component, ElementRef, OnDestroy, signal, viewChild } from '@angular/co
       font-size: 14px;
       line-height: 1.4;
     }
-
-    .snackbar-close {
-      background: none;
-      border: none;
-      color: inherit;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 4px;
-      opacity: 0.8;
-      transition: opacity 0.2s;
-      flex-shrink: 0;
-    }
-
-    .snackbar-close:hover {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .snackbar-close:focus {
-      outline: 2px solid rgba(255, 255, 255, 0.5);
-      outline-offset: 2px;
-    }
   `,
 })
 export class SnackbarComponent implements OnDestroy {
@@ -110,14 +102,14 @@ export class SnackbarComponent implements OnDestroy {
     viewChild.required<ElementRef<HTMLElement & { showPopover: () => void; hidePopover: () => void }>>('popover');
 
   protected readonly message = signal('');
-  protected readonly action = signal('Close');
+  protected readonly type = signal<'info' | 'warn' | 'error'>('info');
 
   private hideTimeout?: number;
 
-  show(message: string, action = 'Close', options: { duration: number } = { duration: 3000 }): void {
+  show(message: string, type: 'info' | 'warn' | 'error', options: { duration: number } = { duration: 3000 }): void {
     this.clearTimeout();
     this.message.set(message);
-    this.action.set(action);
+    this.type.set(type);
 
     // Use native Popover API
     const popoverElement = this.popover().nativeElement;
@@ -132,6 +124,8 @@ export class SnackbarComponent implements OnDestroy {
   close(): void {
     const popoverElement = this.popover().nativeElement;
     popoverElement.hidePopover();
+    this.message.set('');
+    this.type.set('info');
     this.clearTimeout();
   }
 

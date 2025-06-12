@@ -1,39 +1,17 @@
-.sidenav-container {
-  height: 100vh;
-}
-
-.sidenav {
-  width: 200px;
-}
-
-.sidenav .mat-toolbar {
-  background: inherit;
-}
-
-.mat-toolbar.mat-primary {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.spacer {
-  flex: 1 1 auto;
-}
-
-.mat-sidenav-content {
-  display: flex;
-  flex-direction: column;
-}
-.content {
-  padding: 20px;
+:host {
+  display: grid;
+  grid-template: 'nav content' 1fr / auto 1fr;
   flex: 1;
-  background-color: var(--mat-sys-inverse-on-surface);
 }
-
-.mat-nav-list .mat-list-item.active {
-  background-color: rgba(0, 0, 0, 0.04);
+aside {
+  grid-area: nav;
+  padding: var(--content-padding);
+  background-color: var(--color-surface);
 }
-
-.mat-nav-list .mat-list-item mat-icon {
-  margin-right: 16px;
+section {
+  grid-area: content;
+  padding: var(--content-padding);
+  @media (max-width: var(--breakpoint-md)) {
+    padding: var(--content-padding-mobile);
+  }
 }

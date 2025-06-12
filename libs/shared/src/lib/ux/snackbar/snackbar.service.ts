@@ -35,9 +35,9 @@ export class SnackbarService {
     return this.snackbarComponentRef.instance;
   }
 
-  open(message: string, action: string, options: { duration: number } = { duration: 3000 }): void {
+  open(message: string, type: 'info' | 'warn' | 'error', options: { duration: number } = { duration: 3000 }): void {
     const snackbar = this.getOrCreateSnackbarElement();
-    snackbar.show(message, action, options);
+    snackbar.show(message, type, options);
   }
 
   close(): void {

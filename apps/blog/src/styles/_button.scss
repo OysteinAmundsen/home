@@ -11,16 +11,16 @@ button {
   text-align: center;
   &.primary {
     background: var(--color-primary);
-    color: var(--color-white);
+    color: var(--color-surface);
 
     &:hover {
       background: var(--color-primary-dark);
-      color: var(--color-white);
+      color: var(--color-surface);
     }
   }
   &.secondary {
     background: var(--color-gray-500);
-    color: var(--color-white);
+    color: var(--color-surface);
 
     &:hover {
       background: var(--color-gray-600);
@@ -28,7 +28,7 @@ button {
   }
   &.error {
     background: var(--color-error);
-    color: var(--color-white);
+    color: var(--color-surface);
 
     &:hover {
       background: var(--color-error-dark);

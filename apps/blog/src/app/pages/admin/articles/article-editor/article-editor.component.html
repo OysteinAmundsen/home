@@ -1,114 +1,112 @@
-<div class="article-editor">
-  <div class="header">
-    <h1>{{ isEditMode() ? 'Edit Article' : 'New Article' }}</h1>
-    <div class="header-actions">
-      <button (click)="goBack()">Cancel</button>
-      <button class="accent" (click)="saveDraft()" [disabled]="articleForm.invalid || isSaving()">Save Draft</button>
-      <button class="primary" (click)="publish()" [disabled]="articleForm.invalid || isSaving()">
-        {{ isEditMode() ? 'Update' : 'Publish' }}
-      </button>
-    </div>
+<header>
+  <h1>{{ isEditMode() ? 'Edit Article' : 'New Article' }}</h1>
+  <div class="header-actions">
+    <button (click)="goBack()">Cancel</button>
+    <button class="accent" (click)="saveDraft()" [disabled]="articleForm.invalid || isSaving()">Save Draft</button>
+    <button class="primary" (click)="publish()" [disabled]="articleForm.invalid || isSaving()">
+      {{ isEditMode() ? 'Update' : 'Publish' }}
+    </button>
   </div>
+</header>
 
-  <form [formGroup]="articleForm" class="article-form">
-    <section class="card metadata-card">
-      <header>
-        <h2>Article Details</h2>
-      </header>
+<form [formGroup]="articleForm">
+  <section class="card metadata-card">
+    <header>
+      <h2>Article Details</h2>
+    </header>
 
-      <div class="card-content">
-        <div class="form-field full-width">
-          <label for="title">Title</label>
-          <input id="title" formControlName="title" placeholder="Enter article title" required />
-        </div>
-        <div class="image-upload-section">
-          <label for="featuredImage" class="image-upload-label">Featured Image</label>
+    <div class="card-content">
+      <div class="form-field full-width">
+        <label for="title">Title</label>
+        <input id="title" formControlName="title" placeholder="Enter article title" required />
+      </div>
+      <div class="image-upload-section">
+        <label for="featuredImage" class="image-upload-label">Featured Image</label>
 
-          <div class="image-upload-container">
-            @if (imagePreviewUrl()) {
-              <div class="image-preview">
-                <img [src]="imagePreviewUrl()" alt="Featured image preview" />
-                <button
-                  type="button"
-                  mat-icon-button
-                  class="remove-image-btn"
-                  (click)="removeImage()"
-                  title="Remove image"
-                >
-                  <span class="material-icons">close</span>
-                </button>
-              </div>
-            } @else {
-              <div
-                class="image-upload-placeholder"
-                (click)="fileInput.click()"
-                tabindex="0"
-                (keypress)="fileInput.click()"
+        <div class="image-upload-container">
+          @if (imagePreviewUrl()) {
+            <div class="image-preview">
+              <img [src]="imagePreviewUrl()" alt="Featured image preview" />
+              <button
+                type="button"
+                mat-icon-button
+                class="remove-image-btn"
+                (click)="removeImage()"
+                title="Remove image"
               >
-                <span class="material-icons">add_photo_alternate</span>
-                <p>Click to select an image</p>
-                <p class="upload-hint">JPEG, PNG, WebP, GIF (max 5MB)</p>
-              </div>
-            }
-
-            <input
-              id="featuredImage"
-              #fileInput
-              type="file"
-              accept="image/*"
-              (change)="onFileSelected($event)"
-              style="display: none"
-            />
-
-            <button
-              type="button"
-              mat-stroked-button
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+          } @else {
+            <div
+              class="image-upload-placeholder"
               (click)="fileInput.click()"
-              class="{{ !imagePreviewUrl() ? 'select-' : 'change-' }}file-btn"
+              tabindex="0"
+              (keypress)="fileInput.click()"
             >
-              <span class="material-icons">{{ !imagePreviewUrl() ? 'upload' : 'edit' }}</span>
-              {{ !imagePreviewUrl() ? 'Select Image' : 'Change Image' }}
-            </button>
-          </div>
+              <span class="material-icons">add_photo_alternate</span>
+              <p>Click to select an image</p>
+              <p class="upload-hint">JPEG, PNG, WebP, GIF (max 5MB)</p>
+            </div>
+          }
+
+          <input
+            id="featuredImage"
+            #fileInput
+            type="file"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            style="display: none"
+          />
+
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="fileInput.click()"
+            class="{{ !imagePreviewUrl() ? 'select-' : 'change-' }}file-btn"
+          >
+            <span class="material-icons">{{ !imagePreviewUrl() ? 'upload' : 'edit' }}</span>
+            {{ !imagePreviewUrl() ? 'Select Image' : 'Change Image' }}
+          </button>
         </div>
       </div>
-    </section>
-
-    <section class="card content-card">
-      <header>
-        <h2>Content {{ showPreview() ? '(Markdown)' : 'Preview' }}</h2>
-        <div class="spacer"></div>
-        <button
-          type="button"
-          mat-icon-button
-          (click)="togglePreview()"
-          [class.active]="showPreview()"
-          [title]="showPreview() ? 'Preview' : 'Edit Markdown'"
-        >
-          <span class="material-icons">{{ !showPreview() ? 'visibility_off' : 'visibility' }}</span>
-        </button>
-      </header>
-      <div class="card-content">
-        @if (!showPreview()) {
-          <div class="editor-content markdown" [innerHTML]="articleForm.get('content')?.value ?? '' | markdown"></div>
-        } @else {
-          <div class="form-field full-width full-height no-hint">
-            <textarea
-              #markdownEditor
-              class="code-view"
-              formControlName="content"
-              placeholder="Enter markdown here..."
-            ></textarea>
-          </div>
-        }
-      </div>
-    </section>
-  </form>
-
-  @if (isSaving()) {
-    <div class="saving-overlay">
-      <lib-loading-spinner></lib-loading-spinner>
-      <p>Saving article...</p>
     </div>
-  }
-</div>
+  </section>
+
+  <section class="card content-card">
+    <header>
+      <h2>Content {{ showPreview() ? '(Markdown)' : 'Preview' }}</h2>
+      <div class="spacer"></div>
+      <button
+        type="button"
+        mat-icon-button
+        (click)="togglePreview()"
+        [class.active]="showPreview()"
+        [title]="showPreview() ? 'Preview' : 'Edit Markdown'"
+      >
+        <span class="material-icons">{{ !showPreview() ? 'visibility_off' : 'visibility' }}</span>
+      </button>
+    </header>
+    <div class="card-content">
+      @if (!showPreview()) {
+        <div class="editor-content markdown" [innerHTML]="articleForm.get('content')?.value ?? '' | markdown"></div>
+      } @else {
+        <div class="form-field full-width full-height no-hint">
+          <textarea
+            #markdownEditor
+            class="code-view"
+            formControlName="content"
+            placeholder="Enter markdown here..."
+          ></textarea>
+        </div>
+      }
+    </div>
+  </section>
+</form>
+
+@if (isSaving()) {
+  <div class="saving-overlay">
+    <lib-loading-spinner></lib-loading-spinner>
+    <p>Saving article...</p>
+  </div>
+}

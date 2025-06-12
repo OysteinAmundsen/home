@@ -1,9 +1,10 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { ArticleStatus } from '@home/shared/blog/enums';
 import { LoadingSpinnerComponent } from '@home/shared/ux/spinner/loading-spinner.component';
 import { Subject } from 'rxjs';
-import { ArticleCardComponent } from './article-card/article-card.component';
 import { ArticleService } from '../../services/article.service';
+import { ArticleCardComponent } from './article-card/article-card.component';
 
 @Component({
   selector: 'app-home',
@@ -19,10 +20,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Only load articles on browser side to prevent SSR issues
-    if (isPlatformBrowser(this.platformId)) {
-      // Load all articles at once
-      this.articleService.loadArticles();
-    }
+    this.retry();
   }
 
   ngOnDestroy(): void {
@@ -31,9 +29,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   retry(): void {
-    this.articleService.reset();
     if (isPlatformBrowser(this.platformId)) {
-      this.articleService.loadArticles();
+      this.articleService.loadArticles({ status: ArticleStatus.PUBLISHED });
     }
   }
 }

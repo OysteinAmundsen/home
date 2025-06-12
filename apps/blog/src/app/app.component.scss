@@ -34,13 +34,18 @@ nav {
 
 .nav-links {
   display: flex;
+  place-items: center;
   list-style: none;
   margin: 0;
   padding: 0;
   gap: var(--nav-gap);
+  height: 100%;
 
   @media (max-width: var(--breakpoint-md)) {
     gap: var(--nav-gap-mobile);
+  }
+  li {
+    height: 100%;
   }
 
   a {
@@ -48,7 +53,9 @@ nav {
     color: var(--color-text-muted);
     font-weight: var(--font-weight-medium);
     transition: color var(--transition-normal);
-
+    display: flex;
+    place-items: center;
+    height: 100%;
     &:hover,
     &.active {
       color: var(--color-primary);
@@ -65,10 +72,12 @@ nav {
 main {
   flex: 1;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 footer {
-  background: var(--color-background);
+  background: var(--color-surface);
   border-top: 1px solid var(--color-border);
   margin-top: auto;
   padding: var(--spacing-2xl) 0;

@@ -2,10 +2,29 @@
   <div class="container">
     <nav>
       <a routerLink="/" class="logo primary">
-        <img src="/logo.svg" alt="Logo" width="32" height="32" style="margin-right: 0.5rem" />
+        <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <!-- Base rectangles -->
+          <rect x="4" y="8" width="16" height="3" fill="currentColor" transform="rotate(15 12 9.5)" />
+          <rect x="12" y="13" width="16" height="3" fill="currentColor" transform="rotate(-15 20 14.5)" />
+          <rect x="8" y="18" width="16" height="3" fill="currentColor" transform="rotate(15 16 19.5)" />
+
+          <!-- Accent dots with drop shadow for contrast -->
+          <defs>
+            <filter id="contrast-shadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="1" flood-color="rgba(0,0,0,0.3)" />
+              <feDropShadow dx="0" dy="0" stdDeviation="1" flood-color="rgba(255,255,255,0.3)" />
+            </filter>
+          </defs>
+
+          <circle cx="8" cy="10" r="1.5" fill="currentColor" opacity="0.7" filter="url(#contrast-shadow)" />
+          <circle cx="24" cy="16" r="1.5" fill="currentColor" opacity="0.7" filter="url(#contrast-shadow)" />
+          <circle cx="16" cy="22" r="1.5" fill="currentColor" opacity="0.7" filter="url(#contrast-shadow)" />
+        </svg>
+
         <h1>Personal Blog</h1>
       </a>
       <ul class="nav-links">
+        <lib-theme></lib-theme>
         @if (isAdminAvailable()) {
           <li>
             <a routerLink="/admin" routerLinkActive="active"> Admin </a>

@@ -1,6 +1,9 @@
 :root {
+  // Specify to the browser that we support both light and dark color schemes
+  color-scheme: light dark;
+
   // Color Palette
-  --color-primary: #2563eb;
+  --color-primary: light-dark(#2563eb, hsl(221, 83%, 73%));
   --color-primary-dark: #1d4ed8;
 
   // Grayscale (only used colors)
@@ -8,13 +11,12 @@
   --color-gray-600: #4b5563;
 
   // Semantic Colors
-  --color-white: #ffffff;
-  --color-background: #f8fafc;
-  --color-surface: #ffffff;
-  --color-border: #e1e5e9;
-  --color-text-primary: #1f2937;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #9ca3af;
+  --color-background: light-dark(#f8fafc, #0c141d);
+  --color-surface: light-dark(#ffffff, #1f2937);
+  --color-border: light-dark(#e1e5e9, #161a1d);
+  --color-text-primary: light-dark(#1f2937, hsl(215, 28%, 87%));
+  --color-text-secondary: light-dark(hsl(220, 9%, 46%), hsl(221, 9%, 66%));
+  --color-text-muted: light-dark(#9ca3af, #666f7f);
 
   // Status Colors
   --color-error: #dc2626;
@@ -89,4 +91,28 @@
   --content-padding: 3rem;
   --content-padding-mobile: 2rem;
   --card-padding: 1.5rem;
+}
+
+/**
+ * Apply dark or light color scheme based on user preference
+ *
+ * This allows us to have a toggle button in our app to
+ * switch between dark and light mode instead of only
+ * relying on the user's system preference.
+ *
+ * The toggle button is responsible for setting the
+ * `data-schema` attribute on the `html` element to either
+ * `dark` or `light`, which will then override the default
+ * color scheme set by the system.
+ */
+html {
+  &[data-schema='dark'] {
+    color-scheme: dark; // Manually set color scheme to dark
+    // Special overrides for dark mode
+  }
+  // prettier-ignore
+  &[data-schema='light'] {
+    color-scheme: light; // Manually set color scheme to light
+    // Special overrides for light mode
+  }
 }
