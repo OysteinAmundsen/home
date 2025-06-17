@@ -1,52 +1,44 @@
-<div class="dashboard">
-  <h1>Dashboard</h1>
+<h1>Dashboard</h1>
 
-  <div class="stats-grid">
-    <section class="card stat-card">
-      <div class="card-content">
-        <span class="material-icons primary">article</span>
-        <div class="stat-text">
-          <h2>{{ totalArticles() }}</h2>
-          <p>Total Articles</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="card stat-card">
-      <div class="card-content">
-        <span class="material-icons accent">publish</span>
-        <div class="stat-text">
-          <h2>{{ publishedArticles() }}</h2>
-          <p>Published</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="card stat-card">
-      <div class="card-content">
-        <span class="material-icons warn">draft</span>
-        <div class="stat-text">
-          <h2>{{ draftArticles() }}</h2>
-          <p>Drafts</p>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <div class="quick-actions">
-    <h2>Quick Actions</h2>
-    <div class="actions-grid">
-      <section class="card action-card" routerLink="/admin/articles/new">
-        <span class="material-icons">add</span>
-        <h3>New Article</h3>
-        <p>Create a new blog post</p>
-      </section>
-
-      <section class="card action-card" routerLink="/admin/articles">
-        <span class="material-icons">list</span>
-        <h3>Manage Articles</h3>
-        <p>View and edit existing articles</p>
-      </section>
+<div class="stats-grid">
+  <section class="card">
+    <span class="material-icons primary">article</span>
+    <div class="stat-text">
+      <h2>{{ totalArticles() }}</h2>
+      <p>Total Articles</p>
     </div>
+  </section>
+
+  <section class="card">
+    <span class="material-icons accent">publish</span>
+    <div class="stat-text">
+      <h2>{{ publishedArticles() }}</h2>
+      <p>Published</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <span class="material-icons warn">draft</span>
+    <div class="stat-text">
+      <h2>{{ draftArticles() }}</h2>
+      <p>Drafts</p>
+    </div>
+  </section>
+</div>
+
+<div class="quick-actions">
+  <h2>Quick Actions</h2>
+  <div class="actions-grid">
+    <section class="card" routerLink="/admin/articles/new">
+      <span class="material-icons primary">add</span>
+      <h3>New Article</h3>
+      <p>Create a new blog post</p>
+    </section>
+
+    <section class="card" routerLink="/admin/articles">
+      <span class="material-icons primary">list</span>
+      <h3>Manage Articles</h3>
+      <p>View and edit existing articles</p>
+    </section>
   </div>
 </div>

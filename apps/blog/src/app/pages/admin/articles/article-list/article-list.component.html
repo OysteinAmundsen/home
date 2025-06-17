@@ -1,31 +1,31 @@
-<div class="article-list">
-  <div class="header">
-    <h1>Articles</h1>
-    <button class="primary" routerLink="/admin/articles/new">
-      <span class="material-icons">add</span>
-      New Article
-    </button>
-  </div>
+<div class="header">
+  <h1>Articles</h1>
+  <button class="primary" routerLink="/admin/articles/new">
+    <span class="material-icons">add</span>
+    New Article
+  </button>
+</div>
 
-  <section class="card filters-card">
-    <div class="filters">
-      <div class="form-field">
-        <label for="search">Search</label>
-        <input id="search" [(ngModel)]="searchTerm" (input)="onSearchChange()" placeholder="Search articles..." />
-        <span class="material-icons" matSuffix>search</span>
-      </div>
-
-      <div class="form-field">
-        <label for="status">Status</label>
-        <select id="status" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
-          <option value="">All</option>
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-        </select>
-      </div>
+<section class="card padded">
+  <div class="card-content filters">
+    <div class="form-field">
+      <label for="search">Search</label>
+      <input id="search" [(ngModel)]="searchTerm" (input)="onSearchChange()" placeholder="Search articles..." />
+      <span class="material-icons suffix">search</span>
     </div>
-  </section>
-  <section class="card table-card">
+
+    <div class="form-field">
+      <label for="status">Status</label>
+      <select id="status" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+        <option value="">All</option>
+        <option value="published">Published</option>
+        <option value="draft">Draft</option>
+      </select>
+    </div>
+  </div>
+</section>
+<section class="card padded table-card">
+  <div class="card-content">
     <div class="table-container">
       <table class="articles-table">
         <thead>
@@ -42,10 +42,7 @@
           @if (loading()) {
             <tr>
               <td [attr.colspan]="displayedColumns.length" class="loading-cell">
-                <div class="loading-content">
-                  <span class="material-icons">refresh</span>
-                  Loading articles...
-                </div>
+                <lib-loading-spinner message="Loading articles..."></lib-loading-spinner>
               </td>
             </tr>
           } @else if (articles().length === 0) {
@@ -65,7 +62,7 @@
                 <td>
                   <div class="thumbnail-container">
                     @if (article.featuredImage) {
-                      <img [src]="article.featuredImage" [alt]="article.title" class="article-thumbnail" />
+                      <img [src]="article.featuredImage" [alt]="article.title" />
                     } @else {
                       &nbsp;
                     }
@@ -83,7 +80,7 @@
                   </span>
                 </td>
                 <td>
-                  {{ article.publishedAt ? (article.publishedAt | date: 'short') : 'Not published' }}
+                  {{ article.publishedAt ? (article.publishedAt | date: 'short') : ' ' }}
                 </td>
                 <td>
                   {{ article.updatedAt | date: 'short' }}
@@ -132,5 +129,5 @@
         <span>per page</span>
       </nav>
     }
-  </section>
-</div>
+  </div>
+</section>

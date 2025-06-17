@@ -5,6 +5,7 @@
   // Color Palette
   --color-primary: light-dark(#2563eb, hsl(221, 83%, 73%));
   --color-primary-dark: #1d4ed8;
+  --color-accent: light-dark(hsl(49, 83%, 53%), hsl(49, 83%, 73%));
 
   // Grayscale (only used colors)
   --color-gray-500: #6b7280;
@@ -14,15 +15,17 @@
   --color-background: light-dark(#f8fafc, #0c141d);
   --color-surface: light-dark(#ffffff, #1f2937);
   --color-border: light-dark(#e1e5e9, #161a1d);
+  --color-outline: light-dark(hsl(210, 15%, 60%), hsl(206, 14%, 40%));
   --color-text-primary: light-dark(#1f2937, hsl(215, 28%, 87%));
   --color-text-secondary: light-dark(hsl(220, 9%, 46%), hsl(221, 9%, 66%));
   --color-text-muted: light-dark(#9ca3af, #666f7f);
 
   // Status Colors
-  --color-error: #dc2626;
-  --color-error-dark: #b91c1c;
-  --color-error-light: #fef2f2;
-  --color-error-border: #fecaca;
+  --color-warn: hsl(24, 72%, 51%);
+  --color-error: light-dark(hsl(0, 72%, 61%), hsl(0, 72%, 61%));
+  --color-error-dark: color-mix(in srgb, var(--color-error), black 20%);
+  --color-error-light: color-mix(in srgb, var(--color-error), white 30%);
+  --color-error-border: hsl(0, 96%, 89%);
 
   // Gradient
   --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -48,6 +51,7 @@
   --line-height-loose: 1.8;
 
   // Spacing
+  --spacing-xs: 0.235rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 0.75rem;
   --spacing-lg: 1rem;

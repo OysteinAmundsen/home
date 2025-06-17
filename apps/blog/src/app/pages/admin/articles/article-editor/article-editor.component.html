@@ -10,31 +10,25 @@
 </header>
 
 <form [formGroup]="articleForm">
-  <section class="card metadata-card">
+  <section class="card padded">
     <header>
       <h2>Article Details</h2>
     </header>
 
     <div class="card-content">
-      <div class="form-field full-width">
+      <div class="form-field">
         <label for="title">Title</label>
         <input id="title" formControlName="title" placeholder="Enter article title" required />
       </div>
       <div class="image-upload-section">
-        <label for="featuredImage" class="image-upload-label">Featured Image</label>
+        <label for="featuredImage">Featured Image</label>
 
         <div class="image-upload-container">
           @if (imagePreviewUrl()) {
             <div class="image-preview">
               <img [src]="imagePreviewUrl()" alt="Featured image preview" />
-              <button
-                type="button"
-                mat-icon-button
-                class="remove-image-btn"
-                (click)="removeImage()"
-                title="Remove image"
-              >
-                <span class="material-icons">close</span>
+              <button type="button" class="fab error" (click)="removeImage()" title="Remove image">
+                <span class="material-icons">delete</span>
               </button>
             </div>
           } @else {
@@ -61,7 +55,6 @@
 
           <button
             type="button"
-            mat-stroked-button
             (click)="fileInput.click()"
             class="{{ !imagePreviewUrl() ? 'select-' : 'change-' }}file-btn"
           >
@@ -73,13 +66,13 @@
     </div>
   </section>
 
-  <section class="card content-card">
+  <section class="card padded markdown-editor">
     <header>
       <h2>Content {{ showPreview() ? '(Markdown)' : 'Preview' }}</h2>
       <div class="spacer"></div>
       <button
         type="button"
-        mat-icon-button
+        class="fab"
         (click)="togglePreview()"
         [class.active]="showPreview()"
         [title]="showPreview() ? 'Preview' : 'Edit Markdown'"
@@ -91,7 +84,7 @@
       @if (!showPreview()) {
         <div class="editor-content markdown" [innerHTML]="articleForm.get('content')?.value ?? '' | markdown"></div>
       } @else {
-        <div class="form-field full-width full-height no-hint">
+        <div class="form-field">
           <textarea
             #markdownEditor
             class="code-view"
@@ -106,7 +99,6 @@
 
 @if (isSaving()) {
   <div class="saving-overlay">
-    <lib-loading-spinner></lib-loading-spinner>
-    <p>Saving article...</p>
+    <lib-loading-spinner message="Saving article..."></lib-loading-spinner>
   </div>
 }

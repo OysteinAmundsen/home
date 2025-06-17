@@ -9,9 +9,9 @@
 } @else if (article()) {
   <article>
     @if (article()!.featuredImage) {
-      <div class="featured-image">
+      <header class="featured-image">
         <img [src]="article()!.featuredImage" [alt]="article()!.title" />
-      </div>
+      </header>
     }
 
     <div class="container">

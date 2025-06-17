@@ -1,17 +1,19 @@
-.article-list {
+:host {
   max-width: 1200px;
+  width: 100%;
+  height: 100%;
   margin: 0 auto;
+  padding: var(--spacing-2xl) 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-}
-
-.filters-card {
-  margin-bottom: 20px;
 }
 
 .filters {
@@ -44,13 +46,11 @@
     font-size: 0.8em;
   }
 }
-.mat-column-thumbnail {
-  padding-right: 0;
-}
 
 .actions {
   display: flex;
   gap: 8px;
+  place-content: center;
 }
 
 .thumbnail-container {
@@ -59,31 +59,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.article-thumbnail {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 1px solid var(--mat-sys-outline-variant);
-}
-
-.no-image-placeholder {
-  width: 40px;
-  height: 40px;
-  background: var(--mat-sys-surface-variant);
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--mat-sys-on-surface-variant);
-
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+  img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--mat-sys-outline-variant);
   }
 }
 
@@ -112,47 +93,19 @@
   border: none !important;
 }
 
-.loading-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  color: #666;
-  font-size: 0.875rem;
-  mat-icon {
-    animation: spin 1s linear infinite;
-    font-size: 1.25rem;
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .no-data-cell .no-data {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
   padding: 2rem;
-  mat-icon {
-    font-size: 3rem;
-    width: 3rem;
-    height: 3rem;
-    color: #ccc;
-  }
   h3 {
     margin: 0;
-    color: #666;
+    color: var(--color-muted);
   }
   p {
     margin: 0;
-    color: #999;
+    color: var(--color-muted);
     font-size: 0.875rem;
   }
 }

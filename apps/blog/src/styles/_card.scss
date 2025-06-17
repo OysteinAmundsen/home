@@ -1,10 +1,24 @@
 .card {
+  display: grid;
+  grid-template:
+    'header' auto
+    'content' 1fr / 1fr;
   background: var(--color-surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   header {
     display: flex;
+    grid-area: header;
+  }
+  .card-content {
+    grid-area: content;
+  }
+  &.padded {
+    header,
+    .card-content {
+      padding: var(--spacing-md);
+    }
   }
 }
 

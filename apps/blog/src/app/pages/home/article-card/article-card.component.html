@@ -1,8 +1,8 @@
 <article class="card card-hover">
   @if (article().featuredImage) {
-    <div class="featured-image">
+    <header class="featured-image">
       <img [src]="article().featuredImage" [alt]="article().title" loading="lazy" />
-    </div>
+    </header>
   }
   <div class="card-content">
     <h2 class="card-title">

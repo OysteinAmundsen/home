@@ -5,13 +5,39 @@
 }
 aside {
   grid-area: nav;
-  padding: var(--content-padding);
   background-color: var(--color-surface);
+  h2 {
+    margin-top: 1rem;
+    padding: calc(var(--content-padding) / 2);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    li {
+      margin: 0;
+      padding: 0;
+      padding: 0 calc(var(--content-padding) / 2);
+      a {
+        display: flex;
+        gap: 0.5rem;
+        padding: var(--spacing-sm) 0;
+        color: var(--color-text);
+        text-decoration: none;
+      }
+      &:hover {
+        background-color: hsl(from var(--color-primary) h s l / 10%);
+      }
+    }
+  }
 }
 section {
   grid-area: content;
-  padding: var(--content-padding);
+  padding: 0 var(--content-padding);
   @media (max-width: var(--breakpoint-md)) {
     padding: var(--content-padding-mobile);
+  }
+  > div {
+    height: 100%;
   }
 }

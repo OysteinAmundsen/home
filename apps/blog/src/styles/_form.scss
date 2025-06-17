@@ -1,0 +1,94 @@
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.form-field {
+  display: grid;
+  position: relative;
+  flex: 1;
+  &:has(label) {
+    grid-template:
+      'label' auto
+      'input' auto / 1fr;
+  }
+  label {
+    grid-area: label;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+  input {
+    grid-area: input;
+    width: 100%;
+  }
+  .prefix,
+  .suffix {
+    grid-area: input;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+  }
+  &:has(.prefix) input {
+    padding-left: var(--spacing-lg);
+  }
+  &:has(.suffix) input {
+    padding-right: var(--spacing-lg);
+  }
+  .prefix {
+    justify-content: flex-start;
+    padding-left: var(--spacing-lg);
+  }
+  .suffix {
+    justify-content: flex-end;
+    padding-right: var(--spacing-lg);
+  }
+  textarea {
+    height: 100%;
+    width: 100%;
+    padding: 0.5rem;
+    resize: vertical;
+  }
+}
+
+input,
+textarea,
+select {
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+input,
+textarea,
+select,
+::picker(select) {
+  border: 2px solid var(--color-outline);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+}
+
+/* opt into customizing select */
+select {
+  &,
+  &::picker(select) {
+    appearance: base-select;
+  }
+  &::picker(select) {
+    margin-top: 4px;
+    cursor: pointer;
+  }
+  option:not(:checked) {
+    color: var(--color-text-muted);
+  }
+  option:focus,
+  option:hover {
+    outline: none;
+    background-color: hsl(from var(--color-surface) h s 50% / 50%);
+  }
+  &:has(option:hover) option:focus:not(:hover) {
+    // Do not apply focus styles when hovering. Without this
+    // you could potentially have two option elements which both appear focused
+    background-color: transparent;
+  }
+}

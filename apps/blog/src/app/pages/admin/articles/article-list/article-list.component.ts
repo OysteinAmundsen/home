@@ -6,10 +6,11 @@ import { ArticleStatus } from '@home/shared/blog/enums';
 import { Article } from '@home/shared/blog/interfaces';
 import { SnackbarService } from '@home/shared/ux/snackbar/snackbar.service';
 import { ArticleService } from '../../../../services/article.service';
+import { LoadingSpinnerComponent } from '@home/shared/ux/spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-article-list',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, LoadingSpinnerComponent],
   templateUrl: './article-list.component.html',
   styleUrl: './article-list.component.scss',
 })
