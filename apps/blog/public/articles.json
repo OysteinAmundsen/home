@@ -49,18 +49,20 @@
     ],
     "status": "published",
     "createdAt": "2024-12-12T09:15:00.000Z",
-    "updatedAt": "2025-06-06T11:27:17.634Z",
+    "updatedAt": "2025-06-18T18:26:21.837Z",
     "authorId": "admin",
-    "featuredImage": "/article-images/1749209237612-534770738.jpeg"
+    "featuredImage": "/article-images/1749209237612-534770738.jpeg",
+    "publishedAt": "2025-06-18T18:26:21.837Z"
   },
   {
     "id": "1749721567659",
     "title": "test",
     "slug": "test",
-    "content": "# Your Article Title\n\n## Introduction\n\nWrite your introduction here...\n\n## Main Content\n\nAdd your main content here with **bold text**, *italic text*, and [links](https://example.com).\n\n### Subsection\n\n- List item 1\n- List item 2\n- List item 3\n\n> This is a blockquote for important information.\n\n```javascript\n// Code blocks are also supported\nconsole.log('Hello, world!');\n```\n\n## Conclusion\n\nWrap up your article here.\n",
+    "content": "# This is a test\n\n## Introduction\n\nI'm just testing to see if the backend for this still works\n\n## Main Content\n\nAdd your main content here with **bold text**, *italic text*, and [links](https://example.com).\n\n### Subsection\n\n- List item 1\n- List item 2\n- List item 3\n\n> This is a blockquote for important information.\n\n```javascript\n// Code blocks are also supported\nconsole.log('Hello, world!');\n```\n\n## Conclusion\n\nWrap up your article here.\n",
     "status": "draft",
     "featuredImage": "",
     "createdAt": "2025-06-12T09:46:07.659Z",
-    "updatedAt": "2025-06-12T09:46:25.585Z"
+    "updatedAt": "2025-06-18T18:33:11.303Z",
+    "publishedAt": "2025-06-18T18:26:09.680Z"
   }
 ]

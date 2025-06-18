@@ -9,7 +9,6 @@ import {
   ApiOperation,
   ApiParam,
   ApiQuery,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { ArticlesService } from './articles.service';
@@ -27,7 +26,7 @@ export class ArticlesController {
   @ApiQuery({ name: 'status', required: false, description: 'Filter by status' })
   @ApiQuery({ name: 'search', required: false, description: 'Search term' })
   @ApiQuery({ name: 'all', required: false, description: 'Return all articles without pagination', example: 'true' })
-  @ApiResponse({ status: 200, description: 'Returns paginated published articles' })
+  @ApiOkResponse({ description: 'Returns paginated published articles' })
   async findAll(@Query() query: ArticleQueryDto): Promise<PaginatedResponse<ArticleResponseDto>> {
     return this.articlesService.findAll(query);
   }
@@ -35,8 +34,8 @@ export class ArticlesController {
   @Get(':slug')
   @ApiOperation({ summary: 'Get published article by slug' })
   @ApiParam({ name: 'slug', description: 'Article slug' })
-  @ApiResponse({ status: 200, description: 'Returns the published article', type: ArticleResponseDto })
-  @ApiResponse({ status: 404, description: 'Article not found' })
+  @ApiOkResponse({ description: 'Returns the published article', type: ArticleResponseDto })
+  @ApiNotFoundResponse({ description: 'Article not found' })
   async findBySlug(@Param('slug') slug: string): Promise<ArticleResponseDto> {
     return this.articlesService.findBySlug(slug);
   }
@@ -62,9 +61,8 @@ export class ArticlesController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete article (Admin only)' })
   @ApiParam({ name: 'id', description: 'Article ID' })
-  @ApiResponse({ status: 200, description: 'Article deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Article not found' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOkResponse({ description: 'Article deleted successfully' })
+  @ApiNotFoundResponse({ description: 'Article not found' })
   async remove(@Param('id') id: string): Promise<void> {
     return this.articlesService.remove(id);
   }

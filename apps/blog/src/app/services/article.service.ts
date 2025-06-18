@@ -95,7 +95,7 @@ export class ArticleService {
     loader: async ({ params }) => {
       if (!params) return null;
       try {
-        return await this.apiService.getArticleBySlug(params).toPromise();
+        return await firstValueFrom(this.apiService.getArticleBySlug(params));
       } catch (error) {
         console.error('Error loading article:', error);
         return null;

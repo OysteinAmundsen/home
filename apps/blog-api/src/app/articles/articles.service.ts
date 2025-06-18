@@ -138,6 +138,13 @@ export class ArticlesService {
         throw new BadRequestException(`Article with slug "${newSlug}" already exists`);
       article.slug = newSlug;
     }
+    if (article.status !== dto.status) {
+      if (dto.status === ArticleStatus.PUBLISHED) {
+        article.publishedAt = new Date();
+      } else {
+        article.publishedAt = undefined; // Clear published date if not published
+      }
+    }
 
     article = { ...article, ...dto, updatedAt: new Date() };
     articles[idx] = article;

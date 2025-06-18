@@ -5,8 +5,8 @@ import { RouterModule } from '@angular/router';
 import { ArticleStatus } from '@home/shared/blog/enums';
 import { Article } from '@home/shared/blog/interfaces';
 import { SnackbarService } from '@home/shared/ux/snackbar/snackbar.service';
-import { ArticleService } from '../../../../services/article.service';
 import { LoadingSpinnerComponent } from '@home/shared/ux/spinner/loading-spinner.component';
+import { ArticleService } from '../../../../services/article.service';
 
 @Component({
   selector: 'app-article-list',
@@ -47,7 +47,7 @@ export class ArticleListComponent implements OnInit {
       page,
       limit: this.pageSize,
     };
-    if (this.searchTerm()) params.search = this.searchTerm();
+    params.search = this.searchTerm();
     if (this.selectedStatus()) params.status = this.selectedStatus() as ArticleStatus;
 
     // Use the new signal-based API
