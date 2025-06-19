@@ -9,28 +9,24 @@
   <section class="articles-section">
     <h2 class="section-title">Latest Articles</h2>
 
-    @if (articleService.error()) {
+    @if (articles.error()) {
       <div class="error-message">
-        <p>{{ articleService.error() }}</p>
+        <p>{{ articles.error() }}</p>
         <button (click)="retry()" class="retry-button">Try Again</button>
       </div>
     }
-    @if (articleService.articles().length > 0) {
+    @if (articles.value()?.data?.length) {
       <div class="articles-grid">
-        @for (article of articleService.articles(); track article.id) {
-          <!-- @defer (on viewport) { -->
+        @for (article of articles.value()?.data; track article.id) {
           <app-article-card [article]="article"></app-article-card>
-          <!-- } @placeholder {
-            <div class="article-placeholder">Loading article...</div>
-          } -->
         }
       </div>
-    } @else if (!articleService.loading()) {
+    } @else if (!articles.isLoading()) {
       <div class="empty-state">
         <p>No articles found. Check back later for new content!</p>
       </div>
     }
-    @if (articleService.loading()) {
+    @if (articles.isLoading()) {
       <lib-loading-spinner message="Loading articles..."></lib-loading-spinner>
     }
   </section>

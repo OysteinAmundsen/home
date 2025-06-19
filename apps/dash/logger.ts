@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { IncomingMessage, ServerResponse } from 'http';
 import type * as httpProxy from 'http-proxy';
 import { Options } from 'http-proxy-middleware';
 
@@ -54,7 +55,7 @@ function wrap(color: Color | Color[], message: string): string {
 
 // https://github.com/chimurai/http-proxy-middleware/blob/master/src/plugins/default/logger-plugin.ts
 export const requestLogger = (proxyServer: httpProxy, options: Options) => {
-  proxyServer.on('proxyRes', (proxyRes: any, req, res) => {
+  proxyServer.on('proxyRes', (proxyRes: any, req: IncomingMessage, res: ServerResponse) => {
     let target: URL;
     const proxyPath = `${(req as any).baseUrl || ''}`;
     try {

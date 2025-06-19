@@ -1,16 +1,16 @@
 import { inject } from '@angular/core';
 import { RenderMode, ServerRoute } from '@angular/ssr';
 import { firstValueFrom } from 'rxjs';
-import { ApiService } from './services/api.service';
+import { ArticleService } from './services/article.service';
 
 export const serverRoutes: ServerRoute[] = [
   {
     path: 'articles/:slug',
     renderMode: RenderMode.Prerender,
     async getPrerenderParams() {
-      const apiService = inject(ApiService);
+      const articleService = inject(ArticleService);
       const articles = await firstValueFrom(
-        apiService.getArticles({
+        articleService.getArticles({
           page: 1,
           limit: 100,
           status: 'published' as const,

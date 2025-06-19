@@ -1,87 +1,67 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, effect, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, linkedSignal, resource, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Article } from '@home/shared/blog/interfaces';
 import { MarkdownPipe } from '@home/shared/pipes/markdown.pipe';
 import { LoadingSpinnerComponent } from '@home/shared/ux/spinner/loading-spinner.component';
+import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { ArticleService } from '../../services/article.service';
 
 @Component({
   selector: 'app-article-detail',
-  imports: [CommonModule, RouterModule, MarkdownPipe, LoadingSpinnerComponent],
+  imports: [CommonModule, RouterLink, MarkdownPipe, LoadingSpinnerComponent],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.scss',
 })
 export class ArticleDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly articleService = inject(ArticleService);
   private readonly titleService = inject(Title);
   private readonly metaService = inject(Meta);
-  readonly article = signal<Article | null>(null);
-  readonly loading = signal(true);
-  readonly error = signal<string | null>(null);
+  private readonly destroyRef$ = inject(DestroyRef);
 
-  constructor() {
-    // Effect to watch for article changes from the service
-    effect(() => {
-      const serviceArticle = this.articleService.currentArticle();
-      const isLoading = this.articleService.currentArticleLoading();
-
-      this.loading.set(isLoading);
-
-      if (serviceArticle) {
-        this.article.set(serviceArticle);
-        this.error.set(null);
-        this.updateMetaTags(serviceArticle);
-      } else if (!isLoading) {
-        // Only set error if not loading and we expected an article
-        const slug = this.route.snapshot.paramMap.get('slug');
-        if (slug) {
-          this.error.set('Article not found');
-        }
+  slug = signal<string | null>(null);
+  readonly article = resource({
+    params: this.slug,
+    loader: async ({ params }) => {
+      if (!params) {
+        this.error.set('Invalid article slug');
+        return null;
       }
-    });
-  }
+
+      try {
+        // Load the article by slug
+        const article = await firstValueFrom(this.articleService.getArticleBySlug(params));
+
+        // Update the title and meta tags
+        this.titleService.setTitle(`${article.title} | Personal Blog`);
+
+        const excerpt = this.getExcerpt(article);
+        this.metaService.updateTag({ name: 'description', content: excerpt });
+        this.metaService.updateTag({ property: 'og:title', content: article.title });
+        this.metaService.updateTag({ property: 'og:description', content: excerpt });
+
+        if (article.featuredImage) {
+          this.metaService.updateTag({ property: 'og:image', content: article.featuredImage });
+        }
+        return article;
+      } catch (error) {
+        this.error.set('Article not found');
+        return null;
+      }
+    },
+  });
+  error = linkedSignal<string | null>(() => this.article.error()?.message || null);
 
   ngOnInit(): void {
-    const slug = this.route.snapshot.paramMap.get('slug');
-    if (!slug) {
-      this.error.set('Invalid article URL');
-      this.loading.set(false);
-      return;
-    }
-
-    this.loadArticle(slug);
+    // Set the active slug from the route
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef$))
+      .subscribe((params) => this.slug.set(params['slug'] || null));
   }
 
-  private loadArticle(slug: string): void {
-    // Use the new signal-based API
-    this.articleService.getArticleBySlug(slug);
-  }
-
-  private updateMetaTags(article: Article): void {
-    this.titleService.setTitle(`${article.title} | Personal Blog`);
-
-    const excerpt = this.getExcerpt(article);
-    this.metaService.updateTag({ name: 'description', content: excerpt });
-    this.metaService.updateTag({
-      property: 'og:title',
-      content: article.title,
-    });
-    this.metaService.updateTag({
-      property: 'og:description',
-      content: excerpt,
-    });
-
-    if (article.featuredImage) {
-      this.metaService.updateTag({
-        property: 'og:image',
-        content: article.featuredImage,
-      });
-    }
-  }
   formatDate(date: Date | string): string {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     return dateObj.toLocaleDateString('en-US', {
@@ -96,7 +76,7 @@ export class ArticleDetailComponent implements OnInit {
     return dateObj.toISOString();
   }
   getReadingTime(): number {
-    const article = this.article();
+    const article = this.article.value();
     if (!article) return 0;
 
     const wordsPerMinute = 200;

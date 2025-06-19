@@ -1,38 +1,43 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, computed, inject, linkedSignal, resource } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ArticleStatus } from '@home/shared/blog/enums';
 import { Article } from '@home/shared/blog/interfaces';
-import { ArticleService } from '../../../services/article.service';
+import { firstValueFrom } from 'rxjs';
+import { ArticleQuery, ArticleService } from '../../../services/article.service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
   private readonly articleService = inject(ArticleService); // Computed signals derived from the article service
-  readonly totalArticles = computed(() => this.articleService.articles().length);
+
+  private readonly _query = linkedSignal<ArticleQuery>(
+    () =>
+      ({
+        page: 1,
+        limit: 10,
+        status: ArticleStatus.PUBLISHED,
+        search: '',
+        all: false,
+      }) as ArticleQuery,
+  );
+  articles = resource({
+    params: () => this._query(),
+    loader: async ({ params }) => {
+      const articles = await firstValueFrom(this.articleService.getArticles(params));
+      return articles;
+    },
+  });
+
+  readonly totalArticles = computed(() => this.articles.value()?.data.length || 0);
   readonly publishedArticles = computed(
-    () => this.articleService.articles().filter((a: Article) => a.status === ArticleStatus.PUBLISHED).length,
+    () => this.articles.value()?.data.filter((a: Article) => a.status === ArticleStatus.PUBLISHED).length || 0,
   );
   readonly draftArticles = computed(
-    () => this.articleService.articles().filter((a: Article) => a.status === ArticleStatus.DRAFT).length,
+    () => this.articles.value()?.data.filter((a: Article) => a.status === ArticleStatus.DRAFT).length || 0,
   );
-
-  constructor() {
-    // Effect to handle errors
-    effect(() => {
-      const error = this.articleService.error();
-      if (error) {
-        console.error('Error loading articles for stats:', error);
-      }
-    });
-  }
-
-  ngOnInit() {
-    // Load all articles for stats calculation
-    this.articleService.loadAdminArticles({ page: 1, limit: 1000 });
-  }
 }

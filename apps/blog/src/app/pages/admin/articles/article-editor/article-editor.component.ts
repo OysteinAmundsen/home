@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, HostListener, inject, OnInit, resource, signal, viewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ArticleStatus } from '@home/shared/blog/enums';
 import { MarkdownPipe } from '@home/shared/pipes/markdown.pipe';
 import { SnackbarService } from '@home/shared/ux/snackbar/snackbar.service';
@@ -10,7 +10,7 @@ import { ArticleService } from '../../../../services/article.service';
 
 @Component({
   selector: 'app-article-editor',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, MarkdownPipe, LoadingSpinnerComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, MarkdownPipe, LoadingSpinnerComponent],
   templateUrl: './article-editor.component.html',
   styleUrl: './article-editor.component.scss',
 })

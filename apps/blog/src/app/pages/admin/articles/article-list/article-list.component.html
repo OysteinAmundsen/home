@@ -10,13 +10,13 @@
   <div class="card-content filters">
     <div class="form-field">
       <label for="search">Search</label>
-      <input id="search" [(ngModel)]="searchTerm" (input)="onSearchChange()" placeholder="Search articles..." />
+      <input id="search" [(ngModel)]="searchTerm" placeholder="Search articles..." />
       <span class="material-icons suffix">search</span>
     </div>
 
     <div class="form-field">
       <label for="status">Status</label>
-      <select id="status" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+      <select id="status" [(ngModel)]="selectedStatus">
         <option value="">All</option>
         <option value="published">Published</option>
         <option value="draft">Draft</option>
@@ -39,13 +39,13 @@
           </tr>
         </thead>
         <tbody>
-          @if (loading()) {
+          @if (articles.isLoading()) {
             <tr>
               <td [attr.colspan]="displayedColumns.length" class="loading-cell">
                 <lib-loading-spinner message="Loading articles..."></lib-loading-spinner>
               </td>
             </tr>
-          } @else if (articles().length === 0) {
+          } @else if (articles.value()?.data?.length === 0) {
             <tr>
               <td [attr.colspan]="displayedColumns.length" class="no-data-cell">
                 <div class="no-data">
@@ -57,7 +57,7 @@
               </td>
             </tr>
           } @else {
-            @for (article of articles(); track article.id) {
+            @for (article of articles.value()?.data; track article.id) {
               <tr>
                 <td>
                   <div class="thumbnail-container">
@@ -99,31 +99,31 @@
       </table>
     </div>
 
-    @if (articles().length > 0) {
+    @if (articles.value()?.data?.length) {
       <nav class="paginator">
-        <button [disabled]="currentPage() === 1" (click)="onPageChange({ pageIndex: 0, pageSize: pageSize })">
+        <button [disabled]="currentPage() === 1" (click)="onPageChange({ pageIndex: 0, pageSize: pageSize() })">
           « First
         </button>
         <button
           [disabled]="currentPage() === 1"
-          (click)="onPageChange({ pageIndex: currentPage() - 2, pageSize: pageSize })"
+          (click)="onPageChange({ pageIndex: currentPage() - 2, pageSize: pageSize() })"
         >
           ‹ Prev
         </button>
         <span> Page {{ currentPage() }} of {{ totalPages() }} </span>
         <button
           [disabled]="currentPage() === totalPages()"
-          (click)="onPageChange({ pageIndex: currentPage(), pageSize: pageSize })"
+          (click)="onPageChange({ pageIndex: currentPage(), pageSize: pageSize() })"
         >
           Next ›
         </button>
         <button
           [disabled]="currentPage() === totalPages()"
-          (click)="onPageChange({ pageIndex: totalPages() - 1, pageSize: pageSize })"
+          (click)="onPageChange({ pageIndex: totalPages() - 1, pageSize: pageSize() })"
         >
           Last »
         </button>
-        <select [(ngModel)]="pageSize" (change)="onPageChange({ pageIndex: 0, pageSize: pageSize })">
+        <select [(ngModel)]="pageSize" (change)="onPageChange({ pageIndex: 0, pageSize: pageSize() })">
           <option *ngFor="let size of [5, 10, 25, 50]" [value]="size">{{ size }}</option>
         </select>
         <span>per page</span>

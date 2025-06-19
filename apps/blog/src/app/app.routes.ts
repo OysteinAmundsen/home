@@ -1,3 +1,5 @@
+import { isPlatformBrowser } from '@angular/common';
+import { inject, PLATFORM_ID } from '@angular/core';
 import { Route } from '@angular/router';
 
 export const appRoutes: Route[] = [
@@ -20,7 +22,15 @@ export const appRoutes: Route[] = [
     path: 'admin',
     loadComponent: () => import('./pages/admin/admin.component').then((m) => m.AdminComponent),
     loadChildren: () => import('./pages/admin/admin.routes').then((m) => m.adminRoutes),
-    // canActivate: [() => location.origin.includes('://localhost')],
+    canActivate: [
+      () => {
+        const platformId = inject(PLATFORM_ID);
+        if (isPlatformBrowser(platformId)) {
+          return location.origin.includes('://localhost');
+        }
+        return true;
+      },
+    ],
   },
   {
     path: '**',

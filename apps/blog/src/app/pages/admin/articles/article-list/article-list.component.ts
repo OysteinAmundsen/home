@@ -1,71 +1,59 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, resource, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { ArticleStatus } from '@home/shared/blog/enums';
 import { Article } from '@home/shared/blog/interfaces';
 import { SnackbarService } from '@home/shared/ux/snackbar/snackbar.service';
 import { LoadingSpinnerComponent } from '@home/shared/ux/spinner/loading-spinner.component';
-import { ArticleService } from '../../../../services/article.service';
+import { firstValueFrom } from 'rxjs';
+import { ArticleQuery, ArticleService } from '../../../../services/article.service';
 
 @Component({
   selector: 'app-article-list',
-  imports: [CommonModule, RouterModule, FormsModule, LoadingSpinnerComponent],
+  imports: [CommonModule, RouterLink, FormsModule, LoadingSpinnerComponent],
   templateUrl: './article-list.component.html',
   styleUrl: './article-list.component.scss',
 })
-export class ArticleListComponent implements OnInit {
+export class ArticleListComponent {
   private readonly articleService = inject(ArticleService);
   private readonly snackBar = inject(SnackbarService); // Service signals accessed through getters to avoid initialization order issues
-  readonly articles = () => this.articleService.articles();
-  readonly loading = () => this.articleService.loading();
-  readonly totalArticles = () => this.articleService.totalArticles();
-  readonly totalPages = computed(() => Math.ceil(this.totalArticles() / this.pageSize));
-  readonly currentPage = () => this.articleService.currentPage();
 
-  searchTerm = signal<string>(''); // Use signal for search term
-  selectedStatus = signal<ArticleStatus | ''>(''); // Use signal for selected status
-  pageSize = 10;
+  currentPage = signal(1);
+  searchTerm = signal<string>('');
+  selectedStatus = signal<ArticleStatus | ''>('');
+  pageSize = signal(10);
   displayedColumns: string[] = ['thumbnail', 'title', 'status', 'publishedAt', 'updatedAt', 'actions'];
+  articles = resource({
+    params: () =>
+      ({
+        page: this.currentPage(),
+        limit: this.pageSize(),
+        status: this.selectedStatus(),
+        search: this.searchTerm(),
+        all: false,
+      }) as ArticleQuery,
+    loader: async ({ params }) => {
+      const articles = await firstValueFrom(this.articleService.getArticles(params));
+      return articles;
+    },
+  });
+
+  readonly totalArticles = () => this.articles.value()?.data.length || 0;
+  readonly totalPages = computed(() => Math.ceil(this.totalArticles() / this.pageSize()));
 
   constructor() {
     // Effect to handle errors
     effect(() => {
-      const error = this.articleService.error();
+      const error = this.articles.error();
       if (error) {
         this.snackBar.open('Error loading articles', 'error', { duration: 5000 });
       }
     });
   }
 
-  ngOnInit() {
-    this.loadArticles();
-  }
-
-  loadArticles(page = 1) {
-    const params: { page: number; limit: number; search?: string; status?: ArticleStatus } = {
-      page,
-      limit: this.pageSize,
-    };
-    params.search = this.searchTerm();
-    if (this.selectedStatus()) params.status = this.selectedStatus() as ArticleStatus;
-
-    // Use the new signal-based API
-    this.articleService.loadAdminArticles(params);
-  }
-
   onPageChange(event: { pageIndex: number; pageSize: number }) {
-    this.pageSize = event.pageSize;
-    this.loadArticles(event.pageIndex + 1); // Material paginator is 0-based, our API is 1-based
-  }
-
-  onSearchChange() {
-    // Debounce search and reset to first page
-    setTimeout(() => this.loadArticles(1), 300);
-  }
-
-  onFilterChange() {
-    this.loadArticles(1); // Reset to first page when filter changes
+    this.pageSize.set(event.pageSize);
   }
 
   getStatusColor(status: ArticleStatus): 'primary' | 'accent' | 'warn' {
