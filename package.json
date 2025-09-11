@@ -39,7 +39,7 @@
     "@angular/platform-browser-dynamic": "20.0.0",
     "@angular/platform-server": "20.0.0",
     "@angular/router": "20.0.0",
-    "@angular/ssr": "20.0.0",
+    "@angular/ssr": "20.3.0",
     "@grpc/grpc-js": "^1.13.4",
     "@grpc/proto-loader": "^0.7.15",
     "@mlc-ai/web-llm": "^0.2.79",
