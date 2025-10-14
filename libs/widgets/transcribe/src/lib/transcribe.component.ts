@@ -134,7 +134,7 @@ export default class TranscribeComponent extends AbstractWidgetComponent {
     this.isProcessing.set(false);
   }
 
-  draw(analyser: AnalyserNode, dataArray: Uint8Array) {
+  draw(analyser: AnalyserNode, dataArray: Uint8Array<ArrayBuffer>) {
     const canvas = this.visualizer()!.nativeElement;
     const ctx = this.canvasCtx()!;
     const WIDTH = canvas.width;
