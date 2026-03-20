@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -10,7 +10,7 @@ import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'lib-transcribe',
-  imports: [CommonModule, WidgetComponent, ReactiveFormsModule],
+  imports: [WidgetComponent, ReactiveFormsModule],
   templateUrl: './transcribe.component.html',
   styleUrl: './transcribe.component.scss',
 })

@@ -7,7 +7,7 @@ import { PopoverComponent } from './popover.component';
     class: 'popover-toggle',
     '[attr.popovertarget]': 'popoverPanel().uniqueId()',
     '[style.anchor-name]': "'--' + popoverPanel().uniqueId()",
-    '[popovertargetaction]': 'toggle',
+    '[attr.popovertargetaction]': '"toggle"',
   },
 })
 export class PopoverAnchorDirective {

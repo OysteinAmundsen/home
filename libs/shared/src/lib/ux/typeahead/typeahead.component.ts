@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, ElementRef, forwardRef, input, OnInit, signal, viewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime } from 'rxjs';
@@ -7,7 +7,7 @@ let id = 0;
 
 @Component({
   selector: 'lib-typeahead',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   template: `
     <div class="form-group" [attr.popovertarget]="uniqueId()">
       <input type="search" [placeholder]="placeholder()" [formControl]="input" />

@@ -1,17 +1,17 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { Component, ElementRef, HostListener, inject, input, PLATFORM_ID, signal } from '@angular/core';
 
 let id = 0;
 
 @Component({
   selector: 'lib-popover',
-  imports: [CommonModule],
+  imports: [],
   template: `<ng-content></ng-content>`,
   host: {
     class: 'popover-panel',
     '[id]': 'uniqueId()',
     '[style.--anchor]': '"--" + uniqueId()',
-    '[popover]': '"auto"',
+    '[attr.popover]': '"auto"',
   },
 })
 export class PopoverComponent {

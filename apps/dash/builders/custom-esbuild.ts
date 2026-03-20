@@ -47,6 +47,9 @@ const wbInject: Plugin = {
     });
     let workerCode = '';
 
+    // Mark Node.js built-ins as external for browser builds
+    builder.onResolve({ filter: /^url$/ }, () => ({ path: 'url', external: true }));
+
     // Pre-build the worker, so that we get a single module for this
     // as angular would chunk it otherwise
     builder.onStart(async () => {
@@ -58,6 +61,7 @@ const wbInject: Plugin = {
         minify: true,
         platform: 'browser',
         target: 'es2017',
+        external: ['url'],
       });
       workerCode = result.outputFiles[0].text;
     });

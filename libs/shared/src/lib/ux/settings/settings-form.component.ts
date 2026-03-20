@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -15,7 +15,7 @@ type AppSetting = {
 
 @Component({
   selector: 'lib-settings-form',
-  imports: [CommonModule, ReactiveFormsModule, StringPipe],
+  imports: [ReactiveFormsModule, StringPipe],
   templateUrl: './settings-form.component.html',
   styleUrl: './settings-form.component.scss',
 })

@@ -25,6 +25,7 @@
         "inlineStyleLanguage": "scss",
         "outputMode": "server",
         "externalDependencies": [
+          "url",
           "node_modules/*",
           "typeorm",
           "class-transformer",
@@ -48,7 +49,7 @@
           {
             "glob": "**/{swagger-ui.css,swagger-ui-bundle.js,swagger-ui-standalone-preset.js,favicon-32x32.png,favicon-16x16.png}",
             "input": "./node_modules/swagger-ui-dist",
-            "output": "./api/api"
+            "output": "./api"
           }
         ],
         "styles": ["apps/dash/src/styles.scss"],

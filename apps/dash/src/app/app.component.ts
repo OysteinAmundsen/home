@@ -1,5 +1,5 @@
 import { trigger } from '@angular/animations';
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, ElementRef, HostListener, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppSettingsService } from '@home/shared/app.settings';
@@ -13,7 +13,7 @@ import { TimeComponent } from './shared/time.component';
 import { dashboardAnimation } from './views/dashboard/dashboard.animation';
 
 @Component({
-  imports: [RouterModule, CommonModule, TimeComponent, ThemeComponent, LoginComponent, NotifyComponent],
+  imports: [RouterModule, TimeComponent, ThemeComponent, LoginComponent, NotifyComponent],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
